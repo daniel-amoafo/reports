@@ -6,9 +6,11 @@ import KeychainSwift
 public final class SecureKeyValueStore {
 
     // MARK: - Private Properties
-    private let keychain = KeychainSwift()
+    private let keychain: KeychainSwift
 
-    public init() {}
+    public init(keyPrefix: String = "") {
+        keychain = KeychainSwift(keyPrefix: keyPrefix)
+    }
 }
 
 extension SecureKeyValueStore: KeyValueStore {
@@ -198,8 +200,8 @@ extension SecureKeyValueStore: KeyValueStore {
             return nil
         }
     }
-    
-    private func store<DecodedObjectType>(value: DecodedObjectType,  key: String) -> Bool
+
+    private func store<DecodedObjectType>(value: DecodedObjectType, key: String) -> Bool
     where DecodedObjectType: NSObject & NSCoding {
         do {
             let data = try NSKeyedArchiver.archivedData(withRootObject: value, requiringSecureCoding: false)

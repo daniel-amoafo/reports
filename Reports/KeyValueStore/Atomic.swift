@@ -1,5 +1,3 @@
-// Created by Daniel Amoafo on 5/2/2024.
-
 import os
 
 /**
