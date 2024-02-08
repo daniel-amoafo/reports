@@ -1,0 +1,50 @@
+included: # paths to include during linting
+  - Reports
+  - ReportsTests
+  - ReportsUITests
+excluded:
+  - Carthage
+  - Pods
+opt_in_rules:
+  - fatal_error_message
+  - modifier_order
+  - multiline_arguments
+  - multiline_arguments_brackets
+  - multiline_literal_brackets
+  - prefer_self_type_over_type_of_self
+  - shorthand_optional_binding
+  - sorted_imports
+  - unavailable_function
+  - unhandled_throwing_task
+trailing_comma:
+    mandatory_comma: true
+trailing_whitespace:
+    ignores_comments: false  
+function_body_length:
+    warning: 300
+    error: 500
+function_parameter_count:
+    warning: 6
+    error: 8
+type_body_length:
+    warning: 300
+    error: 500
+file_length:
+    warning: 1000
+    error: 1500
+    ignore_comment_only_lines: true
+cyclomatic_complexity:
+    warning: 15
+    error: 25
+reporter: "xcode"
+
+custom_rules:
+    string_data:
+        name: String to UTF Data conversion
+        regex: '\.data\(using: .utf8\)'
+        message: Strings should not be converted to data this way as it produces an unnecessary optional result. Use Data(<string>.utf8) instead.
+
+    strong_self:
+        name: Strong Self
+        regex: '`self` = self'
+        message: Do not surround 'self' with backticks when reassiging in a closure.
