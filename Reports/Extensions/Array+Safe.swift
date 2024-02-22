@@ -1,9 +1,4 @@
-//
-//  Array+Safe.swift
-//  YNABReports
-//
 //  Created by Daniel Amoafo on 30/8/20.
-//
 
 import Foundation
 

@@ -16,6 +16,7 @@ struct SFSafariView: UIViewControllerRepresentable {
         _ uiViewController: SFSafariViewController,
         context: UIViewControllerRepresentableContext<SFSafariView>) {
         // No need to do anything
+            
     }
 }
 

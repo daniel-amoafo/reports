@@ -4,12 +4,12 @@ import XCTest
 
 final class BudgetSystemServiceTests: XCTestCase {
 
-    var sut: BudgetSystemService!
+    var sut: BudgetClient!
     
     func testFetchAccounts() async throws {
         await withMainSerialExecutor {
             let budgetProvider = Factory.createBudgetProvider()
-            sut = BudgetSystemService(provider: budgetProvider, selectedBudgetId: "someBudgetId")
+            sut = BudgetClient(provider: budgetProvider, selectedBudgetId: "someBudgetId")
             
             XCTAssertTrue(sut.accounts.isEmpty)
             sut.fetchAccounts()

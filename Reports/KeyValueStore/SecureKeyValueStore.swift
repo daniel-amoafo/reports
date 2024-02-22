@@ -67,6 +67,18 @@ extension SecureKeyValueStore: KeyValueStore {
         return nsURL as URL
     }
 
+    public func value<T: KeyValueStoreValue>(forKey key: String) -> T? {
+        guard let data = keychain.getData(key) else {
+            return nil
+        }
+        do {
+            return try JSONDecoder().decode(T.self, from: data)
+        } catch {
+            debugPrint("Error \(error.localizedDescription)")
+            return nil
+        }
+    }
+
     public func array<T: KeyValueStoreValue>(forKey key: String) -> [T]? {
         guard let data = keychain.getData(key) else {
             return nil
@@ -147,6 +159,19 @@ extension SecureKeyValueStore: KeyValueStore {
               store(value: nsUrl, key: key) else {
             removeValue(forKey: key)
             return
+        }
+    }
+
+    public func set<T: KeyValueStoreValue>(_ value: T?, forKey key: String) {
+        guard let value else {
+            removeValue(forKey: key)
+            return
+        }
+        do {
+            let data = try JSONEncoder().encode(value)
+            set(data, forKey: key)
+        } catch {
+            debugPrint("Error: \(error.localizedDescription)")
         }
     }
 
