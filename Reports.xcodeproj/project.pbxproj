@@ -32,7 +32,7 @@
 		184DF0C92B6E1C3F00BA6F21 /* ReportsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184DF0C82B6E1C3F00BA6F21 /* ReportsTests.swift */; };
 		184DF0D32B6E1C3F00BA6F21 /* ReportsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184DF0D22B6E1C3F00BA6F21 /* ReportsUITests.swift */; };
 		184DF0D52B6E1C3F00BA6F21 /* ReportsUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184DF0D42B6E1C3F00BA6F21 /* ReportsUITestsLaunchTests.swift */; };
-		18C3BFB02B81874000E444C8 /* AppIntroLogin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C3BFAF2B81874000E444C8 /* AppIntroLogin.swift */; };
+		18C3BFB02B81874000E444C8 /* AppIntroLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C3BFAF2B81874000E444C8 /* AppIntroLoginView.swift */; };
 		18C3BFB22B820AEA00E444C8 /* SFSafariView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C3BFB12B820AEA00E444C8 /* SFSafariView.swift */; };
 		18C3BFB52B820D2800E444C8 /* SafariViewControllerViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C3BFB42B820D2800E444C8 /* SafariViewControllerViewModifier.swift */; };
 		18C3BFB72B820DD000E444C8 /* Binding+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C3BFB62B820DD000E444C8 /* Binding+Additions.swift */; };
@@ -89,7 +89,7 @@
 		184DF0D42B6E1C3F00BA6F21 /* ReportsUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportsUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		184DF0E12B6E1D3500BA6F21 /* BudgetSystemService */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BudgetSystemService; path = Packages/BudgetSystemService; sourceTree = "<group>"; };
 		18C3BFAE2B806A7500E444C8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		18C3BFAF2B81874000E444C8 /* AppIntroLogin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIntroLogin.swift; sourceTree = "<group>"; };
+		18C3BFAF2B81874000E444C8 /* AppIntroLoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIntroLoginView.swift; sourceTree = "<group>"; };
 		18C3BFB12B820AEA00E444C8 /* SFSafariView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SFSafariView.swift; sourceTree = "<group>"; };
 		18C3BFB42B820D2800E444C8 /* SafariViewControllerViewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariViewControllerViewModifier.swift; sourceTree = "<group>"; };
 		18C3BFB62B820DD000E444C8 /* Binding+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Binding+Additions.swift"; sourceTree = "<group>"; };
@@ -157,7 +157,7 @@
 			isa = PBXGroup;
 			children = (
 				184DF0B82B6E1C3E00BA6F21 /* ContentView.swift */,
-				18C3BFAF2B81874000E444C8 /* AppIntroLogin.swift */,
+				18C3BFAF2B81874000E444C8 /* AppIntroLoginView.swift */,
 				18C3BFB12B820AEA00E444C8 /* SFSafariView.swift */,
 			);
 			path = Views;
@@ -211,16 +211,17 @@
 			path = Type;
 			sourceTree = "<group>";
 		};
-		183ECBE72B747460006C45B2 /* Extensions */ = {
+		183ECBE72B747460006C45B2 /* Additions */ = {
 			isa = PBXGroup;
 			children = (
 				183ECBEA2B747460006C45B2 /* Array+Safe.swift */,
 				18C3BFB62B820DD000E444C8 /* Binding+Additions.swift */,
+				18C3BFBE2B82370B00E444C8 /* BudgetSystemService+Config.swift */,
 				183ECBE92B747460006C45B2 /* Collection+Additions.swift */,
 				183ECBE82B747460006C45B2 /* String+Additions.swift */,
 				18C3BFC02B83993200E444C8 /* URL+Additions.swift */,
 			);
-			path = Extensions;
+			path = Additions;
 			sourceTree = "<group>";
 		};
 		184DF0AA2B6E1C3E00BA6F21 = {
@@ -251,7 +252,7 @@
 			children = (
 				18C3BFAE2B806A7500E444C8 /* Info.plist */,
 				18C3BFBB2B82309200E444C8 /* App */,
-				183ECBE72B747460006C45B2 /* Extensions */,
+				183ECBE72B747460006C45B2 /* Additions */,
 				183ECBBD2B70DFE1006C45B2 /* KeyValueStore */,
 				183ECBD02B74701D006C45B2 /* UI */,
 				184DF0BA2B6E1C3E00BA6F21 /* Assets.xcassets */,
@@ -299,9 +300,8 @@
 		18C3BFBB2B82309200E444C8 /* App */ = {
 			isa = PBXGroup;
 			children = (
-				18C3BFBE2B82370B00E444C8 /* BudgetSystemService+Config.swift */,
-				184DF0B62B6E1C3E00BA6F21 /* ReportsApp.swift */,
 				18C3BFBC2B8230E100E444C8 /* AppFeature.swift */,
+				184DF0B62B6E1C3E00BA6F21 /* ReportsApp.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -485,7 +485,7 @@
 				183ECBC52B70E10C006C45B2 /* Atomic.swift in Sources */,
 				183ECBED2B747460006C45B2 /* Collection+Additions.swift in Sources */,
 				183ECBC32B70E0E3006C45B2 /* InMemoryKeyValueStore.swift in Sources */,
-				18C3BFB02B81874000E444C8 /* AppIntroLogin.swift in Sources */,
+				18C3BFB02B81874000E444C8 /* AppIntroLoginView.swift in Sources */,
 				183ECBE22B747085006C45B2 /* FontWeight.swift in Sources */,
 				18C3BFB22B820AEA00E444C8 /* SFSafariView.swift in Sources */,
 				183ECBDF2B747085006C45B2 /* FloatingTitleRow.swift in Sources */,

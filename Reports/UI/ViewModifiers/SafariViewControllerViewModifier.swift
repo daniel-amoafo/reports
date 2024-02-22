@@ -6,8 +6,8 @@ extension View {
     /// Monitor the `openURL` environment variable and handle them in-app instead of via
     /// the external web browser.
     /// Uses the `SafariViewWrapper` which will present the URL in a `SFSafariViewController`.
-    func handleOpenURLInApp(isPresented: Binding<Bool>) -> some View {
-        modifier(SafariViewControllerViewModifier(isPresented: isPresented))
+    func handleOpenURLInApp() -> some View {
+        modifier(SafariViewControllerViewModifier())
     }
 }
 
@@ -15,7 +15,6 @@ extension View {
 /// the external web browser.
 private struct SafariViewControllerViewModifier: ViewModifier {
     @State private var urlToOpen: URL?
-    @Binding var isPresented: Bool
 
     func body(content: Content) -> some View {
         content
@@ -33,7 +32,7 @@ private struct SafariViewControllerViewModifier: ViewModifier {
                 onDismiss: {
                     urlToOpen = nil
                 }, content: {
-                    SFSafariView(url: urlToOpen!)
+                   EmptyView()
                 }
             )
     }

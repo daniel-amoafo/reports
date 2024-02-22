@@ -5,7 +5,8 @@ import Foundation
 extension URL {
 
     var isDeeplink: Bool {
-        return scheme == "cw-reports" // matches my-url-scheme://<rest-of-the-url>
+        // my-url-scheme://<rest-of-the-url>
+        return ["cw-reports", "https"].contains(scheme)
     }
 
     var queryItems: [URLQueryItem]? {
