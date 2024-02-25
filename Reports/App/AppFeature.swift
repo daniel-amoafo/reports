@@ -20,6 +20,8 @@ struct AppFeature {
 
     @Dependency(\.budgetClient) var budgetClient
 
+    var logger = LogFactory.create(category: .appFeature)
+
     var body: some ReducerOf<Self> {
         Scope(state: \.appIntroLogin, action: \.appIntroLogin) {
             AppIntroLogin()
@@ -32,11 +34,10 @@ struct AppFeature {
             case .appIntroLogin:
                 return .none
             case .onAppear:
-                
+                performOnAppear()
                 return .none
             }
         }
-
     }
 }
 
@@ -44,7 +45,7 @@ private extension AppFeature {
 
     func handleOpenURL(_ url: URL, state: inout State) {
         guard url.isDeeplink, let host = url.host() else {
-            debugPrint("supplied url was not a known deeplink path. \(url)")
+            logger.warning("supplied url was not a known deeplink path. \(url)")
             return
         }
 
@@ -61,6 +62,6 @@ private extension AppFeature {
     }
 
     func performOnAppear() {
-
+        // check if auth token is valid
     }
 }

@@ -9,6 +9,7 @@ struct FloatingTitleRow: View {
     let title: String?
     let text: Binding<String>
     let displayType: DisplayType
+    let typography: Typography
     let titleColor: Color
     let textColor: Color
     let dividerConfig: HorizontalDivider.Config?
@@ -17,6 +18,7 @@ struct FloatingTitleRow: View {
         title: String? = nil,
         text: Binding<String>,
         displayType: DisplayType =  .textField,
+        typography: Typography = .body,
         titleColor: Color = Color(.secondaryLabel),
         textColor: Color = Color(.label),
         dividerConfig: HorizontalDivider.Config? = nil
@@ -24,6 +26,7 @@ struct FloatingTitleRow: View {
         self.title = title ?? nil
         self.text = text
         self.displayType = displayType
+        self.typography = typography
         self.titleColor = titleColor
         self.textColor = textColor
         self.dividerConfig = dividerConfig
@@ -40,6 +43,7 @@ extension FloatingTitleRow {
             ZStack(alignment: .leading) {
                 if titleIsAvailable {
                     Text(title ?? "")
+                        .typography(typography)
                         .foregroundStyle(titleColor)
                         .offset(y: text.wrappedValue.isEmpty ? 0 : titleOffset * -1)
                         .scaleEffect(text.wrappedValue.isEmpty ? 1 : 0.8, anchor: .leading)
@@ -47,9 +51,11 @@ extension FloatingTitleRow {
                 switch displayType {
                 case .textField:
                     TextField("", text: text) // give TextField an empty placeholder
+                        .font(typography.font)
                         .foregroundColor(textColor)
                 case .label:
                     Text(text.wrappedValue)
+                        .typography(typography)
                         .foregroundColor(textColor)
                 }
             }
@@ -128,7 +134,7 @@ private struct PreviewWithContentView: View {
     ScrollView {
         VStack {
             Group {
-                FloatingTitleRow(text: .constant("textfield with no title"))
+                FloatingTitleRow(text: .constant("textfield with no title"), typography: .title1)
 
                 PreviewNoContentView(text: "")
 

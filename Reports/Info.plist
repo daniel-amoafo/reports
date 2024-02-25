@@ -2,6 +2,19 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Cairo-Black</string>
+		<string>Cairo-Bold</string>
+		<string>Cairo-ExtraBold</string>
+		<string>Cairo-ExtraLight</string>
+		<string>Cairo-Light</string>
+		<string>Cairo-Medium</string>
+		<string>Cairo-Regular</string>
+		<string>Cairo-SemiBold</string>
+		<string>OpenSans-Regular</string>
+		<string>OpenSans-SemiBold</string>
+	</array>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

@@ -7,6 +7,7 @@ struct MultiSelectListView<Element: Identifiable & CustomStringConvertible>: Vie
 
     let items: IdentifiedArrayOf<Element>
     @Binding var selected: [Element.ID]
+    var typography: Typography = .title3Emphasized
 
     var body: some View {
         List {
@@ -18,6 +19,7 @@ struct MultiSelectListView<Element: Identifiable & CustomStringConvertible>: Vie
                     label: {
                         HStack {
                             Text(item.description).foregroundColor(.black)
+                                .typography(typography)
                             Spacer()
                             if selected.contains(item.id) {
                                 Image(systemName: "checkmark").foregroundColor(.accentColor)
