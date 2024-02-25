@@ -11,7 +11,18 @@ struct ReportsApp: App {
 
     var body: some Scene {
         WindowGroup {
-            AppIntroLoginView(store: store.scope(state: \.appIntroLogin, action: \.appIntroLogin))
+            ZStack {
+                switch store.authStatus {
+                case .unknown:
+                    ProgressView()
+                case .loggedIn:
+                    Text("Tab View - Customer Logged In 🎉")
+                case .loggedOut:
+                    AppIntroLoginView(
+                        store: store.scope(state: \.appIntroLogin, action: \.appIntroLogin)
+                    )
+                }
+            }
             .onOpenURL(perform: { url in
                 store.send(.onOpenURL(url))
             })

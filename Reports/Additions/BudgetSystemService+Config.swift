@@ -8,12 +8,18 @@ private let _accessTokenKey = "ynab-access-token"
 
 extension BudgetClient {
 
+    func updateYnabProvider(with accessToken: String) {
+        Self.storeAccessToken(accessToken: accessToken)
+        updateProvider(.ynab(accessToken: accessToken))
+        self.authorizationStatus = .loggedIn(accessToken: accessToken)
+    }
+
     static func makeClient(accessToken: String? = nil, store: KeyValueStore = SecureKeyValueStore()) -> BudgetClient {
         guard let accessToken = accessToken ?? store.string(forKey: _accessTokenKey) else {
             return .noActiveClient
         }
         let selectedBudgetId = store.string(forKey: "ynab-selected-budget-id")
-        storeAccessToken(accessToken: _accessTokenKey, store: store)
+        storeAccessToken(accessToken: accessToken, store: store)
 
         return .init(provider: .ynab(accessToken: accessToken), selectedBudgetId: selectedBudgetId)
     }
@@ -39,7 +45,9 @@ extension BudgetClient: DependencyKey {
 
 extension BudgetClient: TestDependencyKey {
     public static var testValue: BudgetClient {
-        let budgetProvider = BudgetProvider(fetchAccounts: { _ in return [] })
+        let budgetProvider = BudgetProvider(
+            fetchBudgetSummaries: { return [] }, fetchAccounts: { _ in return [] }
+        )
         return BudgetClient(provider: budgetProvider, selectedBudgetId: "someTestId")
     }
 }

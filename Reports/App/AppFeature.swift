@@ -10,11 +10,13 @@ struct AppFeature {
     @ObservableState
     struct State: Equatable {
         var appIntroLogin = AppIntroLogin.State()
+        var authStatus: AuthorizationStatus = .unknown
     }
 
     enum Action {
         case onOpenURL(URL)
         case appIntroLogin(AppIntroLogin.Action)
+        case didUpdateAuthStatus(AuthorizationStatus)
         case onAppear
     }
 
@@ -31,11 +33,20 @@ struct AppFeature {
             case let .onOpenURL(url):
                 handleOpenURL(url, state: &state)
                 return .none
+
             case .appIntroLogin:
                 return .none
-            case .onAppear:
-                performOnAppear()
+
+            case let .didUpdateAuthStatus(newStatus):
+                guard newStatus != state.authStatus else { return  .none }
+                state.authStatus = newStatus
+                logger.debug("authStatus update: \(newStatus)")
                 return .none
+
+            case .onAppear:
+                return .run { send in
+                    await performOnAppear(send: send)
+                }
             }
         }
     }
@@ -52,16 +63,23 @@ private extension AppFeature {
         switch host {
         case "oauth":
             if let accessToken = url.fragmentItems?["access_token"], accessToken.isNotEmpty {
-                BudgetClient.storeAccessToken(accessToken: accessToken)
-                budgetClient.updateProvider(.ynab(accessToken: accessToken))
+                budgetClient.updateYnabProvider(with: accessToken)
                 state.appIntroLogin.showSafariBrowser = nil
+                logger.info("oauth url path handled, updated budge client with new access token.")
             }
         default:
             break
         }
     }
 
-    func performOnAppear() {
-        // check if auth token is valid
+    func performOnAppear(send: Send<AppFeature.Action>) async {
+        logger.debug("\(#function) - updating budget summaries")
+        await budgetClient.updateBudgetSummaries()
+
+        // Monitor authorization satus updates
+        for await status in budgetClient.$authorizationStatus.values {
+            await send(.didUpdateAuthStatus(status))
+        }
     }
+
 }

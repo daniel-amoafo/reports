@@ -117,6 +117,7 @@
 		18C3BFD72B8AE9EC00E444C8 /* Cairo-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Cairo-Bold.ttf"; sourceTree = "<group>"; };
 		18C3BFD82B8AE9EC00E444C8 /* OpenSans-SemiBoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "OpenSans-SemiBoldItalic.ttf"; sourceTree = "<group>"; };
 		18C3BFD92B8AE9EC00E444C8 /* OpenSans-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "OpenSans-Regular.ttf"; sourceTree = "<group>"; };
+		18C3BFE62B8B5F4E00E444C8 /* BudgetSystemService.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; name = BudgetSystemService.xctestplan; path = Packages/BudgetSystemService/BudgetSystemService.xctestplan; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -245,6 +246,7 @@
 		184DF0AA2B6E1C3E00BA6F21 = {
 			isa = PBXGroup;
 			children = (
+				18C3BFE62B8B5F4E00E444C8 /* BudgetSystemService.xctestplan */,
 				183ECBCE2B724CA1006C45B2 /* Reports.xctestplan */,
 				184DF0E12B6E1D3500BA6F21 /* BudgetSystemService */,
 				184DF0B52B6E1C3E00BA6F21 /* Reports */,

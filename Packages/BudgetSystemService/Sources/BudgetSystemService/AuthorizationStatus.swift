@@ -2,13 +2,22 @@
 
 import Foundation
 
-public enum AuthorizationStatus {
-    case loggedIn(accessInfo: AccessInfo)
-    case logggedOut
+public enum AuthorizationStatus: Equatable {
+    case loggedIn(accessToken: String)
+    case loggedOut
     case unknown
 }
 
-public struct AccessInfo: Codable, Equatable {
-    public let accessToken: String
-    public let createdDate: Date
+extension AuthorizationStatus: CustomStringConvertible {
+
+    public var description: String {
+        switch self {
+        case .loggedIn:
+            return "loggedIn"
+        case .loggedOut:
+            return "loggedOut"
+        case .unknown:
+            return "unknown"
+        }
+    }
 }

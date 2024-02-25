@@ -120,10 +120,10 @@
     {
       "identity" : "swiftynab",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/andrebocchini/swiftynab",
+      "location" : "https://github.com/daniel-amoafo/swiftynab/",
       "state" : {
-        "revision" : "3b301eb21e417a30fcc479b803953846df557d9b",
-        "version" : "2.1.0"
+        "branch" : "fix-api-errors",
+        "revision" : "95a1ea9906bc2f0bce63751c918946f60ad8b277"
       }
     },
     {

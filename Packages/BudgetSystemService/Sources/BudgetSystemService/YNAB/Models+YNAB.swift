@@ -10,3 +10,14 @@ extension Account {
         self.name = ynabAccount.name
     }
 }
+
+extension BudgetSummary {
+    
+    init(ynabBudgetSummary: SwiftYNAB.BudgetSummary) {
+        self.id = ynabBudgetSummary.id
+        self.name = ynabBudgetSummary.name
+        self.lastModifiedOn = ynabBudgetSummary.lastModifiedOn
+        self.firstMonth = ynabBudgetSummary.firstMonth
+        self.lastMonth = ynabBudgetSummary.lastMonth
+    }
+}

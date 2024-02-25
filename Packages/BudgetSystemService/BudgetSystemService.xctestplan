@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "37F79F81-DB06-441E-9CE0-6ACB449F2575",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : false
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "BudgetSystemServiceTests",
+        "name" : "BudgetSystemServiceTests"
+      }
+    }
+  ],
+  "version" : 1
+}
