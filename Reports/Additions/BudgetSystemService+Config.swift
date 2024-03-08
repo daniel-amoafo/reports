@@ -11,21 +11,27 @@ extension BudgetClient {
     func updateYnabProvider(with accessToken: String) {
         Self.storeAccessToken(accessToken: accessToken)
         updateProvider(.ynab(accessToken: accessToken))
-        self.authorizationStatus = .loggedIn(accessToken: accessToken)
     }
 
-    static func makeClient(accessToken: String? = nil, store: KeyValueStore = SecureKeyValueStore()) -> BudgetClient {
+    static func makeClient(
+        accessToken: String? = nil,
+        bugdetProvider: BudgetProvider? = nil,
+        store: KeyValueStore = SecureKeyValueStore()
+    ) -> BudgetClient {
         guard let accessToken = accessToken ?? store.string(forKey: _accessTokenKey) else {
             return .noActiveClient
         }
         let selectedBudgetId = store.string(forKey: "ynab-selected-budget-id")
         storeAccessToken(accessToken: accessToken, store: store)
 
-        return .init(provider: .ynab(accessToken: accessToken), selectedBudgetId: selectedBudgetId)
+        // use the provided budgetProvider otherwise default to ynab budget provider
+        let provider: BudgetProvider = bugdetProvider ?? .ynab(accessToken: accessToken)
+
+        return .init(provider: provider, selectedBudgetId: selectedBudgetId)
     }
 
     static func storeAccessToken(accessToken: String, store: KeyValueStore = SecureKeyValueStore()) {
-        store.set(_accessTokenKey, forKey: _accessTokenKey)
+        store.set(accessToken, forKey: _accessTokenKey)
     }
 }
 
@@ -48,7 +54,7 @@ extension BudgetClient: TestDependencyKey {
         let budgetProvider = BudgetProvider(
             fetchBudgetSummaries: { return [] }, fetchAccounts: { _ in return [] }
         )
-        return BudgetClient(provider: budgetProvider, selectedBudgetId: "someTestId")
+        return BudgetClient(provider: budgetProvider)
     }
 }
 

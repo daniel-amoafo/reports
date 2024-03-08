@@ -16,15 +16,13 @@ struct AppIntroLogin {
         case showSafariBrowser(PresentationAction<SFSafari.Action>)
     }
 
-    @Dependency(\.openURL) var openURL
+    @Dependency(\.configProvider) var configProvider
 
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
             case .authorizeButtonTapped:
-                if let url = createAuthorizeURL() {
-                    state.showSafariBrowser = .init(url: url)
-                }
+                state.showSafariBrowser = .init(url: createAuthorizeURL())
                 return .none
             case .showSafariBrowser:
                 return .none
@@ -38,16 +36,11 @@ struct AppIntroLogin {
 
 private extension AppIntroLogin {
 
-    func createAuthorizeURL() -> URL? {
-        let clientID = "2af5bad4b3d684eed0003a8f64bb5524c94ea728b13f0a93a48526e2171ee027"
-        let redirectURI = "cw-reports://oauth"
-
-        var ynabPath: String {
-         "https://app.ynab.com/oauth/authorize?"
-            + "client_id=\(clientID)&redirect_uri=\(redirectURI)&response_type=token&scope=read-only"
+    func createAuthorizeURL() -> URL {
+        guard let oauthUrl = URL(string: configProvider.oauthPath) else {
+            fatalError("Unable to generate ouath path url - \(configProvider.oauthPath)")
         }
-
-        return .init(string: ynabPath)
+        return oauthUrl
     }
 }
 

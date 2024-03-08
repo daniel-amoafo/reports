@@ -3,7 +3,7 @@
 import Foundation
 
 public enum AuthorizationStatus: Equatable {
-    case loggedIn(accessToken: String)
+    case loggedIn
     case loggedOut
     case unknown
 }

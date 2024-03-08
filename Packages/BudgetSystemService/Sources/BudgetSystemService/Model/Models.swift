@@ -30,4 +30,17 @@ public struct BudgetSummary: Identifiable, Equatable {
     /// Budget's last month
     public let lastMonth: String
 
+    public init(
+        id: String,
+        name: String,
+        lastModifiedOn: String,
+        firstMonth: String,
+        lastMonth: String
+    ) {
+        self.id = id
+        self.name = name
+        self.lastModifiedOn = lastModifiedOn
+        self.firstMonth = firstMonth
+        self.lastMonth = lastMonth
+    }
 }

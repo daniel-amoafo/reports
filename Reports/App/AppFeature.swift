@@ -65,7 +65,7 @@ private extension AppFeature {
             if let accessToken = url.fragmentItems?["access_token"], accessToken.isNotEmpty {
                 budgetClient.updateYnabProvider(with: accessToken)
                 state.appIntroLogin.showSafariBrowser = nil
-                logger.info("oauth url path handled, updated budge client with new access token.")
+                logger.info("oauth url path handled, updated budget client with new access token.")
             }
         default:
             break

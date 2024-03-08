@@ -1,0 +1,11 @@
+// Created by Daniel Amoafo on 7/3/2024.
+
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+
+// xcconfig files don't support double slashes // inline. Url's are not properly parsed, workaround using variable
+SLASH = /
+PROTOCOL_HTTPS = https:/$(SLASH)
+REDIRECT_URI = cw-reports:/$(SLASH)oauth
+CLIENT_ID_YNAB = 2af5bad4b3d684eed0003a8f64bb5524c94ea728b13f0a93a48526e2171ee027
+OAUTH_PATH_YNAB = $(PROTOCOL_HTTPS)app.ynab.com/oauth/authorize?client_id=$(CLIENT_ID_YNAB)&redirect_uri=$(REDIRECT_URI)&response_type=token&scope=read-only

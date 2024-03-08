@@ -30,6 +30,8 @@
 		184DF0C92B6E1C3F00BA6F21 /* ReportsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184DF0C82B6E1C3F00BA6F21 /* ReportsTests.swift */; };
 		184DF0D32B6E1C3F00BA6F21 /* ReportsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184DF0D22B6E1C3F00BA6F21 /* ReportsUITests.swift */; };
 		184DF0D52B6E1C3F00BA6F21 /* ReportsUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184DF0D42B6E1C3F00BA6F21 /* ReportsUITestsLaunchTests.swift */; };
+		186E8A1E2B99872F00E65BDE /* ConfigProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186E8A1D2B99872F00E65BDE /* ConfigProvider.swift */; };
+		186E8A202B998C2A00E65BDE /* ConfigProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186E8A1F2B998C2A00E65BDE /* ConfigProviderTests.swift */; };
 		18C3BFB02B81874000E444C8 /* AppIntroLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C3BFAF2B81874000E444C8 /* AppIntroLoginView.swift */; };
 		18C3BFB22B820AEA00E444C8 /* SFSafariView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C3BFB12B820AEA00E444C8 /* SFSafariView.swift */; };
 		18C3BFB72B820DD000E444C8 /* Binding+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C3BFB62B820DD000E444C8 /* Binding+Additions.swift */; };
@@ -50,6 +52,7 @@
 		18C3BFE32B8AE9EC00E444C8 /* Cairo-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 18C3BFD72B8AE9EC00E444C8 /* Cairo-Bold.ttf */; };
 		18C3BFE42B8AE9EC00E444C8 /* OpenSans-SemiBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 18C3BFD82B8AE9EC00E444C8 /* OpenSans-SemiBoldItalic.ttf */; };
 		18C3BFE52B8AE9EC00E444C8 /* OpenSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 18C3BFD92B8AE9EC00E444C8 /* OpenSans-Regular.ttf */; };
+		18C3BFE92B8B6FA100E444C8 /* BudgetSystemService+ConfigTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C3BFE82B8B6FA100E444C8 /* BudgetSystemService+ConfigTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -96,6 +99,9 @@
 		184DF0D22B6E1C3F00BA6F21 /* ReportsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportsUITests.swift; sourceTree = "<group>"; };
 		184DF0D42B6E1C3F00BA6F21 /* ReportsUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportsUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		184DF0E12B6E1D3500BA6F21 /* BudgetSystemService */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BudgetSystemService; path = Packages/BudgetSystemService; sourceTree = "<group>"; };
+		186E8A1C2B99631200E65BDE /* BaseConfig.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = BaseConfig.xcconfig; sourceTree = "<group>"; };
+		186E8A1D2B99872F00E65BDE /* ConfigProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigProvider.swift; sourceTree = "<group>"; };
+		186E8A1F2B998C2A00E65BDE /* ConfigProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigProviderTests.swift; sourceTree = "<group>"; };
 		18C3BFAE2B806A7500E444C8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		18C3BFAF2B81874000E444C8 /* AppIntroLoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIntroLoginView.swift; sourceTree = "<group>"; };
 		18C3BFB12B820AEA00E444C8 /* SFSafariView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SFSafariView.swift; sourceTree = "<group>"; };
@@ -118,6 +124,7 @@
 		18C3BFD82B8AE9EC00E444C8 /* OpenSans-SemiBoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "OpenSans-SemiBoldItalic.ttf"; sourceTree = "<group>"; };
 		18C3BFD92B8AE9EC00E444C8 /* OpenSans-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "OpenSans-Regular.ttf"; sourceTree = "<group>"; };
 		18C3BFE62B8B5F4E00E444C8 /* BudgetSystemService.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; name = BudgetSystemService.xctestplan; path = Packages/BudgetSystemService/BudgetSystemService.xctestplan; sourceTree = "<group>"; };
+		18C3BFE82B8B6FA100E444C8 /* BudgetSystemService+ConfigTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BudgetSystemService+ConfigTests.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -295,9 +302,10 @@
 		184DF0C72B6E1C3F00BA6F21 /* ReportsTests */ = {
 			isa = PBXGroup;
 			children = (
+				18C3BFE72B8B6F9200E444C8 /* Additons */,
 				183ECBCB2B710FC0006C45B2 /* KeyValueStore */,
 				184DF0C82B6E1C3F00BA6F21 /* ReportsTests.swift */,
-				18C3BFC22B8399C600E444C8 /* URLTests.swift */,
+				186E8A1F2B998C2A00E65BDE /* ConfigProviderTests.swift */,
 			);
 			path = ReportsTests;
 			sourceTree = "<group>";
@@ -324,6 +332,7 @@
 				18C3BFBC2B8230E100E444C8 /* AppFeature.swift */,
 				184DF0B62B6E1C3E00BA6F21 /* ReportsApp.swift */,
 				18C3BFCA2B87522200E444C8 /* Logger.swift */,
+				186E8A1D2B99872F00E65BDE /* ConfigProvider.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -339,6 +348,7 @@
 			isa = PBXGroup;
 			children = (
 				18C3BFCD2B8AE9EC00E444C8 /* Fonts */,
+				186E8A1C2B99631200E65BDE /* BaseConfig.xcconfig */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -360,6 +370,15 @@
 				18C3BFD92B8AE9EC00E444C8 /* OpenSans-Regular.ttf */,
 			);
 			path = Fonts;
+			sourceTree = "<group>";
+		};
+		18C3BFE72B8B6F9200E444C8 /* Additons */ = {
+			isa = PBXGroup;
+			children = (
+				18C3BFE82B8B6FA100E444C8 /* BudgetSystemService+ConfigTests.swift */,
+				18C3BFC22B8399C600E444C8 /* URLTests.swift */,
+			);
+			path = Additons;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -544,6 +563,7 @@
 				183ECBDE2B747085006C45B2 /* ButtonStyleOutline.swift in Sources */,
 				18C3BFCB2B87522200E444C8 /* Logger.swift in Sources */,
 				184DF0B92B6E1C3E00BA6F21 /* ContentView.swift in Sources */,
+				186E8A1E2B99872F00E65BDE /* ConfigProvider.swift in Sources */,
 				184DF0B72B6E1C3E00BA6F21 /* ReportsApp.swift in Sources */,
 				183ECBEE2B747460006C45B2 /* Array+Safe.swift in Sources */,
 				18C3BFB72B820DD000E444C8 /* Binding+Additions.swift in Sources */,
@@ -565,8 +585,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				183ECBCD2B724835006C45B2 /* SecureKeyValueStoreTests.swift in Sources */,
+				18C3BFE92B8B6FA100E444C8 /* BudgetSystemService+ConfigTests.swift in Sources */,
 				18C3BFC32B8399C600E444C8 /* URLTests.swift in Sources */,
 				184DF0C92B6E1C3F00BA6F21 /* ReportsTests.swift in Sources */,
+				186E8A202B998C2A00E65BDE /* ConfigProviderTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -597,6 +619,7 @@
 /* Begin XCBuildConfiguration section */
 		184DF0D62B6E1C3F00BA6F21 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 186E8A1C2B99631200E65BDE /* BaseConfig.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -658,6 +681,7 @@
 		};
 		184DF0D72B6E1C3F00BA6F21 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 186E8A1C2B99631200E65BDE /* BaseConfig.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;

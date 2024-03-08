@@ -73,7 +73,9 @@ private enum Factory {
     static let dictionary = ["First": "🔑", "Second": "🔒"]
 
     static func createSecureKeyValueStore() -> SecureKeyValueStore {
-        SecureKeyValueStore(keyPrefix: KeyPrefix)
+        let store = SecureKeyValueStore(keyPrefix: KeyPrefix)
+        store.removeAllValues()
+        return store
     }
 
 }

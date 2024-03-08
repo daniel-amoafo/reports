@@ -6,15 +6,19 @@ import OSLog
 public class BudgetClient {
     
     public private(set) var provider: BudgetProvider
-    public private(set) var selectedBudgetId: String?
 
-    @Published public private(set) var bugetSummaries: IdentifiedArrayOf<BudgetSummary> = []
+    @Published public private(set) var budgetSummaries: IdentifiedArrayOf<BudgetSummary> = []
     @Published public private(set) var accounts: IdentifiedArrayOf<Account> = []
     @Published public var authorizationStatus: AuthorizationStatus
+    @Published public private(set) var selectedBudgetId: String?
 
     private let logger = Logger(subsystem: "BudgetSystemService", category: "BudgetClient")
 
-    public init(provider: BudgetProvider, selectedBudgetId: String? = nil, authorizationStatus: AuthorizationStatus = .unknown) {
+    public init(
+        provider: BudgetProvider,
+        selectedBudgetId: String? = nil,
+        authorizationStatus: AuthorizationStatus = .unknown
+    ) {
         self.provider = provider
         self.selectedBudgetId = selectedBudgetId
         self.authorizationStatus = authorizationStatus
@@ -22,6 +26,16 @@ public class BudgetClient {
 
     public func updateProvider(_ provider: BudgetProvider) {
         self.provider = provider
+        Task {
+            await updateBudgetSummaries()
+        }
+    }
+
+    public func updateSelectedBudgetId(_ selectedId: String) throws {
+        guard budgetSummaries.map(\.id).contains(selectedId) else {
+            throw BudgetClientError.selectedBudgetIdInvalid
+        }
+        selectedBudgetId = selectedId
     }
 
     public func updateBudgetSummaries() async {
@@ -30,10 +44,16 @@ public class BudgetClient {
             Task {
                 await MainActor.run {
                     // updating published events on main run loop
-                    self.bugetSummaries = IdentifiedArray(uniqueElements: fetchedBudgetSummaries)
+                    self.budgetSummaries = IdentifiedArray(uniqueElements: fetchedBudgetSummaries)
+                    // must be logged in to successfully fetch budgetsummaries without error
+                    self.authorizationStatus = .loggedIn
+
+                    logger.debug("budgetSummaries updated count(\(self.budgetSummaries.count))")
+                    // ensure the selected budget id is in the updated budget summaries
                     if let selectedBudgetId = self.selectedBudgetId,
                         !fetchedBudgetSummaries.map(\.id).contains(selectedBudgetId) {
                         self.selectedBudgetId = nil
+                        logger.debug("selectedBudgetId set to nil")
                     }
                 }
             }
@@ -64,9 +84,8 @@ public class BudgetClient {
            budgetClientError.isNotAuthorized {
             self.authorizationStatus = .loggedOut
             logger.error("Budget Client is not authorized, status updated to logged out")
-        } else {
-            logger.error("\(error.localizedDescription)")
         }
+        logger.error("\(error.localizedDescription)")
     }
 }
 
@@ -75,74 +94,4 @@ public class BudgetClient {
 extension BudgetClient {
     
     public static let noActiveClient = BudgetClient(provider: .noop, authorizationStatus: .loggedOut)
-}
-
-// MARK: - BudgetProvider
-
-public struct BudgetProvider {
-    
-    private let _fetchBudgetSummaries: () async throws -> [BudgetSummary]
-    private let _fetchAccounts: (_ budgetId: String) async throws -> [Account]
-    
-    public init(
-        fetchBudgetSummaries: @Sendable @escaping () async throws -> [BudgetSummary],
-        fetchAccounts: @Sendable @escaping (_ budgetId: String) async throws -> [Account]
-    ) {
-        self._fetchBudgetSummaries = fetchBudgetSummaries
-        self._fetchAccounts = fetchAccounts
-    }
-    
-}
-
-public extension BudgetProvider {
-    
-    func fetchBudgetSummaries() async throws -> [BudgetSummary] {
-        try await _fetchBudgetSummaries()
-    }
-
-    func fetchAccounts(for budgetId: String) async throws -> [Account] {
-        try await _fetchAccounts(budgetId)
-    }
-}
-
-extension BudgetProvider {
-
-    // Static BudgetProvider that does nothing
-    static let noop = BudgetProvider(
-        fetchBudgetSummaries: { return [] },
-        fetchAccounts: { _ in return [] }
-    )
-}
-
-// MARK: - BudgetClientError
-
-public enum BudgetClientError: LocalizedError {
-
-    case http(code: String, message: String?)
-    case unknown
-
-    public var errorDescription: String? {
-        switch self {
-        case let .http(_, message):
-            return message
-        case .unknown:
-            return nil
-        }
-    }
-
-    public var code: String? {
-        switch self {
-        case let .http(code, _):
-            return code
-        case .unknown:
-            return nil
-        }
-    }
-
-    var isNotAuthorized: Bool {
-        if let code = self.code, code == "401" {
-            return true
-        }
-        return false
-    }
 }
