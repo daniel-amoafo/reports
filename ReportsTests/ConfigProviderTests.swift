@@ -3,7 +3,7 @@
 @testable import Reports
 import XCTest
 
-final class ConfigProviderTestsTests: XCTestCase {
+final class ConfigProviderTests: XCTestCase {
 
     var sut: ConfigProvider!
 
