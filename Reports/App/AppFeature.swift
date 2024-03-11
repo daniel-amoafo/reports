@@ -1,8 +1,11 @@
 // Created by Daniel Amoafo on 18/2/2024.
 
 import BudgetSystemService
+import Combine
 import ComposableArchitecture
 import SwiftUI
+
+private var subscribers: Set<AnyCancellable> = []
 
 @Reducer
 struct AppFeature {
@@ -10,23 +13,29 @@ struct AppFeature {
     @ObservableState
     struct State: Equatable {
         var appIntroLogin = AppIntroLogin.State()
+        var mainTab = MainTab.State()
         var authStatus: AuthorizationStatus = .unknown
     }
 
     enum Action {
         case onOpenURL(URL)
         case appIntroLogin(AppIntroLogin.Action)
+        case mainTab(MainTab.Action)
         case didUpdateAuthStatus(AuthorizationStatus)
         case onAppear
     }
 
     @Dependency(\.budgetClient) var budgetClient
+    @Dependency(\.configProvider) var configProvider
 
     var logger = LogFactory.create(category: .appFeature)
 
     var body: some ReducerOf<Self> {
         Scope(state: \.appIntroLogin, action: \.appIntroLogin) {
             AppIntroLogin()
+        }
+        Scope(state: \.mainTab, action: \.mainTab) {
+            MainTab()
         }
         Reduce { state, action in
             switch action {
@@ -36,7 +45,8 @@ struct AppFeature {
 
             case .appIntroLogin:
                 return .none
-
+            case .mainTab:
+                return .none
             case let .didUpdateAuthStatus(newStatus):
                 guard newStatus != state.authStatus else { return  .none }
                 state.authStatus = newStatus
@@ -79,7 +89,13 @@ private extension AppFeature {
         // Monitor authorization satus updates
         for await status in budgetClient.$authorizationStatus.values {
             await send(.didUpdateAuthStatus(status))
+            logger.debug("did update auth status to: \(status)")
         }
+
+        for await selectedBudgetId in budgetClient.$selectedBudgetId.values {
+            logger.debug("storing selectedBudget \(selectedBudgetId ?? "")")
+        }
+
     }
 
 }

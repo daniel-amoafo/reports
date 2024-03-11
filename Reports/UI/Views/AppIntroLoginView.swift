@@ -54,7 +54,9 @@ struct AppIntroLoginView: View {
             Button("Login into YNAB") {
                 self.store.send(.authorizeButtonTapped)
             }
+            .buttonStyle(.kleonPrimary)
         }
+        .padding(.horizontal)
         .sheet(
             item: $store.scope(
                 state: \.showSafariBrowser,

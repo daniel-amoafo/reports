@@ -8,6 +8,7 @@ struct LogFactory {
     enum Category: String {
         case appFeature = "AppFeature"
         case login = "Login"
+        case home = "Home"
     }
 
     static func create(category: Category) -> Logger {

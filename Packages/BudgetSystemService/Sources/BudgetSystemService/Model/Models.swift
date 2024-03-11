@@ -14,7 +14,7 @@ public struct Account: Identifiable, Equatable {
     }
 }
 
-public struct BudgetSummary: Identifiable, Equatable {
+public struct BudgetSummary: Identifiable, Equatable, CustomStringConvertible {
     /// Budget id
     public let id: String
 
@@ -29,6 +29,8 @@ public struct BudgetSummary: Identifiable, Equatable {
 
     /// Budget's last month
     public let lastMonth: String
+
+    public var description: String { name }
 
     public init(
         id: String,

@@ -36,6 +36,7 @@ public class BudgetClient {
             throw BudgetClientError.selectedBudgetIdInvalid
         }
         selectedBudgetId = selectedId
+        logger.debug("BudgetClient selectedBudgetId updated to: \(selectedId)")
     }
 
     public func updateBudgetSummaries() async {

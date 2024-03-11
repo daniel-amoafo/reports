@@ -21,12 +21,14 @@ extension BudgetClient {
         guard let accessToken = accessToken ?? store.string(forKey: _accessTokenKey) else {
             return .noActiveClient
         }
-        let selectedBudgetId = store.string(forKey: "ynab-selected-budget-id")
+
         storeAccessToken(accessToken: accessToken, store: store)
 
         // use the provided budgetProvider otherwise default to ynab budget provider
         let provider: BudgetProvider = bugdetProvider ?? .ynab(accessToken: accessToken)
 
+        @Dependency(\.configProvider) var configProvider
+        let selectedBudgetId = configProvider.storedSelectedBudgetId
         return .init(provider: provider, selectedBudgetId: selectedBudgetId)
     }
 

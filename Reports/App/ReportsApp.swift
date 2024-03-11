@@ -16,7 +16,9 @@ struct ReportsApp: App {
                 case .unknown:
                     ProgressView()
                 case .loggedIn:
-                    Text("Tab View - Customer Logged In 🎉")
+                    MainTabView(
+                        store: store.scope(state: \.mainTab, action: \.mainTab)
+                    )
                 case .loggedOut:
                     AppIntroLoginView(
                         store: store.scope(state: \.appIntroLogin, action: \.appIntroLogin)

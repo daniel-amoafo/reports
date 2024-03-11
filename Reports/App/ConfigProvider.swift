@@ -3,10 +3,19 @@
 import Dependencies
 import Foundation
 
-struct ConfigProvider {
+class ConfigProvider {
+
+    private let defaultStore: KeyValueStore
+    private let secureStore: KeyValueStore
 
     enum Key: String {
         case oathPath = "cw-oath-path"
+        case selectedBudgetId = "selected-Budget-Id"
+    }
+
+    init(defaultStore: KeyValueStore = UserDefaults.standard, secureStore: KeyValueStore = SecureKeyValueStore()) {
+        self.defaultStore = defaultStore
+        self.secureStore = secureStore
     }
 
     private var infoDict: [String: Any]? {
@@ -19,11 +28,28 @@ struct ConfigProvider {
         }
         return path
     }
+
+    var storedSelectedBudgetId: String? {
+        get {
+            defaultStore.string(forKey: Key.selectedBudgetId.rawValue)
+        }
+        set {
+            guard newValue != storedSelectedBudgetId else {
+                return
+            }
+            defaultStore.set(newValue, forKey: Key.selectedBudgetId.rawValue)
+        }
+    }
+
 }
 
 extension ConfigProvider: DependencyKey {
     static var liveValue: ConfigProvider {
         .init()
+    }
+
+    static var previewValue: ConfigProvider {
+        .init(defaultStore: InMemoryKeyValueStore(), secureStore: InMemoryKeyValueStore())
     }
 }
 
