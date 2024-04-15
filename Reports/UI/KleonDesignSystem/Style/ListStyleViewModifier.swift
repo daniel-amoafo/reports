@@ -118,5 +118,6 @@ private extension ListStyleViewModifier.RowType {
             .typography(.title2Emphasized)
             .listRowBottom()
     }
+    .backgroundShadow()
     .padding(.horizontal)
 }

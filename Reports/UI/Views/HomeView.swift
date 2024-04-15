@@ -12,6 +12,7 @@ struct Home {
         @Presents var destination: Destination.State?
         var selectedBudgetId: String?
         var budgetList: IdentifiedArrayOf<BudgetSummary>?
+        var charts: [Chart] = []
 
         var selectedBudgetName: String? {
             guard let selectedBudgetId else { return nil }
@@ -57,6 +58,7 @@ struct Home {
             case .onAppear:
                 state.budgetList = budgetClient.budgetSummaries
                 state.selectedBudgetId = budgetClient.selectedBudgetId
+                state.charts = configProvider.charts
                 return .none
             case .destination:
                 return .none
@@ -76,7 +78,7 @@ private extension Home {
     func updateBudgetClientSelectedBudgetId(_ selectedBudgetId: String) {
         do {
             try budgetClient.updateSelectedBudgetId(selectedBudgetId)
-            configProvider.storedSelectedBudgetId = selectedBudgetId
+            configProvider.selectedBudgetId = selectedBudgetId
 
         } catch {
             logger.error("Error attempting to update selectedBudgetId: \(error.localizedDescription)")
@@ -92,6 +94,8 @@ struct HomeView: View {
     @Bindable var store: StoreOf<Home>
     @State var selectedString: String?
     private let logger = LogFactory.create(category: .home)
+
+    @State private var viewAllFrame: CGRect = .zero
 
     var body: some View {
         ZStack {
@@ -127,14 +131,13 @@ private extension HomeView {
     var newReportSectionView: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: .Spacing.small) {
-                ForEach(0..<10) {
-                    Text("Item \($0)")
-                        .typography(.title2Emphasized)
-                        .foregroundStyle(.white)
-                        .frame(width: 140, height: 166)
-                        .background(.red)
+                ForEach(store.charts) { chart in
+                    ChartButtonView(title: chart.name, image: chart.type.image) {
+
+                    }
                 }
             }
+            .padding(.vertical, .Spacing.medium)
         }
         .contentMargins(.leading, .Spacing.medium)
         .padding(.top, .Spacing.large)
@@ -157,21 +160,17 @@ private extension HomeView {
                 }
             })
             .buttonStyle(.listRowSingle)
+            .backgroundShadow()
             .padding(.horizontal, .Spacing.medium)
             .popover(item: $store.scope(
                 state: \.destination?.popoverSelectBudget,
                 action: \.destination.popoverSelectBudget
             )) { _ in
                 if let budgetList = store.budgetList {
-                    // this binding is not ideal.
-                    // should belong in the state object rather than inline defined here :/
-                    let selectedBudgetId = Binding<String?> {
-                        store.selectedBudgetId
-                    } set: { newValue in
-                        store.send(.didUpdateSelectedBudgetId(newValue))
-                        logger.debug("selectedBudgetId set by popover - \(newValue ?? "[nil]")")
-                    }
-                    SelectListView<BudgetSummary>(items: budgetList, selectedItem: selectedBudgetId)
+                    SelectListView<BudgetSummary>(
+                        items: budgetList,
+                        selectedItem: $store.selectedBudgetId.sending(\.didUpdateSelectedBudgetId)
+                    )
                 }
             }
         }
@@ -189,7 +188,7 @@ private extension HomeView {
 
             Button(action: /*@START_MENU_TOKEN@*/{}/*@END_MENU_TOKEN@*/, label: {
                 HStack(spacing: .Spacing.small) {
-                    Image(R.image.pieChart)
+                    Image(R.image.chartPie)
                         .resizable()
                         .frame(width: 42, height: 42)
                     VStack(alignment: .leading) {
@@ -203,17 +202,15 @@ private extension HomeView {
             })
             .buttonStyle(.listRowMiddle)
 
-            GeometryReader { geometry in
-                HStack {
-                    Button("View All") {
+            VStack {
+                Button("View All") {
 
-                    }
-                    .buttonStyle(.kleonPrimary)
                 }
-                .frame(width: geometry.size.width * 0.6)
-                .listRowBottom()
+                .buttonStyle(.kleonPrimary)
             }
+            .listRowBottom()
         }
+        .backgroundShadow()
         .padding(.horizontal, .Spacing.medium)
     }
 }

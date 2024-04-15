@@ -8,14 +8,17 @@ class ConfigProvider {
     private let defaultStore: KeyValueStore
     private let secureStore: KeyValueStore
 
+    let charts: [Chart]
+
     enum Key: String {
-        case oathPath = "cw-oath-path"
+        case oauthPath = "cw-oauth-path"
         case selectedBudgetId = "selected-Budget-Id"
     }
 
     init(defaultStore: KeyValueStore = UserDefaults.standard, secureStore: KeyValueStore = SecureKeyValueStore()) {
         self.defaultStore = defaultStore
         self.secureStore = secureStore
+        self.charts = Chart.makeDefaultCharts()
     }
 
     private var infoDict: [String: Any]? {
@@ -23,24 +26,30 @@ class ConfigProvider {
     }
 
     var oauthPath: String {
-        guard let path = infoDict?[Key.oathPath.rawValue] as? String else {
-            fatalError("\(Key.oathPath.rawValue) was unexpectedly not defined")
+        guard let path = infoDict?[Key.oauthPath.rawValue] as? String else {
+            fatalError("\(Key.oauthPath.rawValue) was unexpectedly not defined")
         }
         return path
     }
 
-    var storedSelectedBudgetId: String? {
+    var selectedBudgetId: String? {
         get {
             defaultStore.string(forKey: Key.selectedBudgetId.rawValue)
         }
         set {
-            guard newValue != storedSelectedBudgetId else {
+            guard newValue != selectedBudgetId else {
                 return
             }
             defaultStore.set(newValue, forKey: Key.selectedBudgetId.rawValue)
         }
     }
+}
 
+extension ConfigProvider: Equatable {
+    static func == (lhs: ConfigProvider, rhs: ConfigProvider) -> Bool {
+        return lhs.oauthPath == rhs.oauthPath &&
+        lhs.selectedBudgetId == rhs.selectedBudgetId
+    }
 }
 
 extension ConfigProvider: DependencyKey {

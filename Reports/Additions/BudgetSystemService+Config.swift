@@ -28,7 +28,7 @@ extension BudgetClient {
         let provider: BudgetProvider = bugdetProvider ?? .ynab(accessToken: accessToken)
 
         @Dependency(\.configProvider) var configProvider
-        let selectedBudgetId = configProvider.storedSelectedBudgetId
+        let selectedBudgetId = configProvider.selectedBudgetId
         return .init(provider: provider, selectedBudgetId: selectedBudgetId)
     }
 

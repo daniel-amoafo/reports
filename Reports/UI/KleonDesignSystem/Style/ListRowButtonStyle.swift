@@ -55,11 +55,11 @@ extension ButtonStyle where Self == ListRowButtonStyle {
 private struct PreviewContentRow: View {
     var body: some View {
         HStack(spacing: .Spacing.small) {
-            Image(R.image.pieChart)
+            Image(R.image.chartPie)
                 .resizable()
                 .frame(width: 42, height: 42)
             VStack(alignment: .leading) {
-                Text("Spending Trends")
+                Text("Total Spending")
                     .typography(.headlineEmphasized)
                 Text("Aug 23 - Dec 23, Main Budget")
                     .typography(.bodyEmphasized)
@@ -80,6 +80,7 @@ private struct PreviewContentRow: View {
             }
         })
         .buttonStyle(.listRowSingle)
+        .backgroundShadow()
 
         VStack(spacing: 0) {
             Button(action: {}, label: {
@@ -97,6 +98,7 @@ private struct PreviewContentRow: View {
             })
             .buttonStyle(.listRowBottom)
         }
+        .backgroundShadow()
     }
     .padding(.horizontal)
 }

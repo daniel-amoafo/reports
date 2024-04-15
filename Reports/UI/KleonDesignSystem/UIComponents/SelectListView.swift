@@ -37,18 +37,21 @@ struct SelectListView<Element: Identifiable & CustomStringConvertible>: View {
 
         // creates selected binding using the singleItem binding
         // as the backing source binding provider
-        self._selected = Binding(get: {
-            guard let value = selectedItem.wrappedValue else {
-                return []
+        self._selected = Binding(
+            get: {
+                guard let value = selectedItem.wrappedValue else {
+                    return []
+                }
+                return [value]
+            },
+            set: { newValue in
+                if let singleSelected = newValue.first {
+                    selectedItem.wrappedValue = singleSelected
+                } else {
+                    selectedItem.wrappedValue = nil
+                }
             }
-            return [value]
-        }, set: { newValue in
-            if let singleSelected = newValue.first {
-                selectedItem.wrappedValue = singleSelected
-            } else {
-                selectedItem.wrappedValue = nil
-            }
-        })
+        )
     }
 
     var body: some View {

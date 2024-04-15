@@ -28,6 +28,11 @@
 		184DF0C92B6E1C3F00BA6F21 /* ReportsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184DF0C82B6E1C3F00BA6F21 /* ReportsTests.swift */; };
 		184DF0D32B6E1C3F00BA6F21 /* ReportsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184DF0D22B6E1C3F00BA6F21 /* ReportsUITests.swift */; };
 		184DF0D52B6E1C3F00BA6F21 /* ReportsUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184DF0D42B6E1C3F00BA6F21 /* ReportsUITestsLaunchTests.swift */; };
+		186A80E72BC9F8450015FFC7 /* ChartButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186A80E62BC9F8450015FFC7 /* ChartButtonView.swift */; };
+		186A80EB2BCA57F90015FFC7 /* BackgroundShadowViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186A80EA2BCA57F90015FFC7 /* BackgroundShadowViewModifier.swift */; };
+		186A80F22BCBF4990015FFC7 /* ViewRectReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186A80F12BCBF4990015FFC7 /* ViewRectReader.swift */; };
+		186A80F52BCC013F0015FFC7 /* BottomShadowViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186A80F42BCC013F0015FFC7 /* BottomShadowViewModifier.swift */; };
+		186A80F82BCCA86B0015FFC7 /* NavBarScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186A80F72BCCA86B0015FFC7 /* NavBarScrollView.swift */; };
 		186E8A1E2B99872F00E65BDE /* ConfigProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186E8A1D2B99872F00E65BDE /* ConfigProvider.swift */; };
 		186E8A202B998C2A00E65BDE /* ConfigProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186E8A1F2B998C2A00E65BDE /* ConfigProviderTests.swift */; };
 		186E8A222B9AEDB100E65BDE /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186E8A212B9AEDB100E65BDE /* MainTabView.swift */; };
@@ -107,6 +112,11 @@
 		184DF0D22B6E1C3F00BA6F21 /* ReportsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportsUITests.swift; sourceTree = "<group>"; };
 		184DF0D42B6E1C3F00BA6F21 /* ReportsUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportsUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		184DF0E12B6E1D3500BA6F21 /* BudgetSystemService */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BudgetSystemService; path = Packages/BudgetSystemService; sourceTree = "<group>"; };
+		186A80E62BC9F8450015FFC7 /* ChartButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartButtonView.swift; sourceTree = "<group>"; };
+		186A80EA2BCA57F90015FFC7 /* BackgroundShadowViewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundShadowViewModifier.swift; sourceTree = "<group>"; };
+		186A80F12BCBF4990015FFC7 /* ViewRectReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewRectReader.swift; sourceTree = "<group>"; };
+		186A80F42BCC013F0015FFC7 /* BottomShadowViewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomShadowViewModifier.swift; sourceTree = "<group>"; };
+		186A80F72BCCA86B0015FFC7 /* NavBarScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavBarScrollView.swift; sourceTree = "<group>"; };
 		186E8A1C2B99631200E65BDE /* BaseConfig.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = BaseConfig.xcconfig; sourceTree = "<group>"; };
 		186E8A1D2B99872F00E65BDE /* ConfigProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigProvider.swift; sourceTree = "<group>"; };
 		186E8A1F2B998C2A00E65BDE /* ConfigProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigProviderTests.swift; sourceTree = "<group>"; };
@@ -210,6 +220,7 @@
 				186E8A232B9AF45200E65BDE /* HomeView.swift */,
 				189641BD2B9D675900716258 /* SettingsView.swift */,
 				189641C02B9D67CE00716258 /* SavedReportsView.swift */,
+				186A80E62BC9F8450015FFC7 /* ChartButtonView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -227,11 +238,14 @@
 			isa = PBXGroup;
 			children = (
 				183ECBD52B747085006C45B2 /* Style */,
-				183ECBDA2B747085006C45B2 /* Type */,
+				183ECBDA2B747085006C45B2 /* Font */,
 				183ECBD72B747085006C45B2 /* UIComponents */,
 				186E8A302B9B169C00E65BDE /* CGFloat+DesignStyleMetrics.swift */,
 				186E8A452B9C4BB500E65BDE /* Color+Adjust.swift */,
 				189641AE2B9C72BE00716258 /* AnimationConstants.swift */,
+				186A80EA2BCA57F90015FFC7 /* BackgroundShadowViewModifier.swift */,
+				186A80F12BCBF4990015FFC7 /* ViewRectReader.swift */,
+				186A80F42BCC013F0015FFC7 /* BottomShadowViewModifier.swift */,
 			);
 			path = KleonDesignSystem;
 			sourceTree = "<group>";
@@ -252,16 +266,17 @@
 				183ECBD82B747085006C45B2 /* FloatingTitleRow.swift */,
 				183ECBD92B747085006C45B2 /* SelectListView.swift */,
 				183ECBF02B748E90006C45B2 /* HorizontalDivider.swift */,
+				186A80F72BCCA86B0015FFC7 /* NavBarScrollView.swift */,
 			);
 			path = UIComponents;
 			sourceTree = "<group>";
 		};
-		183ECBDA2B747085006C45B2 /* Type */ = {
+		183ECBDA2B747085006C45B2 /* Font */ = {
 			isa = PBXGroup;
 			children = (
 				183ECBDB2B747085006C45B2 /* Typography.swift */,
 			);
-			path = Type;
+			path = Font;
 			sourceTree = "<group>";
 		};
 		183ECBE72B747460006C45B2 /* Additions */ = {
@@ -588,14 +603,17 @@
 			buildActionMask = 2147483647;
 			files = (
 				189641AF2B9C72BE00716258 /* AnimationConstants.swift in Sources */,
+				186A80F22BCBF4990015FFC7 /* ViewRectReader.swift in Sources */,
 				186E8A442B9C3AD500E65BDE /* KleonButtonStyle.swift in Sources */,
 				183ECBE12B747085006C45B2 /* Typography.swift in Sources */,
+				186A80F82BCCA86B0015FFC7 /* NavBarScrollView.swift in Sources */,
 				18C3BFBF2B82370B00E444C8 /* BudgetSystemService+Config.swift in Sources */,
 				189641BB2B9C8CFE00716258 /* Chart.swift in Sources */,
 				183ECBE02B747085006C45B2 /* SelectListView.swift in Sources */,
 				183ECBC12B70E0B6006C45B2 /* KeyValueStore.swift in Sources */,
 				183ECBF12B748E90006C45B2 /* HorizontalDivider.swift in Sources */,
 				186E8A222B9AEDB100E65BDE /* MainTabView.swift in Sources */,
+				186A80E72BC9F8450015FFC7 /* ChartButtonView.swift in Sources */,
 				18C3BFCB2B87522200E444C8 /* Logger.swift in Sources */,
 				186E8A1E2B99872F00E65BDE /* ConfigProvider.swift in Sources */,
 				186E8A402B9BE5E800E65BDE /* ListStyleViewModifier.swift in Sources */,
@@ -605,6 +623,7 @@
 				189641BE2B9D675900716258 /* SettingsView.swift in Sources */,
 				183ECBC72B70E5DD006C45B2 /* SecureKeyValueStore.swift in Sources */,
 				18C3BFBD2B8230E100E444C8 /* AppFeature.swift in Sources */,
+				186A80F52BCC013F0015FFC7 /* BottomShadowViewModifier.swift in Sources */,
 				183ECBC52B70E10C006C45B2 /* Atomic.swift in Sources */,
 				183ECBED2B747460006C45B2 /* Collection+Additions.swift in Sources */,
 				186E8A312B9B169C00E65BDE /* CGFloat+DesignStyleMetrics.swift in Sources */,
@@ -615,6 +634,7 @@
 				186E8A382B9B34BA00E65BDE /* ListRowButtonStyle.swift in Sources */,
 				183ECBDF2B747085006C45B2 /* FloatingTitleRow.swift in Sources */,
 				183ECBEC2B747460006C45B2 /* String+Additions.swift in Sources */,
+				186A80EB2BCA57F90015FFC7 /* BackgroundShadowViewModifier.swift in Sources */,
 				186E8A242B9AF45200E65BDE /* HomeView.swift in Sources */,
 				189641C12B9D67CE00716258 /* SavedReportsView.swift in Sources */,
 				18C3BFC12B83993200E444C8 /* URL+Additions.swift in Sources */,
@@ -1010,8 +1030,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.7.3;
+				branch = "shared-state-beta";
+				kind = branch;
 			};
 		};
 		186E8A252B9B06EC00E65BDE /* XCRemoteSwiftPackageReference "R" */ = {
