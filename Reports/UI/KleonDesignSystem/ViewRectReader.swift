@@ -55,4 +55,3 @@ public extension View {
         self.modifier(ViewRectReader(rect: rect, coordinateSpace: coordinateSpace))
     }
 }
-

@@ -18,6 +18,7 @@ let package = Package(
         .package(url: "https://github.com/daniel-amoafo/swiftynab/", branch: "fix-api-errors"),
         .package(url: "https://github.com/pointfreeco/swift-identified-collections", from: "1.0.0"),
         .package(url: "https://github.com/pointfreeco/swift-concurrency-extras", from: "1.1.0"),
+        .package(path: "../MoneyCommon"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -27,6 +28,7 @@ let package = Package(
             dependencies: [
                 .product(name: "SwiftYNAB", package: "swiftynab"),
                 .product(name: "IdentifiedCollections", package: "swift-identified-collections"),
+                .product(name: "MoneyCommon", package: "MoneyCommon"),
             ]),
         .testTarget(
             name: "BudgetSystemServiceTests",

@@ -60,6 +60,10 @@ extension ConfigProvider: DependencyKey {
     static var previewValue: ConfigProvider {
         .init(defaultStore: InMemoryKeyValueStore(), secureStore: InMemoryKeyValueStore())
     }
+
+    static var testValue: ConfigProvider {
+        .init(defaultStore: InMemoryKeyValueStore(), secureStore: InMemoryKeyValueStore())
+    }
 }
 
 extension DependencyValues {

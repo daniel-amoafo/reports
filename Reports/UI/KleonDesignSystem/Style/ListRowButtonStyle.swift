@@ -9,8 +9,8 @@ struct ListRowButtonStyle: ButtonStyle {
     let rowType: ListStyleViewModifier.RowType
     var showHorizontalRule: Bool = true
 
-    private let backgroundColor = Color(R.color.colors.button.list)
-    private let backgroundColorHighlight = Color(R.color.colors.button.listHighlight)
+    private let backgroundColor = Color(R.color.button.list)
+    private let backgroundColorHighlight = Color(R.color.button.listHighlight)
 
     init(
         rowType: ListStyleViewModifier.RowType = .middle,
@@ -23,7 +23,7 @@ struct ListRowButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration
             .label
-            .foregroundColor(Color(R.color.colors.text.primary))
+            .foregroundColor(Color(R.color.text.primary))
             .listRow(
                 rowType: rowType,
                 showHorizontalRule: showHorizontalRule,
@@ -39,7 +39,7 @@ extension ButtonStyle where Self == ListRowButtonStyle {
         ListRowButtonStyle(rowType: .top, showHorizontalRule: true)
     }
 
-    static var listRowMiddle: Self {
+    static var listRow: Self {
         ListRowButtonStyle()
     }
 
@@ -91,7 +91,7 @@ private struct PreviewContentRow: View {
             Button(action: {}, label: {
                 PreviewContentRow()
             })
-            .buttonStyle(.listRowMiddle)
+            .buttonStyle(.listRow)
 
             Button(action: {}, label: {
                 PreviewContentRow()

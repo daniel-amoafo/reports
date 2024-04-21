@@ -3,36 +3,45 @@
 import ComposableArchitecture
 import SwiftUI
 
+/// Provides a generic UI solution to select a value / values from a list of items.
+///  The list must conform to Identifiable
 struct SelectListView<Element: Identifiable & CustomStringConvertible>: View {
+
+    @Environment(\.dismiss) var dismiss
 
     private let items: IdentifiedArrayOf<Element>
     @Binding private var selected: [Element.ID]
     private var mode: SelectListViewSelectionMode
     private var noSelectionAllowed: Bool
     private var typography: Typography
+    private let showDoneButton: Bool
 
     init(
         items: IdentifiedArrayOf<Element>,
         selectedItems: Binding<[Element.ID]>,
         noSelectionAllowed: Bool = false,
-        typography: Typography = .title3Emphasized
+        typography: Typography = .title3Emphasized,
+        showDoneButton: Bool = true
     ) {
         self.items = items
         self._selected = selectedItems
         self.mode = .multi
         self.noSelectionAllowed = noSelectionAllowed
         self.typography = typography
+        self.showDoneButton = showDoneButton
     }
 
     init(
         items: IdentifiedArrayOf<Element>,
         selectedItem: Binding<Element.ID?>,
         noSelectionAllowed: Bool = false,
-        typography: Typography = .title3Emphasized
+        typography: Typography = .title3Emphasized,
+        showDoneButton: Bool = true
     ) {
         self.items = items
         self.noSelectionAllowed = noSelectionAllowed
         self.typography = typography
+        self.showDoneButton = showDoneButton
         self.mode = .single
 
         // creates selected binding using the singleItem binding
@@ -55,27 +64,59 @@ struct SelectListView<Element: Identifiable & CustomStringConvertible>: View {
     }
 
     var body: some View {
-        List {
-            ForEach(items) { item in
-                Button(
-                    action: {
-                        toggleSelection(item)
-                    },
-                    label: {
-                        HStack {
-                            Text(item.description)
-                                .typography(typography)
-                            Spacer()
-                            Image(
-                                systemName: selected.contains(item.id) ? "square.inset.filled" : "square"
+        NavigationStack {
+            ZStack {
+                Color(R.color.surface.primary)
+                    .ignoresSafeArea()
+                ScrollView {
+                    VStack(spacing: 0) {
+                        ForEach(items) { item in
+                            Button(
+                                action: {
+                                    toggleSelection(item)
+                                },
+                                label: {
+                                    HStack {
+                                        Text(item.description)
+                                            .typography(typography)
+                                        Spacer()
+                                        Image(
+                                            systemName: selected.contains(item.id) ? "square.inset.filled" : "square"
+                                        )
+                                        .symbolRenderingMode(.hierarchical)
+                                    }
+                                }
                             )
-                            .symbolRenderingMode(.hierarchical)
+                            .tag(item.id)
+                            .buttonStyle(listButtonStyle(for: item))
                         }
                     }
-                )
-                .tag(item.id)
+                    .backgroundShadow()
+                    .padding(.horizontal)
+                    .toolbar {
+                        if showDoneButton {
+                            Button(Strings.doneButtonTitle) {
+                                dismiss()
+                            }
+                            .foregroundColor(Color(R.color.text.primary))
+                        }
+                    }
+                }
             }
         }
+    }
+
+    private func listButtonStyle(for item: Element) -> ListRowButtonStyle {
+        guard items.count > 2 else {
+            return .listRowSingle
+        }
+
+        if item.id == items.first?.id {
+            return  .listRowTop
+        } else if item.id == items.last?.id {
+            return .listRowBottom
+        }
+        return .listRow
     }
 
     private func toggleSelection(_ item: Element) {
@@ -101,7 +142,11 @@ struct SelectListView<Element: Identifiable & CustomStringConvertible>: View {
     }
 }
 
-enum SelectListViewSelectionMode {
+private enum Strings {
+    static let doneButtonTitle = String(localized: "Done", comment: "Dismisses the current screen")
+}
+
+private enum SelectListViewSelectionMode {
     case single
     case multi
 }
@@ -112,7 +157,7 @@ enum SelectListViewSelectionMode {
     ContainerView()
 }
 
-struct ContainerView: View {
+private struct ContainerView: View {
 
     enum SelectionMode {
         case single, multi
@@ -121,6 +166,7 @@ struct ContainerView: View {
     @State private var multiSelect: [String] = ["2", "4"]
     @State private var singleSelect: String?
     @State private var noSelectionAllowed: Bool = false
+    @State private var showDoneButton: Bool = true
     @State private var mode: SelectionMode = .multi
 
     private let list: IdentifiedArrayOf<Item> = [
@@ -139,7 +185,8 @@ struct ContainerView: View {
                         items: list,
                         selectedItems: $multiSelect,
                         noSelectionAllowed: noSelectionAllowed,
-                        typography: .headlineEmphasized
+                        typography: .headlineEmphasized,
+                        showDoneButton: showDoneButton
                     )
 
                 case .single:
@@ -147,12 +194,13 @@ struct ContainerView: View {
                         items: list,
                         selectedItem: $singleSelect,
                         noSelectionAllowed: noSelectionAllowed,
-                        typography: .headlineEmphasized
+                        typography: .headlineEmphasized,
+                        showDoneButton: showDoneButton
                     )
                 }
             }
             .frame(height: 300)
-            .foregroundColor(Color(R.color.colors.text.primary))
+            .foregroundColor(Color(R.color.text.primary))
 
             VStack {
                 Divider()
@@ -163,6 +211,7 @@ struct ContainerView: View {
                 }
                 .pickerStyle(.segmented)
                 Toggle("No selection allowed", isOn: $noSelectionAllowed)
+                Toggle("Show done button", isOn: $showDoneButton)
                 VStack {
                     Text("Selected Values:")
                         .typography(.bodyEmphasized)

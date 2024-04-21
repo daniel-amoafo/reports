@@ -3,12 +3,12 @@
 import BudgetSystemService
 import Dependencies
 
-private var _liveValue: BudgetClient = .noActiveClient
+private var _liveValue: BudgetClient = .notAuthorizedClient
 private let _accessTokenKey = "ynab-access-token"
 
 extension BudgetClient {
 
-    func updateYnabProvider(with accessToken: String) {
+    func updateYnabProvider(_ accessToken: String) {
         Self.storeAccessToken(accessToken: accessToken)
         updateProvider(.ynab(accessToken: accessToken))
     }
@@ -19,7 +19,7 @@ extension BudgetClient {
         store: KeyValueStore = SecureKeyValueStore()
     ) -> BudgetClient {
         guard let accessToken = accessToken ?? store.string(forKey: _accessTokenKey) else {
-            return .noActiveClient
+            return .notAuthorizedClient
         }
 
         storeAccessToken(accessToken: accessToken, store: store)
@@ -53,10 +53,7 @@ extension BudgetClient: DependencyKey {
 
 extension BudgetClient: TestDependencyKey {
     public static var testValue: BudgetClient {
-        let budgetProvider = BudgetProvider(
-            fetchBudgetSummaries: { return [] }, fetchAccounts: { _ in return [] }
-        )
-        return BudgetClient(provider: budgetProvider)
+        return BudgetClient(provider: BudgetProvider.noop)
     }
 }
 

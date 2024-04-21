@@ -21,6 +21,16 @@ public extension BudgetProvider {
             } catch {
                 throw mappedError(error)
             }
+        } fetchTransactionsAll: { budgetId, startDate, currency in
+            do {
+                return try await api.transactions
+                    .getTransactions(budgetId: budgetId, sinceDate: startDate)
+                    .map { transactionDetail in
+                        Transaction(ynabTransation: transactionDetail, curency: currency)
+                    }
+            } catch {
+                throw mappedError(error)
+            }
         }
     }
 }

@@ -10,7 +10,15 @@ public class BudgetClient {
     @Published public private(set) var budgetSummaries: IdentifiedArrayOf<BudgetSummary> = []
     @Published public private(set) var accounts: IdentifiedArrayOf<Account> = []
     @Published public var authorizationStatus: AuthorizationStatus
-    @Published public private(set) var selectedBudgetId: String?
+    @Published public private(set) var selectedBudgetId: String? {
+        didSet {
+            if oldValue != selectedBudgetId {
+                Task {
+                    await fetchAccounts()
+                }
+            }
+        }
+    }
 
     private let logger = Logger(subsystem: "BudgetSystemService", category: "BudgetClient")
 
@@ -22,12 +30,18 @@ public class BudgetClient {
         self.provider = provider
         self.selectedBudgetId = selectedBudgetId
         self.authorizationStatus = authorizationStatus
+
+    }
+
+    public var selectedBudget: BudgetSummary? {
+        guard let selectedBudgetId else { return nil }
+        return budgetSummaries[id: selectedBudgetId]
     }
 
     public func updateProvider(_ provider: BudgetProvider) {
         self.provider = provider
         Task {
-            await updateBudgetSummaries()
+            await fetchBudgetSummaries()
         }
     }
 
@@ -39,7 +53,7 @@ public class BudgetClient {
         logger.debug("BudgetClient selectedBudgetId updated to: \(selectedId)")
     }
 
-    public func updateBudgetSummaries() async {
+    public func fetchBudgetSummaries() async {
         do {
             let fetchedBudgetSummaries = try await provider.fetchBudgetSummaries()
             Task {
@@ -50,7 +64,7 @@ public class BudgetClient {
                     self.authorizationStatus = .loggedIn
 
                     logger.debug("budgetSummaries updated count(\(self.budgetSummaries.count))")
-                    // ensure the selected budget id is in the updated budget summaries
+                    // If set, ensure the selected budget id is in the updated budget summaries
                     if let selectedBudgetId = self.selectedBudgetId,
                         !fetchedBudgetSummaries.map(\.id).contains(selectedBudgetId) {
                         self.selectedBudgetId = nil
@@ -64,18 +78,32 @@ public class BudgetClient {
     }
 
     /// Fetches account list from budget provider and publishes accounts
-    public func updateAccounts() async {
-        guard let selectedBudgetId else { return }
+    @discardableResult
+    public func fetchAccounts() async -> IdentifiedArrayOf<Account> {
+        guard let selectedBudgetId else { return [] }
         do {
             let fetchedAccounts = try await provider.fetchAccounts(for: selectedBudgetId)
-            Task {
-                await MainActor.run {
-                    // updating published events on main run loop
-                    self.accounts = IdentifiedArray(uniqueElements: fetchedAccounts)
-                }
+            let accounts = IdentifiedArray(uniqueElements: fetchedAccounts)
+            Task { @MainActor in
+                self.accounts = accounts
             }
+            logger.debug("accounts updated count - (\(accounts.count))")
+            return accounts
         } catch {
             await resolveError(error)
+            return []
+        }
+    }
+
+    /// Fetch transactions from the selected Budget with a given start date
+    public func fetchTransactionsAll(startDate: Date) async throws -> IdentifiedArrayOf<Transaction> {
+        guard let selectedBudgetId, let currency = budgetSummaries[id: selectedBudgetId]?.currency else { return [] }
+        do {
+            let fetchedTransactions = try await provider.fetchTransactionsAll(selectedBudgetId, startDate, currency)
+            return IdentifiedArray(uniqueElements: fetchedTransactions)
+        } catch {
+            await resolveError(error)
+            throw error
         }
     }
 
@@ -94,5 +122,5 @@ public class BudgetClient {
 
 extension BudgetClient {
     
-    public static let noActiveClient = BudgetClient(provider: .noop, authorizationStatus: .loggedOut)
+    public static let notAuthorizedClient = BudgetClient(provider: .notAuthorized, authorizationStatus: .loggedOut)
 }

@@ -26,7 +26,7 @@ final class BudgetSystemServiceConfigTests: XCTestCase {
         try await withMainSerialExecutor {
             // when
             XCTAssertTrue(env.client.budgetSummaries.isEmpty)
-            await env.client.updateBudgetSummaries()
+            await env.client.fetchBudgetSummaries()
             await Task.megaYield()
             // then
             XCTAssertTrue(env.client.budgetSummaries.isNotEmpty)
@@ -34,7 +34,7 @@ final class BudgetSystemServiceConfigTests: XCTestCase {
             // when
             XCTAssertTrue(env.client.accounts.isEmpty)
             try env.client.updateSelectedBudgetId("2")
-            await env.client.updateAccounts()
+            await env.client.fetchAccounts()
             await Task.megaYield()
             // then
             XCTAssertTrue(env.client.accounts.isNotEmpty)
@@ -48,10 +48,10 @@ final class BudgetSystemServiceConfigTests: XCTestCase {
         await withMainSerialExecutor {
             // when
             XCTAssertTrue(env.client.budgetSummaries.isEmpty)
-            await env.client.updateBudgetSummaries()
+            await env.client.fetchBudgetSummaries()
             await Task.megaYield()
             // then
-            XCTAssertTrue(env.client === BudgetClient.noActiveClient)
+            XCTAssertTrue(env.client === BudgetClient.notAuthorizedClient)
             XCTAssertTrue(env.client.budgetSummaries.isEmpty)
         }
     }
@@ -85,6 +85,8 @@ private enum Factory {
             .mocks
         } fetchAccounts: { _ in
                 .mocks
+        } fetchTransactionsAll: { _, _, _ in
+            []
         }
     }
 
@@ -102,8 +104,22 @@ extension Array where Element == Account {
 extension Array where Element == BudgetSummary {
 
     static let mocks: Self = [
-        .init(id: "1", name: "Summary One", lastModifiedOn: "Yesterday", firstMonth: "March", lastMonth: "May"),
-        .init(id: "2", name: "Summary Two", lastModifiedOn: "Days ago", firstMonth: "April", lastMonth: "Jun"),
+        .init(
+            id: "1",
+            name: "Summary One",
+            lastModifiedOn: "Yesterday",
+            firstMonth: "March",
+            lastMonth: "May",
+            currency: .AUD
+        ),
+        .init(
+            id: "2",
+            name: "Summary Two",
+            lastModifiedOn: "Days ago",
+            firstMonth: "April",
+            lastMonth: "Jun",
+            currency: .AUD
+        ),
     ]
 
 }

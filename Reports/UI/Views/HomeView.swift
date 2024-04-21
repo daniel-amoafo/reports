@@ -24,12 +24,14 @@ struct Home {
         case destination(PresentationAction<Destination.Action>)
         case didTapSelectBudgetButton
         case didUpdateSelectedBudgetId(String?)
+        case didSelectChart(Chart)
         case onAppear
     }
 
     @Reducer(state: .equatable)
     enum Destination {
         case popoverSelectBudget(Home)
+        case popoverNewReport(ReportFeature)
     }
 
     @Dependency(\.budgetClient) var budgetClient
@@ -55,6 +57,11 @@ struct Home {
                     guard let selectedBudgetId else { return }
                     updateBudgetClientSelectedBudgetId(selectedBudgetId)
                 }
+            case let .didSelectChart(chart):
+                state.destination = .popoverNewReport(
+                    ReportFeature.State(chart: chart)
+                )
+                return .none
             case .onAppear:
                 state.budgetList = budgetClient.budgetSummaries
                 state.selectedBudgetId = budgetClient.selectedBudgetId
@@ -99,11 +106,9 @@ struct HomeView: View {
 
     var body: some View {
         ZStack {
-            Color(R.color.colors.surface.primary)
+            Color(R.color.surface.primary)
                 .ignoresSafeArea()
             VStack(spacing: 0) {
-                Text(Strings.title)
-                    .typography(.title1Emphasized)
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: .Spacing.large) {
                         // New Report Section
@@ -119,6 +124,7 @@ struct HomeView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
+        .navigationTitle(Text(Strings.title))
         .onAppear {
             store.send(.onAppear)
         }
@@ -133,7 +139,7 @@ private extension HomeView {
             HStack(spacing: .Spacing.small) {
                 ForEach(store.charts) { chart in
                     ChartButtonView(title: chart.name, image: chart.type.image) {
-
+                        store.send(.didSelectChart(chart))
                     }
                 }
             }
@@ -173,6 +179,11 @@ private extension HomeView {
                     )
                 }
             }
+            .popover(
+                item: $store.scope(state: \.destination?.popoverNewReport, action: \.destination.popoverNewReport)
+            ) { store in
+                ReportView(store: store)
+            }
         }
     }
 
@@ -181,7 +192,7 @@ private extension HomeView {
             HStack {
                 Text("Saved Reports")
                     .typography(.title3Emphasized)
-                    .foregroundColor(Color(R.color.colors.text.secondary))
+                    .foregroundColor(Color(R.color.text.secondary))
                 Spacer()
             }
             .listRowTop(showHorizontalRule: false)
@@ -200,7 +211,7 @@ private extension HomeView {
                     Spacer()
                 }
             })
-            .buttonStyle(.listRowMiddle)
+            .buttonStyle(.listRow)
 
             VStack {
                 Button("View All") {
@@ -216,9 +227,11 @@ private extension HomeView {
 }
 
 #Preview {
-    HomeView(
-        store: Store(initialState: Home.State()) {
-            Home()
-        }
-    )
+    NavigationStack {
+        HomeView(
+            store: Store(initialState: Home.State()) {
+                Home()
+            }
+        )
+    }
 }

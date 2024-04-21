@@ -30,7 +30,7 @@ extension ListStyleViewModifier: ViewModifier {
     private var backgroundContent: some View {
         ZStack {
             Rectangle()
-                .fill(color ?? Color(R.color.colors.surface.secondary))
+                .fill(color ?? Color(R.color.surface.secondary))
                 .clipShape(
                     .rect(
                         topLeadingRadius: rowType.isTopRounded ? cornerRadius : 0,
@@ -105,19 +105,30 @@ private extension ListStyleViewModifier.RowType {
 }
 
 #Preview {
-    VStack(spacing: 0) {
-        Text("This is a top row")
-            .typography(.title2Emphasized)
-            .listRowTop()
+    VStack(spacing: 16) {
+        HStack {
+            Text("This is a top row")
+                .typography(.title2Emphasized)
+            Spacer()
+            Image(systemName: "chevron.right")
+        }
+        .listRowSingle()
+        .backgroundShadow()
 
-        Text("This is a middle row")
-            .typography(.title2Emphasized)
-            .listRow()
+        VStack(spacing: 0) {
+            Text("This is a top row")
+                .typography(.title2Emphasized)
+                .listRowTop()
 
-        Text("This is a bottom row")
-            .typography(.title2Emphasized)
-            .listRowBottom()
+            Text("This is a middle row")
+                .typography(.title2Emphasized)
+                .listRow()
+
+            Text("This is a bottom row")
+                .typography(.title2Emphasized)
+                .listRowBottom()
+        }
+        .backgroundShadow()
     }
-    .backgroundShadow()
-    .padding(.horizontal)
+    .padding(.horizontal, .Spacing.medium)
 }

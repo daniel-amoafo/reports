@@ -151,8 +151,8 @@ public extension Text {
 
     func typography(_ typography: Typography) -> some View {
         self
-            .font(typography.font)
             .accessibilityAddTraits(typography.isAccessibleHeading ? [.isHeader] : [])
+            .font(typography.font)
     }
 
 }

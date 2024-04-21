@@ -37,7 +37,7 @@ extension HorizontalDivider {
 extension HorizontalDivider.Config {
 
     static let standard: Self = .init(
-        color: Color(R.color.colors.border.secondary), height: 0.5
+        color: Color(R.color.border.secondary), height: 0.5
     )
 }
 

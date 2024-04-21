@@ -20,7 +20,7 @@ struct KleonButtonStyle: ButtonStyle {
             .label
             .frame(maxWidth: .infinity)
             .font(typography.font)
-            .foregroundColor(theme.color(isPressed: configuration.isPressed))
+            .foregroundColor(theme.color(isPressed: configuration.isPressed, isEnabled: isEnabled))
             .padding(.horizontal, .Spacing.small)
             .padding(.vertical, .Spacing.xsmall)
             .background(
@@ -28,7 +28,8 @@ struct KleonButtonStyle: ButtonStyle {
                     .fill(
                         theme.backgroundColor(
                             isPressed: configuration.isPressed,
-                            isDarkColorScheme: isDarkColorScheme
+                            isDarkColorScheme: isDarkColorScheme,
+                            isEnabled: isEnabled
                         )
                     )
                     .stroke(
@@ -55,29 +56,29 @@ struct KleonButtonStyle: ButtonStyle {
 
 extension KleonButtonStyle.Theme {
 
-    func color(isPressed: Bool) -> Color {
+    func color(isPressed: Bool, isEnabled: Bool) -> Color {
         let baseColor: Color
         switch self {
         case .primary:
-            baseColor = Color(R.color.colors.button.primaryTitle)
+            baseColor = Color(R.color.button.primaryTitle)
         case .secondary:
-            baseColor = Color(R.color.colors.button.secondaryTitle)
+            baseColor = Color(R.color.button.secondaryTitle)
         case .outline:
-            baseColor = isPressed ? .black : Color(R.color.colors.button.outline)
+            baseColor = isPressed ? .black : Color(R.color.button.outline)
         }
-        guard isPressed else {
-            return baseColor
+        if isPressed || !isEnabled {
+            return baseColor.opacity(0.5)
         }
-        return baseColor.opacity(0.5)
+        return baseColor
     }
 
-    func backgroundColor(isPressed: Bool, isDarkColorScheme: Bool) -> Color {
+    func backgroundColor(isPressed: Bool, isDarkColorScheme: Bool, isEnabled: Bool) -> Color {
         let baseColor: Color
         switch self {
         case .primary:
-            baseColor = Color(R.color.colors.button.primary)
+            baseColor = isEnabled ? Color(R.color.button.primary) : Color(R.color.button.primaryDisabled)
         case .secondary:
-            baseColor = Color(R.color.colors.button.secondary)
+            baseColor = Color(R.color.button.secondary)
         case .outline:
             if isPressed {
                 baseColor = .gray.lighter(by: isDarkColorScheme ? 0 : 50)
@@ -97,7 +98,7 @@ extension KleonButtonStyle.Theme {
         case .primary, .secondary:
             baseColor = .clear
         case .outline:
-            baseColor = isPressed ? .gray : Color(R.color.colors.button.outline)
+            baseColor = isPressed ? .gray : Color(R.color.button.outline)
         }
         guard isPressed else {
             return baseColor
@@ -126,6 +127,9 @@ extension ButtonStyle where Self == KleonButtonStyle {
     VStack(spacing: 8) {
         Button("Primary", action: {})
             .buttonStyle(.kleonPrimary)
+        Button("Primary Disabled", action: {})
+            .buttonStyle(.kleonPrimary)
+            .disabled(true)
 
         Button("Secondary", action: {})
             .buttonStyle(.kleonSecondary)
