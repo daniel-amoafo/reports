@@ -45,6 +45,6 @@ public enum BudgetClientError: LocalizedError {
     }
 
     static func makeIsNotAuthorized() -> Self {
-        .http(code: "401", message: "session not authenticated")
+        .http(code: "401", message: "client not authenticated")
     }
 }

@@ -21,12 +21,27 @@ public extension BudgetProvider {
             } catch {
                 throw mappedError(error)
             }
-        } fetchTransactionsAll: { budgetId, startDate, currency in
+        } fetchCategoryValues: { params in
+            do {
+                let result = try await api.categories.getCategories(budgetId: params.budgetId)
+                    .map { categoryGroup -> (CategoryGroup, [Category]) in
+                        let group = CategoryGroup(ynabCategoryGroup: categoryGroup)
+                        let categories = categoryGroup.categories.map { Category(ynabCategory: $0, curency: params.currency) }
+                        return (group, categories)
+                    }
+                let groups = result.map(\.0)
+                let categories = result.flatMap(\.1)
+                return (groups, categories)
+            } catch {
+                throw mappedError(error)
+            }
+        } fetchTransactionsAll: { params in
             do {
                 return try await api.transactions
-                    .getTransactions(budgetId: budgetId, sinceDate: startDate)
+                    .getTransactions(budgetId: params.budgetId, sinceDate: params.startDate)
                     .map { transactionDetail in
-                        Transaction(ynabTransation: transactionDetail, curency: currency)
+                        let categoryGroup = params.categoryGroupProvider?.getCategoryGroupForCategory(id: transactionDetail.categoryId)
+                        return Transaction(ynabTransation: transactionDetail, curency: params.currency, categoryGroup: categoryGroup)
                     }
             } catch {
                 throw mappedError(error)

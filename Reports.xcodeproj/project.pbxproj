@@ -44,9 +44,10 @@
 		186E8A442B9C3AD500E65BDE /* KleonButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186E8A432B9C3AD500E65BDE /* KleonButtonStyle.swift */; };
 		186E8A462B9C4BB500E65BDE /* Color+Adjust.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186E8A452B9C4BB500E65BDE /* Color+Adjust.swift */; };
 		189641AF2B9C72BE00716258 /* AnimationConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189641AE2B9C72BE00716258 /* AnimationConstants.swift */; };
-		189641BB2B9C8CFE00716258 /* Chart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189641BA2B9C8CFD00716258 /* Chart.swift */; };
+		189641BB2B9C8CFE00716258 /* ReportChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189641BA2B9C8CFD00716258 /* ReportChart.swift */; };
 		189641BE2B9D675900716258 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189641BD2B9D675900716258 /* SettingsView.swift */; };
 		189641C12B9D67CE00716258 /* SavedReportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189641C02B9D67CE00716258 /* SavedReportsView.swift */; };
+		18A514C92BD5001300B072DE /* SpendingTotalChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A514C82BD5001300B072DE /* SpendingTotalChartView.swift */; };
 		18C3BFB02B81874000E444C8 /* AppIntroLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C3BFAF2B81874000E444C8 /* AppIntroLoginView.swift */; };
 		18C3BFB22B820AEA00E444C8 /* SFSafariView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C3BFB12B820AEA00E444C8 /* SFSafariView.swift */; };
 		18C3BFB72B820DD000E444C8 /* Binding+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C3BFB62B820DD000E444C8 /* Binding+Additions.swift */; };
@@ -127,10 +128,11 @@
 		186E8A432B9C3AD500E65BDE /* KleonButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KleonButtonStyle.swift; sourceTree = "<group>"; };
 		186E8A452B9C4BB500E65BDE /* Color+Adjust.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Adjust.swift"; sourceTree = "<group>"; };
 		189641AE2B9C72BE00716258 /* AnimationConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationConstants.swift; sourceTree = "<group>"; };
-		189641BA2B9C8CFD00716258 /* Chart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Chart.swift; sourceTree = "<group>"; };
+		189641BA2B9C8CFD00716258 /* ReportChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportChart.swift; sourceTree = "<group>"; };
 		189641BD2B9D675900716258 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		189641C02B9D67CE00716258 /* SavedReportsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedReportsView.swift; sourceTree = "<group>"; };
 		18A514C22BCFF5FC00B072DE /* MoneyCommon */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = MoneyCommon; path = Packages/MoneyCommon; sourceTree = "<group>"; };
+		18A514C82BD5001300B072DE /* SpendingTotalChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendingTotalChartView.swift; sourceTree = "<group>"; };
 		18C3BFAE2B806A7500E444C8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		18C3BFAF2B81874000E444C8 /* AppIntroLoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIntroLoginView.swift; sourceTree = "<group>"; };
 		18C3BFB12B820AEA00E444C8 /* SFSafariView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SFSafariView.swift; sourceTree = "<group>"; };
@@ -365,7 +367,7 @@
 		189641B62B9C8CC000716258 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				189641BA2B9C8CFD00716258 /* Chart.swift */,
+				189641BA2B9C8CFD00716258 /* ReportChart.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -373,6 +375,7 @@
 		18A514C42BD3652F00B072DE /* ChartGraphViews */ = {
 			isa = PBXGroup;
 			children = (
+				18A514C82BD5001300B072DE /* SpendingTotalChartView.swift */,
 			);
 			path = ChartGraphViews;
 			sourceTree = "<group>";
@@ -606,7 +609,7 @@
 				186E8A442B9C3AD500E65BDE /* KleonButtonStyle.swift in Sources */,
 				183ECBE12B747085006C45B2 /* Typography.swift in Sources */,
 				18C3BFBF2B82370B00E444C8 /* BudgetSystemService+Config.swift in Sources */,
-				189641BB2B9C8CFE00716258 /* Chart.swift in Sources */,
+				189641BB2B9C8CFE00716258 /* ReportChart.swift in Sources */,
 				183ECBE02B747085006C45B2 /* SelectListView.swift in Sources */,
 				183ECBC12B70E0B6006C45B2 /* KeyValueStore.swift in Sources */,
 				183ECBF12B748E90006C45B2 /* HorizontalDivider.swift in Sources */,
@@ -619,6 +622,7 @@
 				184DF0B72B6E1C3E00BA6F21 /* ReportsApp.swift in Sources */,
 				183ECBEE2B747460006C45B2 /* Array+Safe.swift in Sources */,
 				18C3BFB72B820DD000E444C8 /* Binding+Additions.swift in Sources */,
+				18A514C92BD5001300B072DE /* SpendingTotalChartView.swift in Sources */,
 				189641BE2B9D675900716258 /* SettingsView.swift in Sources */,
 				183ECBC72B70E5DD006C45B2 /* SecureKeyValueStore.swift in Sources */,
 				186A80F52BCC013F0015FFC7 /* BottomShadowViewModifier.swift in Sources */,

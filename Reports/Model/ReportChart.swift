@@ -2,7 +2,7 @@
 
 import SwiftUI
 
-struct Chart: Identifiable, Equatable {
+struct ReportChart: Identifiable, Equatable {
     let id: String
     let name: String
     let description: String
@@ -29,7 +29,7 @@ enum ChartType: Equatable {
     }
 }
 
-extension Chart {
+extension ReportChart {
 
     private enum Strings {
         static let spendingTotalTitle = String(
@@ -58,7 +58,7 @@ extension Chart {
         )
     }
 
-    static func makeDefaultCharts() -> [Chart] {
+    static func makeDefaultCharts() -> [ReportChart] {
         [
             .init(
                 id: "spendingTotal",

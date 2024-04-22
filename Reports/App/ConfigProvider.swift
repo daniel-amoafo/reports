@@ -8,7 +8,7 @@ class ConfigProvider {
     private let defaultStore: KeyValueStore
     private let secureStore: KeyValueStore
 
-    let charts: [Chart]
+    let charts: [ReportChart]
 
     enum Key: String {
         case oauthPath = "cw-oauth-path"
@@ -18,7 +18,7 @@ class ConfigProvider {
     init(defaultStore: KeyValueStore = UserDefaults.standard, secureStore: KeyValueStore = SecureKeyValueStore()) {
         self.defaultStore = defaultStore
         self.secureStore = secureStore
-        self.charts = Chart.makeDefaultCharts()
+        self.charts = ReportChart.makeDefaultCharts()
     }
 
     private var infoDict: [String: Any]? {

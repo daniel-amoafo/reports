@@ -101,8 +101,7 @@ private extension AppFeature {
 
     func loadBudgetClientData() async {
         logger.debug("\(#function) - fetching budgetClient data")
-        await budgetClient.fetchBudgetSummaries()
-        await budgetClient.fetchAccounts()
+        await budgetClient.fetchLoadedData()
     }
 
 }

@@ -12,7 +12,7 @@ struct Home {
         @Presents var destination: Destination.State?
         var selectedBudgetId: String?
         var budgetList: IdentifiedArrayOf<BudgetSummary>?
-        var charts: [Chart] = []
+        var charts: [ReportChart] = []
 
         var selectedBudgetName: String? {
             guard let selectedBudgetId else { return nil }
@@ -24,7 +24,7 @@ struct Home {
         case destination(PresentationAction<Destination.Action>)
         case didTapSelectBudgetButton
         case didUpdateSelectedBudgetId(String?)
-        case didSelectChart(Chart)
+        case didSelectChart(ReportChart)
         case onAppear
     }
 

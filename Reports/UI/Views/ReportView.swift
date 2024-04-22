@@ -9,7 +9,7 @@ struct ReportFeature {
 
     @ObservableState
     struct State: Equatable {
-        let chart: Chart
+        let chart: ReportChart
         var showChartMoreInfo = false
         var fromDate: Date = .now
         var toDate: Date = .aWeekFrom(.now)
@@ -43,7 +43,7 @@ struct ReportFeature {
         case selectAccountRowTapped(Bool)
         case didSelectAccountId(String?)
         case runReportTapped
-        case reportReponse(IdentifiedArrayOf<BudgetSystemService.Transaction>)
+        case runReportReponse(IdentifiedArrayOf<BudgetSystemService.Transaction>)
         case onAppear
     }
 
@@ -67,7 +67,7 @@ struct ReportFeature {
                 return .run { [state] send in
                     await fetchReport(state: state, send: send)
                 }
-            case let .reportReponse(transaction):
+            case let .runReportReponse(transaction):
                 // call report graph
                 state.reportLoading = false
                 print(transaction.count)
@@ -93,8 +93,9 @@ private extension ReportFeature {
     func fetchReport(state: ReportFeature.State, send: Send<ReportFeature.Action>) async {
 
         do {
-            let transactions = try await budgetClient.fetchTransactionsAll(startDate: state.fromDate)
-            await send(.reportReponse(transactions))
+            let transactions = try await budgetClient
+                .fetchTransactionsAll(startDate: state.fromDate, finishDate: state.toDate)
+            await send(.runReportReponse(transactions))
         } catch {
 
         }
@@ -324,13 +325,13 @@ struct ReportView: View {
             Button {
                 store.send(.runReportTapped, animation: .default)
             } label: {
-                if store.reportLoading {
-                    ProgressView()
-                        .tint(Color(R.color.button.primaryTitle))
-                } else {
+                ZStack {
                     Text(Strings.runReportTitle)
                         .typography(.title3Emphasized)
-
+                        .opacity(store.reportLoading ? 0 : 1)
+                    ProgressView()
+                        .tint(Color(R.color.button.primaryTitle))
+                        .opacity(store.reportLoading ? 1 : 0)
                 }
             }
             .buttonStyle(.kleonPrimary)
@@ -373,16 +374,16 @@ private extension VerticalAlignment {
     }
 }
 
-private extension Chart {
+private extension ReportChart {
 
-    static let mock: Chart = Self.makeDefaultCharts()[0]
+    static let mock: ReportChart = Self.makeDefaultCharts()[0]
 }
 
 extension IdentifiedArray where ID == Account.ID, Element == Account {
 
     static let mocks: Self = [
-        .init(id: "01", name: "Everyday Account"),
-        .init(id: "02", name: "Acme Account"),
-        .init(id: "03", name: "Appleseed Account"),
+        .init(id: "01", name: "Everyday Account", deleted: false),
+        .init(id: "02", name: "Acme Account", deleted: false),
+        .init(id: "03", name: "Appleseed Account", deleted: false),
     ]
 }

@@ -9,6 +9,8 @@ public class BudgetClient {
 
     @Published public private(set) var budgetSummaries: IdentifiedArrayOf<BudgetSummary> = []
     @Published public private(set) var accounts: IdentifiedArrayOf<Account> = []
+    @Published public private(set) var categoryGroups: IdentifiedArrayOf<CategoryGroup> = []
+    @Published public private(set) var categories: IdentifiedArrayOf<Category> = []
     @Published public var authorizationStatus: AuthorizationStatus
     @Published public private(set) var selectedBudgetId: String? {
         didSet {
@@ -53,6 +55,13 @@ public class BudgetClient {
         logger.debug("BudgetClient selectedBudgetId updated to: \(selectedId)")
     }
 
+    /// Helper function to fetch published data values
+    public func fetchLoadedData() async {
+        await fetchBudgetSummaries()
+        await fetchAccounts()
+        await fetchCategoryValues()
+    }
+
     public func fetchBudgetSummaries() async {
         do {
             let fetchedBudgetSummaries = try await provider.fetchBudgetSummaries()
@@ -63,7 +72,7 @@ public class BudgetClient {
                     // must be logged in to successfully fetch budgetsummaries without error
                     self.authorizationStatus = .loggedIn
 
-                    logger.debug("budgetSummaries updated count(\(self.budgetSummaries.count))")
+                    logger.debug("budgetSummaries count(\(self.budgetSummaries.count))")
                     // If set, ensure the selected budget id is in the updated budget summaries
                     if let selectedBudgetId = self.selectedBudgetId,
                         !fetchedBudgetSummaries.map(\.id).contains(selectedBudgetId) {
@@ -82,12 +91,13 @@ public class BudgetClient {
     public func fetchAccounts() async -> IdentifiedArrayOf<Account> {
         guard let selectedBudgetId else { return [] }
         do {
-            let fetchedAccounts = try await provider.fetchAccounts(for: selectedBudgetId)
+            let fetchedAccounts = try await provider.fetchAccounts(selectedBudgetId)
             let accounts = IdentifiedArray(uniqueElements: fetchedAccounts)
+                .filter { $0.deleted == false }
             Task { @MainActor in
                 self.accounts = accounts
             }
-            logger.debug("accounts updated count - (\(accounts.count))")
+            logger.debug("accounts count (\(accounts.count))")
             return accounts
         } catch {
             await resolveError(error)
@@ -95,11 +105,34 @@ public class BudgetClient {
         }
     }
 
+    public func fetchCategoryValues() async {
+        guard let selectedBudgetId, let currency = budgetSummaries[id: selectedBudgetId]?.currency else { return }
+        do {
+            let fetchedCategoryValues = try await provider.fetchCategoryValues(
+                .init(budgetId: selectedBudgetId, currency: currency)
+            )
+            let categoryGroups = IdentifiedArray(uniqueElements: fetchedCategoryValues.groups)
+            Task { @MainActor in
+                self.categoryGroups = categoryGroups
+            }
+            logger.debug("categoryGroups count (\(categoryGroups.count))")
+        } catch {
+            await resolveError(error)
+        }
+    }
+
     /// Fetch transactions from the selected Budget with a given start date
-    public func fetchTransactionsAll(startDate: Date) async throws -> IdentifiedArrayOf<Transaction> {
+    public func fetchTransactionsAll(startDate: Date, finishDate: Date) async throws -> IdentifiedArrayOf<Transaction> {
         guard let selectedBudgetId, let currency = budgetSummaries[id: selectedBudgetId]?.currency else { return [] }
         do {
-            let fetchedTransactions = try await provider.fetchTransactionsAll(selectedBudgetId, startDate, currency)
+            let fetchedTransactions = try await provider.fetchTransactionsAll(
+                .init(budgetId: selectedBudgetId, startDate: startDate, finishDate: finishDate, currency: currency, categoryGroupProvider: self)
+            )
+                .filter {
+                    (startDate ... finishDate).contains($0.date) &&
+                    $0.transferAccountId == nil &&
+                    $0.deleted == false
+                }
             return IdentifiedArray(uniqueElements: fetchedTransactions)
         } catch {
             await resolveError(error)
@@ -123,4 +156,24 @@ public class BudgetClient {
 extension BudgetClient {
     
     public static let notAuthorizedClient = BudgetClient(provider: .notAuthorized, authorizationStatus: .loggedOut)
+}
+
+// MARK: - CategoryGroupLookupProviding
+
+extension BudgetClient: CategoryGroupLookupProviding {
+
+    public func getCategoryGroupForCategory(id categoryId: String?) -> CategoryGroup? {
+        guard let categoryId, !categories.isEmpty,
+              let category = categories[id: categoryId] else {
+            return nil
+        }
+        return categoryGroups[id: category.categoryGroupId]
+    }
+}
+
+
+public protocol CategoryGroupLookupProviding {
+
+    func getCategoryGroupForCategory(id: String?) -> CategoryGroup?
+
 }

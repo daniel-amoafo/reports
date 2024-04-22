@@ -85,7 +85,9 @@ private enum Factory {
             .mocks
         } fetchAccounts: { _ in
                 .mocks
-        } fetchTransactionsAll: { _, _, _ in
+        } fetchCategoryValues: { _ in
+            ([], [])
+        } fetchTransactionsAll: { _ in
             []
         }
     }
@@ -95,9 +97,9 @@ private enum Factory {
 extension Array where Element == Account {
 
     static let mocks: Self = [
-        .init(id: "01", name: "First Account"),
-        .init(id: "02", name: "Second Account"),
-        .init(id: "03", name: "Third Account"),
+        .init(id: "01", name: "First Account", deleted: false),
+        .init(id: "02", name: "Second Account", deleted: false),
+        .init(id: "03", name: "Third Account", deleted: false),
     ]
 }
 

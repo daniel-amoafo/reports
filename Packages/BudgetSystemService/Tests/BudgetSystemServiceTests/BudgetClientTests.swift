@@ -70,14 +70,14 @@ final class BudgetClientTests: XCTestCase {
     func testFetchTransactionsAll() async throws {
         // given
         sut = try await Factory.createBudgetClientWithSelectBudgetId("Budget1")
-        let startDate = iso8601DateFormatter.date(from: "2024-02-01")!
+        let startDate = Date.iso8601Formatter.date(from: "2024-02-01")!
+        let finishDate = Date.iso8601Formatter.date(from: "2024-03-30")!
 
         // when
-        let transactions = await sut.fetchTransactionsAll(startDate: startDate)
-        await Task.megaYield()
+        let transactions = try await sut.fetchTransactionsAll(startDate: startDate, finishDate: finishDate)
 
         // then
-        XCTAssertEqual(transactions.count, 3)
+        XCTAssertEqual(transactions.count, 2)
     }
 }
 
@@ -90,7 +90,7 @@ private enum Factory {
         await client.fetchBudgetSummaries()
         await Task.megaYield()
         XCTAssertNil(client.selectedBudgetId)
-        try client.updateSelectedBudgetId("Budget1")
+        try client.updateSelectedBudgetId(budgetId)
 
         return client
     }
@@ -98,13 +98,16 @@ private enum Factory {
     static func createBudgetProvider(
         budgetSummaries: [BudgetSummary]? = nil,
         accounts: [Account]? = nil,
+        categoryGroups: [CategoryGroup]? = nil,
         transactions: [Transaction]? = nil
     ) -> BudgetProvider {
         .init {
             budgetSummaries ?? Self.budgetSummaries
         } fetchAccounts: { budgetId in
             accounts ?? Self.accounts
-        } fetchTransactionsAll: { budgetId, startDate, currency in
+        } fetchCategoryGroups: { params in
+            categoryGroups ?? Self.categoryGroup
+        } fetchTransactionsAll: { params in
             transactions ?? Self.transactions
         }
     }
@@ -118,9 +121,15 @@ private enum Factory {
 
     static var accounts: [Account] {
         [
-            .init(id: "01", name: "First"),
-            .init(id: "02", name: "Second"),
-            .init(id: "03", name: "Third"),
+            .init(id: "01", name: "First", deleted: false),
+            .init(id: "02", name: "Second", deleted: false),
+            .init(id: "03", name: "Third", deleted: false),
+        ]
+    }
+
+    static var categoryGroup: [CategoryGroup] {
+        [
+            .init(id: "CG1", name: "Fixed Expenses", hidden: false, deleted: false, categories: [])
         ]
     }
 
@@ -128,38 +137,37 @@ private enum Factory {
         [
             .init(
                 id: "T1",
-                date: iso8601DateFormatter.date(from: "2024-02-01")!,
+                date: Date.iso8601Formatter.date(from: "2024-02-01")!,
                 money: Money(Decimal(-100), currency: .AUD),
                 accountId: "A1",
                 accountName: "Account First",
                 categoryId: "C1",
-                categoryName: "Groceries"
+                categoryName: "Groceries",
+                transferAccountId: nil,
+                deleted: false
             ),
             .init(
                 id: "T2",
-                date: iso8601DateFormatter.date(from: "2024-03-04")!,
+                date: Date.iso8601Formatter.date(from: "2024-03-04")!,
                 money: Money(Decimal(-123.45), currency: .AUD),
                 accountId: "A1",
                 accountName: "Account First",
                 categoryId: "C2",
-                categoryName: "Electricity Bill"
+                categoryName: "Electricity Bill",
+                transferAccountId: nil,
+                deleted: false
             ),
             .init(
                 id: "T3",
-                date: iso8601DateFormatter.date(from: "2024-04-05")!,
+                date: Date.iso8601Formatter.date(from: "2024-04-05")!,
                 money: Money(Decimal(-299.99), currency: .AUD),
                 accountId: "A2",
                 accountName: "Account Second",
                 categoryId: "C3",
-                categoryName: "Rent"
+                categoryName: "Rent",
+                transferAccountId: nil,
+                deleted: false
             )
         ]
     }
 }
-
-private var iso8601DateFormatter: ISO8601DateFormatter = {
-    let formatter = ISO8601DateFormatter()
-    formatter.formatOptions = [.withFullDate]
-    formatter.timeZone = NSTimeZone.local
-    return formatter
-}()

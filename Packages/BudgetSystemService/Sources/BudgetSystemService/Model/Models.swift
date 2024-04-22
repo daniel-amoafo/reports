@@ -8,12 +8,13 @@ public struct Account: Identifiable, Equatable, CustomStringConvertible {
 
     public var id: String
     public var name: String
-
+    public var deleted: Bool
     public var description: String { name }
 
-    public init(id: String, name: String) {
+    public init(id: String, name: String, deleted: Bool) {
         self.id = id
         self.name = name
+        self.deleted = deleted
     }
 }
 
@@ -54,6 +55,57 @@ public struct BudgetSummary: Identifiable, Equatable, CustomStringConvertible {
     }
 }
 
+public struct CategoryGroup: Identifiable, Equatable, CustomStringConvertible {
+    /// Category group id
+    public let id: String
+
+    /// Category name
+    public let name: String
+
+    /// Whether or not the category is hidden
+    public let hidden: Bool
+
+    /// Whether or not the category is deleted
+    public let deleted: Bool
+
+    public var description: String { name }
+
+    public var categoryIds: [String]
+
+    public init(id: String, name: String, hidden: Bool, deleted: Bool, categoryIds: [String]) {
+        self.id = id
+        self.name = name
+        self.hidden = hidden
+        self.deleted = deleted
+        self.categoryIds = categoryIds
+    }
+}
+
+public struct Category: Identifiable, Equatable, CustomStringConvertible {
+    /// Category id
+    public let id: String
+
+    /// Category group id
+    public let categoryGroupId: String
+
+    /// Category name
+    public let name: String
+
+    /// Whether or not the category is hidden
+    public let hidden: Bool
+
+    /// Category note
+    public let note: String?
+
+    /// Current balance on this category
+    public let balance: Money
+
+    /// Whether or not the category is deleted
+    public let deleted: Bool
+
+    public var description: String { name }
+}
+
 
 public struct Transaction: Identifiable, Equatable, CustomStringConvertible {
 
@@ -72,11 +124,45 @@ public struct Transaction: Identifiable, Equatable, CustomStringConvertible {
     /// Category id
     public let categoryId: String?
 
+    public let categoryGroupId: String?
+
+    public let categoryGroupName: String?
+
     /// Category name
     public let categoryName: String?
 
+    public let transferAccountId: String?
+
+    public let deleted: Bool
+
     public var description: String { 
         "\(id), \(dateFormated()), \(categoryName ?? ""),\(amountFormatted())"
+    }
+
+    public init(
+        id: String,
+        date: Date,
+        money: Money,
+        accountId: String,
+        accountName: String,
+        categoryId: String?,
+        categoryName: String?,
+        categoryGroupId: String?,
+        categoryGroupName: String?,
+        transferAccountId: String?,
+        deleted: Bool
+    ) {
+        self.id = id
+        self.date = date
+        self.money = money
+        self.accountId = accountId
+        self.accountName = accountName
+        self.categoryId = categoryId
+        self.categoryName = categoryName
+        self.categoryGroupId = categoryGroupId
+        self.categoryGroupName = categoryGroupName
+        self.transferAccountId = transferAccountId
+        self.deleted = deleted
     }
 
     public func dateFormated() -> String {

@@ -1,5 +1,5 @@
 import XCTest
-@testable import Money
+@testable import MoneyCommon
 
 final class MoneyTests: XCTestCase {
 

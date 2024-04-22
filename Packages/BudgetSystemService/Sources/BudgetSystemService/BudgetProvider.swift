@@ -7,50 +7,57 @@ import MoneyCommon
 
 public struct BudgetProvider {
 
-    private let _fetchBudgetSummaries: () async throws -> [BudgetSummary]
-    private let _fetchAccounts: (_ budgetId: String) async throws -> [Account]
-    let fetchTransactionsAll: (_ budgetId: String, _ startDate: Date, _ currency: Currency) async throws -> [Transaction]
+    let fetchBudgetSummaries: () async throws -> [BudgetSummary]
+    let fetchAccounts: (_ budgetId: String) async throws -> [Account]
+    let fetchCategoryValues: (_ params: CategoryGroupParameters) async throws -> (groups: [CategoryGroup], categories: [Category])
+    let fetchTransactionsAll: (_ params: TransactionParameters) async throws -> [Transaction]
 
     public init(
         fetchBudgetSummaries: @Sendable @escaping () async throws -> [BudgetSummary],
         fetchAccounts: @Sendable @escaping (_ budgetId: String) async throws -> [Account],
-        fetchTransactionsAll: @Sendable @escaping (_ budgetId: String, _ startDate: Date, _ currency: Currency) async throws -> [Transaction]
+        fetchCategoryValues: @Sendable @escaping (_ params: CategoryGroupParameters) async throws -> (groups: [CategoryGroup], categories: [Category]),
+        fetchTransactionsAll: @Sendable @escaping (_ params: TransactionParameters) async throws -> [Transaction]
 //      fetchTransactionsByAccount
 //      fetchTransactionsByCategory
     ) {
-        self._fetchBudgetSummaries = fetchBudgetSummaries
-        self._fetchAccounts = fetchAccounts
+        self.fetchBudgetSummaries = fetchBudgetSummaries
+        self.fetchAccounts = fetchAccounts
+        self.fetchCategoryValues = fetchCategoryValues
         self.fetchTransactionsAll = fetchTransactionsAll
     }
 
+    public struct CategoryGroupParameters {
+        public let budgetId: String
+        public let currency: Currency
+    }
+
+    public struct TransactionParameters {
+        public let budgetId: String
+        public let startDate: Date
+        public let finishDate: Date
+        public let currency: Currency
+        public let categoryGroupProvider: CategoryGroupLookupProviding?
+    }
 }
+
+// MARK: - Static Budget Providers
 
 public extension BudgetProvider {
 
-    func fetchBudgetSummaries() async throws -> [BudgetSummary] {
-        try await _fetchBudgetSummaries()
-    }
-
-    func fetchAccounts(for budgetId: String) async throws -> [Account] {
-        try await _fetchAccounts(budgetId)
-    }
-
-}
-
-public extension BudgetProvider {
-
-    // Static BudgetProvider that does nothing
+    /// Static BudgetProvider that does nothing
     static let noop = BudgetProvider(
         fetchBudgetSummaries: { return [] },
         fetchAccounts: { _ in return [] }, 
-        fetchTransactionsAll: { _,_,_  in return [] }
+        fetchCategoryValues: { _ in return ([],[]) },
+        fetchTransactionsAll: { _ in return [] }
     )
 
-    //
+    /// A variant of the client that is not authenticated throwing an error when any property is invoked.
     static let notAuthorized = BudgetProvider(
         fetchBudgetSummaries: { throw isNotAuthorizedError() },
-        fetchAccounts: { _ in throw isNotAuthorizedError()  },
-        fetchTransactionsAll: { _,_,_ in throw isNotAuthorizedError() }
+        fetchAccounts: { _ in throw isNotAuthorizedError() },
+        fetchCategoryValues: { _ in throw isNotAuthorizedError() },
+        fetchTransactionsAll: { _ in throw isNotAuthorizedError() }
     )
 
     private static func isNotAuthorizedError() -> BudgetClientError {
