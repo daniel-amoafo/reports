@@ -12,6 +12,10 @@ struct LogFactory {
     }
 
     static func create(category: Category) -> Logger {
-        .init(subsystem: "Reports", category: category.rawValue)
+        create(category: category.rawValue)
+    }
+
+    static func create(category: String) -> Logger {
+        .init(subsystem: "Reports", category: category)
     }
 }

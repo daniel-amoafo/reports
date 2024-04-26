@@ -12,7 +12,7 @@ struct ListStyleViewModifier {
     let showHorizontalRule: Bool
     var color: Color?
 
-    private let cornerRadius = Double(CGFloat.Corner.medium)
+    private let cornerRadius = Double(CGFloat.Corner.rd12)
 
 }
 
@@ -23,7 +23,7 @@ extension ListStyleViewModifier: ViewModifier {
     public func body(content: Content) -> some View {
         content
             .frame(maxWidth: .infinity)
-            .padding(.Spacing.small)
+            .padding(.Spacing.pt12)
             .background(backgroundContent)
     }
 
@@ -130,5 +130,5 @@ private extension ListStyleViewModifier.RowType {
         }
         .backgroundShadow()
     }
-    .padding(.horizontal, .Spacing.medium)
+    .padding(.horizontal, .Spacing.pt16)
 }

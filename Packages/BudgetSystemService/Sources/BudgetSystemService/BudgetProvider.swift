@@ -10,20 +10,18 @@ public struct BudgetProvider {
     let fetchBudgetSummaries: () async throws -> [BudgetSummary]
     let fetchAccounts: (_ budgetId: String) async throws -> [Account]
     let fetchCategoryValues: (_ params: CategoryGroupParameters) async throws -> (groups: [CategoryGroup], categories: [Category])
-    let fetchTransactionsAll: (_ params: TransactionParameters) async throws -> [Transaction]
+    let fetchTransactions: (_ params: TransactionParameters) async throws -> [TransactionEntry]
 
     public init(
         fetchBudgetSummaries: @Sendable @escaping () async throws -> [BudgetSummary],
         fetchAccounts: @Sendable @escaping (_ budgetId: String) async throws -> [Account],
         fetchCategoryValues: @Sendable @escaping (_ params: CategoryGroupParameters) async throws -> (groups: [CategoryGroup], categories: [Category]),
-        fetchTransactionsAll: @Sendable @escaping (_ params: TransactionParameters) async throws -> [Transaction]
-//      fetchTransactionsByAccount
-//      fetchTransactionsByCategory
+        fetchTransactions: @Sendable @escaping (_ params: TransactionParameters) async throws -> [TransactionEntry]
     ) {
         self.fetchBudgetSummaries = fetchBudgetSummaries
         self.fetchAccounts = fetchAccounts
         self.fetchCategoryValues = fetchCategoryValues
-        self.fetchTransactionsAll = fetchTransactionsAll
+        self.fetchTransactions = fetchTransactions
     }
 
     public struct CategoryGroupParameters {
@@ -32,11 +30,18 @@ public struct BudgetProvider {
     }
 
     public struct TransactionParameters {
+        public enum FilterByOption {
+            case account(accountId: String)
+            case category(categoryId: String)
+            // support payee fitler type
+        }
+
         public let budgetId: String
         public let startDate: Date
         public let finishDate: Date
         public let currency: Currency
         public let categoryGroupProvider: CategoryGroupLookupProviding?
+        public let filterBy: FilterByOption?
     }
 }
 
@@ -49,7 +54,7 @@ public extension BudgetProvider {
         fetchBudgetSummaries: { return [] },
         fetchAccounts: { _ in return [] }, 
         fetchCategoryValues: { _ in return ([],[]) },
-        fetchTransactionsAll: { _ in return [] }
+        fetchTransactions: { _ in return [] }
     )
 
     /// A variant of the client that is not authenticated throwing an error when any property is invoked.
@@ -57,7 +62,7 @@ public extension BudgetProvider {
         fetchBudgetSummaries: { throw isNotAuthorizedError() },
         fetchAccounts: { _ in throw isNotAuthorizedError() },
         fetchCategoryValues: { _ in throw isNotAuthorizedError() },
-        fetchTransactionsAll: { _ in throw isNotAuthorizedError() }
+        fetchTransactions: { _ in throw isNotAuthorizedError() }
     )
 
     private static func isNotAuthorizedError() -> BudgetClientError {

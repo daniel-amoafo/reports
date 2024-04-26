@@ -16,7 +16,7 @@ public class BudgetClient {
         didSet {
             if oldValue != selectedBudgetId {
                 Task {
-                    await fetchAccounts()
+                    await fetchBudgetSummaryValues()
                 }
             }
         }
@@ -33,6 +33,10 @@ public class BudgetClient {
         self.selectedBudgetId = selectedBudgetId
         self.authorizationStatus = authorizationStatus
 
+    }
+
+    public var isAuthenticated: Bool {
+        authorizationStatus == .loggedIn
     }
 
     public var selectedBudget: BudgetSummary? {
@@ -58,6 +62,10 @@ public class BudgetClient {
     /// Helper function to fetch published data values
     public func fetchLoadedData() async {
         await fetchBudgetSummaries()
+        await fetchBudgetSummaryValues()
+    }
+
+    func fetchBudgetSummaryValues() async {
         await fetchAccounts()
         await fetchCategoryValues()
     }
@@ -89,7 +97,7 @@ public class BudgetClient {
     /// Fetches account list from budget provider and publishes accounts
     @discardableResult
     public func fetchAccounts() async -> IdentifiedArrayOf<Account> {
-        guard let selectedBudgetId else { return [] }
+        guard let selectedBudgetId, isAuthenticated else { return [] }
         do {
             let fetchedAccounts = try await provider.fetchAccounts(selectedBudgetId)
             let accounts = IdentifiedArray(uniqueElements: fetchedAccounts)
@@ -106,30 +114,46 @@ public class BudgetClient {
     }
 
     public func fetchCategoryValues() async {
-        guard let selectedBudgetId, let currency = budgetSummaries[id: selectedBudgetId]?.currency else { return }
+        guard let selectedBudgetId, isAuthenticated,
+              let currency = budgetSummaries[id: selectedBudgetId]?.currency else { return }
         do {
             let fetchedCategoryValues = try await provider.fetchCategoryValues(
                 .init(budgetId: selectedBudgetId, currency: currency)
             )
             let categoryGroups = IdentifiedArray(uniqueElements: fetchedCategoryValues.groups)
+            let categories = IdentifiedArray(uniqueElements: fetchedCategoryValues.categories)
             Task { @MainActor in
                 self.categoryGroups = categoryGroups
+                self.categories = categories
             }
             logger.debug("categoryGroups count (\(categoryGroups.count))")
+            logger.debug("categories count (\(categories.count))")
         } catch {
             await resolveError(error)
         }
     }
 
     /// Fetch transactions from the selected Budget with a given start date
-    public func fetchTransactionsAll(startDate: Date, finishDate: Date) async throws -> IdentifiedArrayOf<Transaction> {
+    public func fetchTransactions(
+        startDate: Date,
+        finishDate: Date,
+        filterBy: BudgetProvider.TransactionParameters.FilterByOption? = nil
+    ) async throws -> IdentifiedArrayOf<TransactionEntry> {
         guard let selectedBudgetId, let currency = budgetSummaries[id: selectedBudgetId]?.currency else { return [] }
         do {
-            let fetchedTransactions = try await provider.fetchTransactionsAll(
-                .init(budgetId: selectedBudgetId, startDate: startDate, finishDate: finishDate, currency: currency, categoryGroupProvider: self)
+            let fetchedTransactions = try await provider.fetchTransactions(
+                .init(
+                    budgetId: selectedBudgetId,
+                    startDate: startDate,
+                    finishDate: finishDate,
+                    currency: currency,
+                    categoryGroupProvider: self,
+                    filterBy: filterBy
+                )
             )
                 .filter {
-                    (startDate ... finishDate).contains($0.date) &&
+                    (startDate...finishDate).contains($0.date) &&
+                    $0.categoryGroupName != "Internal Master Category" &&
                     $0.transferAccountId == nil &&
                     $0.deleted == false
                 }
@@ -149,6 +173,7 @@ public class BudgetClient {
         }
         logger.error("\(error.localizedDescription)")
     }
+
 }
 
 // MARK: - Static BudgetClient instances
@@ -159,6 +184,12 @@ extension BudgetClient {
 }
 
 // MARK: - CategoryGroupLookupProviding
+
+public protocol CategoryGroupLookupProviding {
+    
+    func getCategoryGroupForCategory(id: String?) -> CategoryGroup?
+    
+}
 
 extension BudgetClient: CategoryGroupLookupProviding {
 
@@ -171,9 +202,3 @@ extension BudgetClient: CategoryGroupLookupProviding {
     }
 }
 
-
-public protocol CategoryGroupLookupProviding {
-
-    func getCategoryGroupForCategory(id: String?) -> CategoryGroup?
-
-}

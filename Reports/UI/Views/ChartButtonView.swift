@@ -33,7 +33,7 @@ struct ChartButtonView: View {
                         .typography(.headlineEmphasized)
                         .fixedSize(horizontal: false, vertical: true)
                 }
-                .padding(.Spacing.small)
+                .padding(.Spacing.pt12)
             }
             .frame(width: min(width, 250), height: min(height, 351))
             .backgroundShadow()
@@ -44,12 +44,12 @@ struct ChartButtonView: View {
 }
 
 #Preview("Single Chart") {
-    ChartButtonView(title: "Title Goes Here", image: ChartType.pie.image) {}
+    ChartButtonView(title: "Title Goes Here", image: ChartType.spendingByTotal.image) {}
 }
 
 #Preview("All Charts") {
     ScrollView(.horizontal) {
-        HStack(spacing: .Spacing.medium) {
+        HStack(spacing: .Spacing.pt16) {
             ForEach(ReportChart.makeDefaultCharts()) { chart in
                 ChartButtonView(title: chart.name, image: chart.type.image) {
                     // perform button action here

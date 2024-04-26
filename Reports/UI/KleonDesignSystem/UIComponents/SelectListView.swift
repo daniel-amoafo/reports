@@ -98,7 +98,7 @@ struct SelectListView<Element: Identifiable & CustomStringConvertible>: View {
                             Button(Strings.doneButtonTitle) {
                                 dismiss()
                             }
-                            .foregroundColor(Color(R.color.text.primary))
+                            .foregroundStyle(Color(R.color.text.primary))
                         }
                     }
                 }
@@ -200,7 +200,7 @@ private struct ContainerView: View {
                 }
             }
             .frame(height: 300)
-            .foregroundColor(Color(R.color.text.primary))
+            .foregroundStyle(Color(R.color.text.primary))
 
             VStack {
                 Divider()

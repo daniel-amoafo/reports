@@ -107,7 +107,7 @@ public struct Category: Identifiable, Equatable, CustomStringConvertible {
 }
 
 
-public struct Transaction: Identifiable, Equatable, CustomStringConvertible {
+public struct TransactionEntry: Identifiable, Equatable, CustomStringConvertible {
 
     public let id: String
 

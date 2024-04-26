@@ -59,7 +59,7 @@ struct Home {
                 }
             case let .didSelectChart(chart):
                 state.destination = .popoverNewReport(
-                    ReportFeature.State(chart: chart)
+                    ReportFeature.State(inputFields: .init(chart: chart))
                 )
                 return .none
             case .onAppear:
@@ -110,7 +110,7 @@ struct HomeView: View {
                 .ignoresSafeArea()
             VStack(spacing: 0) {
                 ScrollView(showsIndicators: false) {
-                    VStack(spacing: .Spacing.large) {
+                    VStack(spacing: .Spacing.pt24) {
                         // New Report Section
                         newReportSectionView
 
@@ -136,17 +136,17 @@ private extension HomeView {
 
     var newReportSectionView: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: .Spacing.small) {
+            HStack(spacing: .Spacing.pt12) {
                 ForEach(store.charts) { chart in
                     ChartButtonView(title: chart.name, image: chart.type.image) {
                         store.send(.didSelectChart(chart))
                     }
                 }
             }
-            .padding(.vertical, .Spacing.medium)
+            .padding(.vertical, .Spacing.pt16)
         }
-        .contentMargins(.leading, .Spacing.medium)
-        .padding(.top, .Spacing.large)
+        .contentMargins(.leading, .Spacing.pt16)
+        .padding(.top, .Spacing.pt24)
     }
 
     var budgetPickerSectionView: some View {
@@ -167,7 +167,7 @@ private extension HomeView {
             })
             .buttonStyle(.listRowSingle)
             .backgroundShadow()
-            .padding(.horizontal, .Spacing.medium)
+            .padding(.horizontal, .Spacing.pt16)
             .popover(item: $store.scope(
                 state: \.destination?.popoverSelectBudget,
                 action: \.destination.popoverSelectBudget
@@ -192,13 +192,13 @@ private extension HomeView {
             HStack {
                 Text("Saved Reports")
                     .typography(.title3Emphasized)
-                    .foregroundColor(Color(R.color.text.secondary))
+                    .foregroundStyle(Color(R.color.text.secondary))
                 Spacer()
             }
             .listRowTop(showHorizontalRule: false)
 
             Button(action: /*@START_MENU_TOKEN@*/{}/*@END_MENU_TOKEN@*/, label: {
-                HStack(spacing: .Spacing.small) {
+                HStack(spacing: .Spacing.pt12) {
                     Image(R.image.chartPie)
                         .resizable()
                         .frame(width: 42, height: 42)
@@ -222,7 +222,7 @@ private extension HomeView {
             .listRowBottom()
         }
         .backgroundShadow()
-        .padding(.horizontal, .Spacing.medium)
+        .padding(.horizontal, .Spacing.pt16)
     }
 }
 

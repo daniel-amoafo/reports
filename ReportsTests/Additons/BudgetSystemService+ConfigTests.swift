@@ -87,7 +87,7 @@ private enum Factory {
                 .mocks
         } fetchCategoryValues: { _ in
             ([], [])
-        } fetchTransactionsAll: { _ in
+        } fetchTransactions: { _ in
             []
         }
     }

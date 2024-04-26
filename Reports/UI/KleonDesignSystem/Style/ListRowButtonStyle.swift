@@ -23,7 +23,7 @@ struct ListRowButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration
             .label
-            .foregroundColor(Color(R.color.text.primary))
+            .foregroundStyle(Color(R.color.text.primary))
             .listRow(
                 rowType: rowType,
                 showHorizontalRule: showHorizontalRule,
@@ -54,7 +54,7 @@ extension ButtonStyle where Self == ListRowButtonStyle {
 
 private struct PreviewContentRow: View {
     var body: some View {
-        HStack(spacing: .Spacing.small) {
+        HStack(spacing: .Spacing.pt12) {
             Image(R.image.chartPie)
                 .resizable()
                 .frame(width: 42, height: 42)

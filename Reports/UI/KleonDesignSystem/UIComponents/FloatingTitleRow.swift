@@ -52,11 +52,11 @@ extension FloatingTitleRow {
                 case .textField:
                     TextField("", text: text) // give TextField an empty placeholder
                         .font(typography.font)
-                        .foregroundColor(textColor)
+                        .foregroundStyle(textColor)
                 case .label:
                     Text(text.wrappedValue)
                         .typography(typography)
-                        .foregroundColor(textColor)
+                        .foregroundStyle(textColor)
                 }
             }
             .padding(.top, titleOffset * 0.7) // ensure title with offset is within views bounds

@@ -10,20 +10,20 @@ struct ReportChart: Identifiable, Equatable {
 }
 
 enum ChartType: Equatable {
-    case bar
-    case pie
+    case spendingByTotal
+    case spendingByTrend
+    case incomeExpensesTable
     case line
-    case table
 
     var image: Image {
         switch self {
-        case .bar:
+        case .spendingByTrend:
             return Image(R.image.chartBar)
         case .line:
             return Image(R.image.chartLine)
-        case .pie:
+        case .spendingByTotal:
             return Image(R.image.chartPie)
-        case .table:
+        case .incomeExpensesTable:
             return Image(R.image.chartTable)
         }
     }
@@ -64,19 +64,19 @@ extension ReportChart {
                 id: "spendingTotal",
                 name: Strings.spendingTotalTitle,
                 description: Strings.spendingTotalDescription,
-                type: .pie
+                type: .spendingByTotal
             ),
             .init(
                 id: "spendingTrend",
                 name: Strings.spendingTrendTitle,
                 description: Strings.spendingTrendDescription,
-                type: .bar
+                type: .spendingByTrend
             ),
             .init(
                 id: "incomeVexpense",
                 name: Strings.incomeExpenseTitle,
                 description: Strings.incomeExpenseDescription,
-                type: .table
+                type: .incomeExpensesTable
             ),
         ]
     }

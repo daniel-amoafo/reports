@@ -20,9 +20,9 @@ struct KleonButtonStyle: ButtonStyle {
             .label
             .frame(maxWidth: .infinity)
             .font(typography.font)
-            .foregroundColor(theme.color(isPressed: configuration.isPressed, isEnabled: isEnabled))
-            .padding(.horizontal, .Spacing.small)
-            .padding(.vertical, .Spacing.xsmall)
+            .foregroundStyle(theme.color(isPressed: configuration.isPressed, isEnabled: isEnabled))
+            .padding(.horizontal, .Spacing.pt12)
+            .padding(.vertical, .Spacing.pt8)
             .background(
                 backgroundShape
                     .fill(

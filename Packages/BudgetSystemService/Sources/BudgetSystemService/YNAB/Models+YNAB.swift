@@ -42,33 +42,51 @@ extension CategoryGroup {
 
 extension Category {
 
-    init(ynabCategory: SwiftYNAB.Category, curency: Currency) {
+    init(ynabCategory: SwiftYNAB.Category, currency: Currency) {
         self.id = ynabCategory.id
         self.name = ynabCategory.name
         self.categoryGroupId = ynabCategory.categoryGroupId
         self.hidden = ynabCategory.hidden
         self.note = ynabCategory.note
         self.deleted = ynabCategory.deleted
-        self.balance = Money.forYNAB(amount: ynabCategory.balance, currency: curency)
+        self.balance = Money.forYNAB(amount: ynabCategory.balance, currency: currency)
     }
 }
 
-extension Transaction {
+extension TransactionEntry {
 
-    init(ynabTransation: SwiftYNAB.TransactionDetail, curency: Currency, categoryGroup: CategoryGroup?) {
-        self.id = ynabTransation.id
-        self.accountId = ynabTransation.accountId
-        self.accountName = ynabTransation.accountName
-        self.categoryId = ynabTransation.categoryId
-        self.categoryName = ynabTransation.categoryName
+    init(ynabTransactionDetail ynab: SwiftYNAB.TransactionDetail, currency: Currency, categoryGroup: CategoryGroup?) {
+        self.id = ynab.id
+        self.accountId = ynab.accountId
+        self.accountName = ynab.accountName
+        self.categoryId = ynab.categoryId
+        self.categoryName = ynab.categoryName
         self.categoryGroupId = categoryGroup?.id
         self.categoryGroupName = categoryGroup?.name
-        self.transferAccountId = ynabTransation.transferAccountId
-        self.money = Money.forYNAB(amount: ynabTransation.amount, currency: curency)
-        self.deleted = ynabTransation.deleted
+        self.transferAccountId = ynab.transferAccountId
+        self.money = Money.forYNAB(amount: ynab.amount, currency: currency)
+        self.deleted = ynab.deleted
 
-        guard let date = DateConverter.date(from: ynabTransation.date) else {
-            fatalError("Unable to convert ynab transaction date string into a Date instance - \(ynabTransation.date)")
+        guard let date = DateConverter.date(from: ynab.date) else {
+            fatalError("Unable to convert ynab transaction date string into a Date instance - \(ynab.date)")
+        }
+        self.date = date
+    }
+
+    init(ynabHybridTransaction ynab: HybridTransaction, currency: Currency, categoryGroup: CategoryGroup?) {
+        self.id = ynab.id
+        self.accountId = ynab.accountId
+        self.accountName = ynab.accountName
+        self.categoryId = ynab.categoryId
+        self.categoryName = ynab.categoryName
+        self.categoryGroupId = categoryGroup?.id
+        self.categoryGroupName = categoryGroup?.name
+        self.transferAccountId = ynab.transferAccountId
+        self.money = Money.forYNAB(amount: ynab.amount, currency: currency)
+        self.deleted = ynab.deleted
+
+        guard let date = DateConverter.date(from: ynab.date) else {
+            fatalError("Unable to convert ynab transaction date string into a Date instance - \(ynab.date)")
         }
         self.date = date
     }
@@ -77,7 +95,23 @@ extension Transaction {
 extension Money {
 
     static func forYNAB(amount: Int, currency: Currency) -> Self {
-        // YNAB amounts store values unit milli units to the thousandths. see https://api.ynab.com/#formats
-        .init(.init(amount / 1_000), currency: currency)
+        // YNAB amounts store values in milli units (to the thousandths). see https://api.ynab.com/#formats
+        let ynabMilliUnits: Double = 1_000
+        let amountConverted = Decimal(Double(amount) / ynabMilliUnits)
+        let amountInCurrencyMilliUnits = (amountConverted as NSDecimalNumber)
+            .multiplying(byPowerOf10: Int16(currency.minorUnit), withBehavior: roundingBehavior) as Decimal
+        
+        return .init(amountInCurrencyMilliUnits, currency: currency)
+    }
+
+    private static var roundingBehavior: NSDecimalNumberHandler {
+        .init(
+           roundingMode: .plain,
+           scale: 0, // scale is set to 0 to prevent rounding (i.e. exact precision)
+           raiseOnExactness: false,
+           raiseOnOverflow: false,
+           raiseOnUnderflow: false,
+           raiseOnDivideByZero: false
+       )
     }
 }

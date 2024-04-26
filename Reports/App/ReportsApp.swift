@@ -51,10 +51,9 @@ struct AppFeature {
                 guard newStatus != state.authStatus else { return  .none }
                 state.authStatus = newStatus
                 logger.debug("authStatus update: \(newStatus)")
-                return .none
-//                return .run { _ in
-//                    await loadBudgetClientData()
-//                }
+                return .run { _ in
+                    await loadBudgetClientData()
+                }
             case .onAppear:
                 return .run { send in
                     await performOnAppear(send: send)

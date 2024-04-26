@@ -23,6 +23,38 @@ public struct Money: Equatable, Hashable {
     }
 }
 
+// MARK: - Conversion
+
+public extension Money {
+
+    /// Converts to minor unit amount  e.g. dollars to cents, 1.00 -> 100 for USD.
+    var toMinorUnitAmount: NSDecimalNumber {
+        return (amount as NSDecimalNumber).multiplying(byPowerOf10: Int16(currency.minorUnit))
+    }
+
+    /// Converts to major unit amount e.g. cents to dollars, e.g. 100 -> 1.00 for USD.
+    var toMajorUnitAmount: NSDecimalNumber {
+        return (amount as NSDecimalNumber).multiplying(byPowerOf10: Int16(-currency.minorUnit))
+    }
+}
+
+// MARK: - Formatting
+
+public extension Money {
+    
+    func stringFormatted(locale: Locale) -> String {
+        let formatter = NumberFormatter()
+        formatter.locale = locale
+        formatter.numberStyle = .currency
+        formatter.currencyCode = currency.code
+        formatter.minimumFractionDigits = currency.minorUnit
+        formatter.maximumFractionDigits = currency.minorUnit
+        formatter.usesGroupingSeparator = true
+
+        return formatter.string(for: toMajorUnitAmount) ?? ""
+    }
+}
+
 // MARK: - Comparable
 
 extension Money: Comparable {

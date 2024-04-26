@@ -5,7 +5,7 @@ import ComposableArchitecture
 import SwiftUI
 
 @Reducer
-struct ReportFeature {
+struct ReportInputFeature {
 
     @ObservableState
     struct State: Equatable {
@@ -38,16 +38,23 @@ struct ReportFeature {
 
     enum Action {
         case chartMoreInfoTapped
+        case delegate(Delegate)
         case updateFromDateTapped(Date)
         case updateToDateTapped(Date)
         case selectAccountRowTapped(Bool)
         case didSelectAccountId(String?)
         case runReportTapped
-        case runReportReponse(IdentifiedArrayOf<BudgetSystemService.Transaction>)
+        case runReportReponse(IdentifiedArrayOf<TransactionEntry>)
         case onAppear
+
+        @CasePathable
+        enum Delegate {
+            case fetchedTransactions(IdentifiedArrayOf<TransactionEntry>)
+        }
     }
 
     @Dependency(\.budgetClient) var budgetClient
+    let logger = LogFactory.create(category: "ReportInput")
 
     var body: some ReducerOf<Self> {
         Reduce { state, action in
@@ -55,103 +62,92 @@ struct ReportFeature {
             case .chartMoreInfoTapped:
                 state.showChartMoreInfo = !state.showChartMoreInfo
                 return .none
+
+            case .delegate:
+              return .none
+
             case let .updateFromDateTapped(fromDate):
                 state.fromDate = fromDate
                 return .none
+
             case let .updateToDateTapped(toDate):
                 state.toDate = toDate
                 return .none
+
             case .runReportTapped:
                 guard !state.reportLoading else { return .none }
                 state.reportLoading = true
                 return .run { [state] send in
                     await fetchReport(state: state, send: send)
                 }
-            case let .runReportReponse(transaction):
+
+            case let .runReportReponse(transactions):
                 // call report graph
                 state.reportLoading = false
-                print(transaction.count)
-                return .none
-            case .onAppear:
-                if state.accounts == nil {
-                    state.accounts = budgetClient.accounts
-                }
-                return .none
+                return .send(.delegate(.fetchedTransactions(transactions)))
+
             case let .selectAccountRowTapped(isActive):
                 state.showAccountList = isActive
                 return .none
+
             case let .didSelectAccountId(accountId):
                 state.selectedAccountId = accountId
+                return .none
+
+            case .onAppear:
+                if state.accounts == nil {
+                    guard budgetClient.accounts.isNotEmpty else { return .none }
+                    var accounts = budgetClient.accounts
+                    let allAccounts = Account.allAccounts
+                    if accounts.insert(allAccounts, at: 0).inserted {
+                        state.selectedAccountId = allAccounts.id
+                    }
+                    state.accounts = accounts
+                }
                 return .none
             }
         }
     }
 }
 
-private extension ReportFeature {
+private extension ReportInputFeature {
 
-    func fetchReport(state: ReportFeature.State, send: Send<ReportFeature.Action>) async {
-
+    func fetchReport(state: ReportInputFeature.State, send: Send<ReportInputFeature.Action>) async {
         do {
+            var filterBy: BudgetProvider.TransactionParameters.FilterByOption?
+            if let selectedId = state.selectedAccountId, selectedId != Account.allAccountsId {
+                filterBy = .account(accountId: selectedId)
+            }
             let transactions = try await budgetClient
-                .fetchTransactionsAll(startDate: state.fromDate, finishDate: state.toDate)
+                .fetchTransactions(startDate: state.fromDate, finishDate: state.toDate, filterBy: filterBy)
             await send(.runReportReponse(transactions))
         } catch {
-
+            logger.error("error: - \(error.localizedDescription)")
         }
     }
 }
 
-private enum Strings {
-    static let newReportTitle = String(localized: "New Report", comment: "the title when a new report is being created")
-    static let chartTitle = String(localized: "Chart", comment: "the title name for the chart section")
-    static let moreInfoTitle = String(
-        localized: "More Info",
-        comment: "the title to as ection that displays more descriptive text about the chart"
-    )
-    static let fromDateTitle = String(localized: "From", comment: "the start date field title")
-    static let toDateTitle = String(localized: "To", comment: "the end date field title")
-    static let runReportTitle = String(localized: "Run", comment: "Generates a new report")
-    static let selectAccountTitle = String(
-        localized: "Select Account",
-        comment: "title for selecting the bank account to run report from"
-    )
-    static let selectAccountPlaceholder = String(
-        localized: "Please select an account for the report",
-        comment: "the account for which the transactions the report will be based on"
-    )
-}
+// MARK: - View
 
-struct ReportView: View {
+struct ReportInputView: View {
 
-    @Bindable var store: StoreOf<ReportFeature>
+    @Bindable var store: StoreOf<ReportInputFeature>
 
     @ScaledMetric(relativeTo: .body) private var chartMoreInfoArrowSize: CGFloat = 5.0
     @ScaledMetric(relativeTo: .body) private var chartImageWidth: CGFloat = 46.0
     @ScaledMetric(relativeTo: .body) private var iconWidth: CGFloat = 14.0
 
     var body: some View {
-        ZStack {
-            Color(R.color.surface.primary)
-                .ignoresSafeArea()
-            VStack(spacing: .Spacing.xsmall) {
-                Text(Strings.newReportTitle)
-                    .typography(.title2Emphasized)
-                ScrollView {
-                    VStack(spacing: 0) {
-                        chartAndInputSection
+        VStack(spacing: 0) {
+            chartAndInputSection
 
-                        dateInputSection
+            dateInputSection
 
-                        accountSection
+            accountSection
 
-                        runReportSection
-                    }
-                    .backgroundShadow()
-                }
-                .contentMargins(.all, 8.0, for: .scrollContent)
-            }
+            runReportSection
         }
+        .backgroundShadow()
         .task {
             store.send(.onAppear)
         }
@@ -160,13 +156,13 @@ struct ReportView: View {
     var chartAndInputSection: some View {
         VStack {
             VStack(spacing: 0) {
-                VStack(spacing: .Spacing.small) {
+                VStack(spacing: .Spacing.pt12) {
                     HStack(spacing: 0) {
                         // Chart Title and Name
                         VStack(alignment: .leading, spacing: 0) {
                             Text(Strings.chartTitle)
                                 .typography(.title2Emphasized)
-                                .foregroundColor(Color(R.color.text.secondary))
+                                .foregroundStyle(Color(R.color.text.secondary))
                             Text(store.chart.name)
                                 .typography(.headlineEmphasized)
                         }
@@ -182,7 +178,7 @@ struct ReportView: View {
                     }
                     // More Info
                     VStack {
-                        HStack(spacing: .Spacing.xxsmall) {
+                        HStack(spacing: .Spacing.pt4) {
                             Button(
                                 action: {
                                     store.send(.chartMoreInfoTapped, animation: .default)
@@ -197,7 +193,7 @@ struct ReportView: View {
                                 }
                             )
                             .buttonStyle(.plain)
-                            .foregroundColor(Color(R.color.text.secondary))
+                            .foregroundStyle(Color(R.color.text.secondary))
                             Spacer()
                         }
                         // Chart description text when expanded
@@ -205,7 +201,7 @@ struct ReportView: View {
                             HStack(spacing: 0) {
                                 Text(store.chart.description)
                                     .typography(.body)
-                                    .foregroundColor(Color(R.color.text.secondary))
+                                    .foregroundStyle(Color(R.color.text.secondary))
                                     .padding()
                             }
                             .frame(maxWidth: .infinity)
@@ -216,10 +212,10 @@ struct ReportView: View {
                         }
                     }
                 }
-                .padding(.Spacing.small)
+                .padding(.Spacing.pt12)
             }
             .background(
-                RoundedRectangle(cornerRadius: 8.0)
+                RoundedRectangle(cornerRadius: .Corner.rd8)
                     .fill(Color.clear)
                     .stroke(Color(R.color.border.secondary), lineWidth: 1.0)
             )
@@ -228,12 +224,12 @@ struct ReportView: View {
     }
 
     var dateInputSection: some View {
-        HStack(alignment: .iconAndTitleAlignment, spacing: .Spacing.xsmall) {
+        HStack(alignment: .iconAndTitleAlignment, spacing: .Spacing.pt8) {
             Image(systemName: "calendar")
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(width: iconWidth)
-                .foregroundColor(Color(R.color.icon.secondary))
+                .foregroundStyle(Color(R.color.icon.secondary))
                 .alignmentGuide(.iconAndTitleAlignment, computeValue: { dimension in
                     dimension[VerticalAlignment.center]
                 })
@@ -261,7 +257,7 @@ struct ReportView: View {
                     }
                 )
             }
-            .foregroundColor(Color(R.color.text.secondary))
+            .foregroundStyle(Color(R.color.text.secondary))
         }
         .listRow()
     }
@@ -272,21 +268,21 @@ struct ReportView: View {
                 store.send(.selectAccountRowTapped(true))
             }, label: {
                 HStack(spacing: 0) {
-                    HStack(alignment: .iconAndTitleAlignment, spacing: .Spacing.xsmall) {
+                    HStack(alignment: .iconAndTitleAlignment, spacing: .Spacing.pt8) {
                         Image(systemName: "building.columns.fill")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: iconWidth)
-                            .foregroundColor(Color(R.color.icon.secondary))
+                            .foregroundStyle(Color(R.color.icon.secondary))
                             .alignmentGuide(
                                 .iconAndTitleAlignment,
                                 computeValue: { dimension in dimension[VerticalAlignment.center] }
                             )
 
-                        VStack(alignment: .leading, spacing: .Spacing.xsmall) {
+                        VStack(alignment: .leading, spacing: .Spacing.pt8) {
                             Text(Strings.selectAccountTitle)
                                 .typography(.bodyEmphasized)
-                                .foregroundColor(Color(R.color.text.secondary))
+                                .foregroundStyle(Color(R.color.text.secondary))
                                 .alignmentGuide(
                                     .iconAndTitleAlignment,
                                     computeValue: { dimension in dimension[VerticalAlignment.center] }
@@ -302,8 +298,8 @@ struct ReportView: View {
                         Spacer()
                     }
                     Image(systemName: "chevron.right")
-                        .foregroundColor(Color(R.color.icon.secondary))
-                        .padding(.trailing, .Spacing.xsmall)
+                        .foregroundStyle(Color(R.color.icon.secondary))
+                        .padding(.trailing, .Spacing.pt8)
                 }
             }
         )
@@ -341,11 +337,48 @@ struct ReportView: View {
         }
         .listRowBottom()
     }
+
+}
+
+// MARK: - Strings
+
+private enum Strings {
+    static let chartTitle = String(localized: "Chart", comment: "the title name for the chart section")
+    static let moreInfoTitle = String(
+        localized: "More Info",
+        comment: "the title to as ection that displays more descriptive text about the chart"
+    )
+    static let fromDateTitle = String(localized: "From", comment: "the start date field title")
+    static let toDateTitle = String(localized: "To", comment: "the end date field title")
+    static let runReportTitle = String(localized: "Run", comment: "Generates a new report")
+    static let selectAccountTitle = String(
+        localized: "Select Account",
+        comment: "title for selecting the bank account to run report from"
+    )
+    static let selectAccountPlaceholder = String(
+        localized: "Please select an account for the report",
+        comment: "the account for which the transactions the report will be based on"
+    )
+    static let allAccountsName = String(
+        localized: "All Accounts",
+        comment: "A special account instance indicating all available accounts should be selected for the report."
+    )
+}
+
+// MARK: - Private
+
+private extension Account {
+
+    static var allAccountsId: String { "CW_ALL_ACCOUNTS" }
+
+    static var allAccounts: Account {
+        .init(id: allAccountsId, name: Strings.allAccountsName, deleted: false)
+    }
 }
 
 private extension Date {
     static func aWeekFrom(_ date: Date) -> Date {
-        .init(timeInterval: TimeInterval(60*60*24*6), since: .now)
+        .init(timeInterval: TimeInterval(60*60*24*6), since: date)
     }
 }
 
@@ -359,31 +392,23 @@ private extension VerticalAlignment {
     static let iconAndTitleAlignment = VerticalAlignment(IconAndTitleAlignment.self)
 }
 
-// MARK: -
+// MARK: - Preview
 
 #Preview {
     NavigationStack {
-        ReportView(
-            store: Store(initialState: ReportFeature.State(
-                chart: .mock,
-                accounts: .mocks
-            )) {
-                ReportFeature()
+        ZStack {
+            Color(R.color.surface.primary)
+                .ignoresSafeArea()
+            ScrollView {
+                ReportInputView(
+                    store: Store(
+                        initialState: ReportInputFeature.State(chart: .mock, accounts: .mocks)
+                    ) {
+                        ReportInputFeature()
+                    }
+                )
             }
-        )
+            .contentMargins(.all, .Spacing.pt16, for: .scrollContent)
+        }
     }
-}
-
-private extension ReportChart {
-
-    static let mock: ReportChart = Self.makeDefaultCharts()[0]
-}
-
-extension IdentifiedArray where ID == Account.ID, Element == Account {
-
-    static let mocks: Self = [
-        .init(id: "01", name: "Everyday Account", deleted: false),
-        .init(id: "02", name: "Acme Account", deleted: false),
-        .init(id: "03", name: "Appleseed Account", deleted: false),
-    ]
 }

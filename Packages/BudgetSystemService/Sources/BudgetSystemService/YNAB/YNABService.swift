@@ -26,7 +26,7 @@ public extension BudgetProvider {
                 let result = try await api.categories.getCategories(budgetId: params.budgetId)
                     .map { categoryGroup -> (CategoryGroup, [Category]) in
                         let group = CategoryGroup(ynabCategoryGroup: categoryGroup)
-                        let categories = categoryGroup.categories.map { Category(ynabCategory: $0, curency: params.currency) }
+                        let categories = categoryGroup.categories.map { Category(ynabCategory: $0, currency: params.currency) }
                         return (group, categories)
                     }
                 let groups = result.map(\.0)
@@ -35,14 +35,18 @@ public extension BudgetProvider {
             } catch {
                 throw mappedError(error)
             }
-        } fetchTransactionsAll: { params in
+        } fetchTransactions: { params in
             do {
-                return try await api.transactions
-                    .getTransactions(budgetId: params.budgetId, sinceDate: params.startDate)
-                    .map { transactionDetail in
-                        let categoryGroup = params.categoryGroupProvider?.getCategoryGroupForCategory(id: transactionDetail.categoryId)
-                        return Transaction(ynabTransation: transactionDetail, curency: params.currency, categoryGroup: categoryGroup)
+                if let filterBy = params.filterBy {
+                    switch filterBy {
+                    case let .account(accountId):
+                        return try await fetchTransactionDetails(params: params, api: api, accountId: accountId)
+                    case let .category(categoryId) :
+                        return try await fetchTransactionHybrids(params: params, api: api, type: .category(id: categoryId))
                     }
+                }  else {
+                    return try await fetchTransactionDetails(params: params, api: api, accountId: nil)
+                }
             } catch {
                 throw mappedError(error)
             }
@@ -52,11 +56,49 @@ public extension BudgetProvider {
 
 private extension BudgetProvider {
 
+    enum TransactionHistoryType {
+        case category(id: String)
+        case payee(id: String)
+    }
+
     static func mappedError(_ error: Error) -> Error {
         if let error = error as? SwiftYNABError {
             return error.mapToBudgetClientError
         }
         return error
+    }
+
+    static func fetchTransactionDetails(params: TransactionParameters, api: YNAB, accountId: String?) async throws -> [TransactionEntry] {
+        let transactionDetails: [TransactionDetail]
+        if let accountId {
+            transactionDetails = try await api.transactions
+                .getTransactions(budgetId: params.budgetId, accountId: accountId, sinceDate: params.startDate)
+        } else {
+            transactionDetails = try await api.transactions
+                .getTransactions(budgetId: params.budgetId, sinceDate: params.startDate)
+        }
+
+        return transactionDetails
+            .map {
+                let categoryGroup = params.categoryGroupProvider?.getCategoryGroupForCategory(id: $0.categoryId)
+                return TransactionEntry(ynabTransactionDetail: $0, currency: params.currency, categoryGroup: categoryGroup)
+            }
+    }
+
+    static func fetchTransactionHybrids(params: TransactionParameters, api: YNAB, type: TransactionHistoryType) async throws -> [TransactionEntry] {
+        let hybridTransactions: [HybridTransaction]
+        switch type {
+        case let .category(categoryId) :
+            hybridTransactions = try await api.transactions.getTransactions(budgetId: params.budgetId, categoryId: categoryId, sinceDate: params.startDate)
+        case .payee:
+            fatalError("fetch transaction by payee not implemented yet :-/")
+        }
+
+        return hybridTransactions
+            .map {
+                let categoryGroup = params.categoryGroupProvider?.getCategoryGroupForCategory(id: $0.categoryId)
+                return TransactionEntry(ynabHybridTransaction: $0, currency: params.currency, categoryGroup: categoryGroup)
+            }
     }
 }
 
