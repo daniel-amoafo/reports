@@ -11,11 +11,16 @@ struct ReportFeature {
     struct State: Equatable {
         var inputFields: ReportInputFeature.State
         @Presents var chartGraph: ChartGraph.State?
+        var scrollToId: String?
+
+        fileprivate let chartContainerId = "GraphChartContainer"
     }
 
-    enum Action {
+    enum Action: BindableAction {
+        case binding(BindingAction<State>)
         case inputFields(ReportInputFeature.Action)
         case chartGraph(PresentationAction<ChartGraph.Action>)
+        case chartDisplayed
         case onAppear
     }
 
@@ -27,11 +32,14 @@ struct ReportFeature {
     @Dependency(\.budgetClient) var budgetClient
 
     var body: some ReducerOf<Self> {
+        BindingReducer()
         Scope(state: \.inputFields, action: \.inputFields) {
             ReportInputFeature()
         }
         Reduce { state, action in
             switch action {
+            case .binding:
+                return .none
             case .chartGraph:
                 return .none
             case let .inputFields(.delegate(.fetchedTransactions(transactions))):
@@ -45,6 +53,12 @@ struct ReportFeature {
                 case .line:
                     break
                 }
+                state.scrollToId = nil
+                return .run { send in
+                    await send(.chartDisplayed, animation: .easeInOut)
+                }
+            case .chartDisplayed:
+                state.scrollToId = state.chartContainerId
                 return .none
             case .inputFields:
                 return .none
@@ -74,16 +88,19 @@ struct ReportView: View {
                 Text(Strings.newReportTitle)
                     .typography(.title2Emphasized)
                 ScrollView {
-                    VStack(spacing: 0) {
+                    VStack(spacing: .Spacing.pt16) {
                         ReportInputView(store: store.scope(state: \.inputFields, action: \.inputFields))
 
                         HorizontalDivider()
                             .opacity(store.chartGraph == nil ? 0 : 1)
 
-                        graphViews
+                        chartGraphView
+                            .id(store.chartContainerId)
                     }
+                    .scrollTargetLayout()
                 }
                 .contentMargins(.all, .Spacing.pt16, for: .scrollContent)
+                .scrollPosition(id: $store.scrollToId, anchor: .top)
             }
         }
         .task {
@@ -91,7 +108,7 @@ struct ReportView: View {
         }
     }
 
-    var graphViews: some View {
+    var chartGraphView: some View {
         VStack {
             if let store = self.store.scope(
                 state: \.chartGraph?.spendingByTotal, action: \.chartGraph.spendingByTotal

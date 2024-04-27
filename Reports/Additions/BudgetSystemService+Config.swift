@@ -49,6 +49,10 @@ extension BudgetClient: DependencyKey {
 
         return _liveValue
     }
+
+    public static var previewValue: BudgetClient {
+        BudgetClient.preview
+    }
 }
 
 extension BudgetClient: TestDependencyKey {

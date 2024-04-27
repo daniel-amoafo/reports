@@ -104,6 +104,16 @@ public struct Category: Identifiable, Equatable, CustomStringConvertible {
     public let deleted: Bool
 
     public var description: String { name }
+
+    public init(id: String, categoryGroupId: String, name: String, hidden: Bool, note: String?, balance: Money, deleted: Bool) {
+        self.id = id
+        self.categoryGroupId = categoryGroupId
+        self.name = name
+        self.hidden = hidden
+        self.note = note
+        self.balance = balance
+        self.deleted = deleted
+    }
 }
 
 

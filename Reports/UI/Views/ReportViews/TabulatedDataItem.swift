@@ -64,6 +64,10 @@ extension TabulatedDataItem {
         if !uncategorizedCategoryGroups.value.isZero {
             categoryGroups.append(uncategorizedCategoryGroups)
         }
+
+        // sort categoryGroups in decending order with lowest negative values taking precedence
+        categoryGroups.sort { $0.value < $1.value }
+
         return (categoryGroups, categories)
     }
 
@@ -101,16 +105,17 @@ extension TabulatedDataItem {
             var category: TabulatedDataItem
             if let item = categories[id: categoryId] {
                 category = item
+                category.value += transaction.money.amount
+                categories[id: categoryId] = category
             } else {
                 category = .init(
                     id: categoryId,
-                    name: transaction.categoryGroupName ?? "[Unexpected category name]",
-                    value: .zero,
+                    name: transaction.categoryName ?? "[Unexpected category name]",
+                    value: transaction.money.amount,
                     currency: transaction.money.currency
                 )
                 categories.append(category)
             }
-            category.value += transaction.money.amount
         } else {
             uncategorized.value += transaction.money.amount
         }

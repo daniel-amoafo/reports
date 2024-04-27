@@ -15,6 +15,8 @@ struct AppFeature {
         var appIntroLogin = AppIntroLogin.State()
         var mainTab = MainTab.State()
         var authStatus: AuthorizationStatus = .unknown
+        var showRetryLoading: Bool = false
+        let connectionCheckTimeout: Double = 10.0
     }
 
     enum Action {
@@ -22,11 +24,13 @@ struct AppFeature {
         case appIntroLogin(AppIntroLogin.Action)
         case mainTab(MainTab.Action)
         case didUpdateAuthStatus(AuthorizationStatus)
+        case checkRetryConnection
         case onAppear
     }
 
     @Dependency(\.budgetClient) var budgetClient
     @Dependency(\.configProvider) var configProvider
+    @Dependency(\.continuousClock) var clock
 
     var logger = LogFactory.create(category: .appFeature)
 
@@ -54,9 +58,18 @@ struct AppFeature {
                 return .run { _ in
                     await loadBudgetClientData()
                 }
+            case .checkRetryConnection:
+                if state.authStatus == .unknown {
+                    state.showRetryLoading = true
+                }
+                return .none
             case .onAppear:
-                return .run { send in
+                state.showRetryLoading = false
+                return .run { [connectionCheckTimeout = state.connectionCheckTimeout] send in
                     await performOnAppear(send: send)
+                    // retry connection if authorization status not updated
+                    try await self.clock.sleep(for: .seconds(connectionCheckTimeout))
+                    await send(.checkRetryConnection, animation: .default)
                 }
             }
         }
@@ -114,9 +127,29 @@ struct ReportsApp: App {
     var body: some Scene {
         WindowGroup {
             ZStack {
+                Color(R.color.surface.primary)
+                    .ignoresSafeArea()
                 switch store.authStatus {
                 case .unknown:
-                    ProgressView()
+                    VStack {
+                        // check if reattempt of loading is required by user if connection timeout reached.
+                        if store.showRetryLoading {
+                            Text(Strings.reconnectText)
+                                .typography(.title3Emphasized)
+                                .multilineTextAlignment(.center)
+                            HStack {
+                                Spacer().frame(minWidth: 20.0)
+                                Button(Strings.reconnectButtonTitle) {
+                                    store.send(.onAppear, animation: .default)
+                                }
+                                .buttonStyle(.kleonOutline)
+                                Spacer().frame(minWidth: 20.0)
+                            }
+                        } else {
+                            ProgressView()
+                        }
+                    }
+                    .padding()
                 case .loggedIn:
                     MainTabView(
                         store: store.scope(state: \.mainTab, action: \.mainTab)
@@ -135,4 +168,17 @@ struct ReportsApp: App {
             }
         }
     }
+}
+
+// MARK: - Strings
+
+private enum Strings {
+    static let reconnectText = String(
+        localized: "Hmm, something went wrong.\nPlease Try Again",
+        comment: "text displayed when unable to load screen into a valid state. Ask the user to retry"
+    )
+    static let reconnectButtonTitle = String(
+        localized: "Reconnect",
+        comment: "Button title when unable to load app to a valid state"
+    )
 }

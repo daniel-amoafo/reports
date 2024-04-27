@@ -187,18 +187,27 @@ extension BudgetClient {
 
 public protocol CategoryGroupLookupProviding {
     
-    func getCategoryGroupForCategory(id: String?) -> CategoryGroup?
-    
+    func getCategoryGroupForCategory(categoryId: String?) -> CategoryGroup?
+    func getCategoryGroup(groupId: String?) -> CategoryGroup?
+
 }
 
 extension BudgetClient: CategoryGroupLookupProviding {
 
-    public func getCategoryGroupForCategory(id categoryId: String?) -> CategoryGroup? {
+    public func getCategoryGroupForCategory(categoryId: String?) -> CategoryGroup? {
         guard let categoryId, !categories.isEmpty,
               let category = categories[id: categoryId] else {
             return nil
         }
         return categoryGroups[id: category.categoryGroupId]
+    }
+
+    public func getCategoryGroup(groupId: String?) -> CategoryGroup? {
+        guard let groupId, !categoryGroups.isEmpty,
+              let group = categoryGroups[id: groupId] else {
+            return nil
+        }
+        return group
     }
 }
 

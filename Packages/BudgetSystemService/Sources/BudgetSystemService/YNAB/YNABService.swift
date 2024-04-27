@@ -80,7 +80,7 @@ private extension BudgetProvider {
 
         return transactionDetails
             .map {
-                let categoryGroup = params.categoryGroupProvider?.getCategoryGroupForCategory(id: $0.categoryId)
+                let categoryGroup = params.categoryGroupProvider?.getCategoryGroupForCategory(categoryId: $0.categoryId)
                 return TransactionEntry(ynabTransactionDetail: $0, currency: params.currency, categoryGroup: categoryGroup)
             }
     }
@@ -96,7 +96,7 @@ private extension BudgetProvider {
 
         return hybridTransactions
             .map {
-                let categoryGroup = params.categoryGroupProvider?.getCategoryGroupForCategory(id: $0.categoryId)
+                let categoryGroup = params.categoryGroupProvider?.getCategoryGroupForCategory(categoryId: $0.categoryId)
                 return TransactionEntry(ynabHybridTransaction: $0, currency: params.currency, categoryGroup: categoryGroup)
             }
     }

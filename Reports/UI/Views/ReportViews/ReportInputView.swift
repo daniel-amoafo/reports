@@ -18,10 +18,6 @@ struct ReportInputFeature {
         var reportLoading = false
         var showAccountList = false
 
-        var chartMoreInfoArrowDirection: String {
-            showChartMoreInfo ? "down" : "right"
-        }
-
         var selectedAccountName: String? {
             guard let selectedAccountId else { return nil }
             return accounts?[id: selectedAccountId]?.name
@@ -84,7 +80,7 @@ struct ReportInputFeature {
             case let .runReportReponse(transactions):
                 // call report graph
                 state.reportLoading = false
-                return .send(.delegate(.fetchedTransactions(transactions)))
+                return .send(.delegate(.fetchedTransactions(transactions)), animation: .default)
 
             case let .selectAccountRowTapped(isActive):
                 state.showAccountList = isActive
@@ -172,7 +168,7 @@ struct ReportInputView: View {
                         // Chart Image
                         store.chart.type.image
                             .resizable()
-                            .aspectRatio(contentMode: .fit)
+                            .scaledToFit()
                             .frame(width: chartImageWidth)
                         Spacer()
                     }
@@ -184,10 +180,11 @@ struct ReportInputView: View {
                                     store.send(.chartMoreInfoTapped, animation: .default)
                                 },
                                 label: {
-                                    Image(systemName: "arrowtriangle.\(store.chartMoreInfoArrowDirection).fill")
+                                    Image(systemName: "arrowtriangle.right.fill")
                                         .resizable()
-                                        .aspectRatio(contentMode: .fit)
+                                        .scaledToFit()
                                         .frame(width: chartMoreInfoArrowSize)
+                                        .rotationEffect(Angle(degrees: store.showChartMoreInfo ? 90.0 : 0.0))
                                     Text(Strings.moreInfoTitle)
                                         .typography(.bodyEmphasized)
                                 }
@@ -227,7 +224,7 @@ struct ReportInputView: View {
         HStack(alignment: .iconAndTitleAlignment, spacing: .Spacing.pt8) {
             Image(systemName: "calendar")
                 .resizable()
-                .aspectRatio(contentMode: .fit)
+                .scaledToFit()
                 .frame(width: iconWidth)
                 .foregroundStyle(Color(R.color.icon.secondary))
                 .alignmentGuide(.iconAndTitleAlignment, computeValue: { dimension in
@@ -271,7 +268,7 @@ struct ReportInputView: View {
                     HStack(alignment: .iconAndTitleAlignment, spacing: .Spacing.pt8) {
                         Image(systemName: "building.columns.fill")
                             .resizable()
-                            .aspectRatio(contentMode: .fit)
+                            .scaledToFit()
                             .frame(width: iconWidth)
                             .foregroundStyle(Color(R.color.icon.secondary))
                             .alignmentGuide(
