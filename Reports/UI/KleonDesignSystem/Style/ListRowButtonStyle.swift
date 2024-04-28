@@ -9,8 +9,8 @@ struct ListRowButtonStyle: ButtonStyle {
     let rowType: ListStyleViewModifier.RowType
     var showHorizontalRule: Bool = true
 
-    private let backgroundColor = Color(R.color.button.list)
-    private let backgroundColorHighlight = Color(R.color.button.listHighlight)
+    private let backgroundColor = Color(.Button.list)
+    private let backgroundColorHighlight = Color(.Button.listHighlight)
 
     init(
         rowType: ListStyleViewModifier.RowType = .middle,
@@ -23,7 +23,7 @@ struct ListRowButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration
             .label
-            .foregroundStyle(Color(R.color.text.primary))
+            .foregroundStyle(Color(.Text.primary))
             .listRow(
                 rowType: rowType,
                 showHorizontalRule: showHorizontalRule,
@@ -55,7 +55,7 @@ extension ButtonStyle where Self == ListRowButtonStyle {
 private struct PreviewContentRow: View {
     var body: some View {
         HStack(spacing: .Spacing.pt12) {
-            Image(R.image.chartPie)
+            Image(.chartPie)
                 .resizable()
                 .frame(width: 42, height: 42)
             VStack(alignment: .leading) {

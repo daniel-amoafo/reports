@@ -40,7 +40,6 @@
 		186E8A202B998C2A00E65BDE /* ConfigProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186E8A1F2B998C2A00E65BDE /* ConfigProviderTests.swift */; };
 		186E8A222B9AEDB100E65BDE /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186E8A212B9AEDB100E65BDE /* MainTabView.swift */; };
 		186E8A242B9AF45200E65BDE /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186E8A232B9AF45200E65BDE /* HomeView.swift */; };
-		186E8A272B9B06EC00E65BDE /* RswiftLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = 186E8A262B9B06EC00E65BDE /* RswiftLibrary */; };
 		186E8A312B9B169C00E65BDE /* CGFloat+DesignStyleMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186E8A302B9B169C00E65BDE /* CGFloat+DesignStyleMetrics.swift */; };
 		186E8A382B9B34BA00E65BDE /* ListRowButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186E8A372B9B34BA00E65BDE /* ListRowButtonStyle.swift */; };
 		186E8A402B9BE5E800E65BDE /* ListStyleViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186E8A3F2B9BE5E800E65BDE /* ListStyleViewModifier.swift */; };
@@ -169,7 +168,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				183ECBCA2B70E70B006C45B2 /* KeychainSwift in Frameworks */,
-				186E8A272B9B06EC00E65BDE /* RswiftLibrary in Frameworks */,
 				183ECBB92B6F092B006C45B2 /* BudgetSystemService in Frameworks */,
 				183ECBE62B74738B006C45B2 /* ComposableArchitecture in Frameworks */,
 			);
@@ -451,14 +449,12 @@
 			buildRules = (
 			);
 			dependencies = (
-				186E8A292B9B072700E65BDE /* PBXTargetDependency */,
 			);
 			name = Reports;
 			packageProductDependencies = (
 				183ECBB82B6F092B006C45B2 /* BudgetSystemService */,
 				183ECBC92B70E70B006C45B2 /* KeychainSwift */,
 				183ECBE52B74738B006C45B2 /* ComposableArchitecture */,
-				186E8A262B9B06EC00E65BDE /* RswiftLibrary */,
 			);
 			productName = Reports;
 			productReference = 184DF0B32B6E1C3E00BA6F21 /* Reports.app */;
@@ -535,7 +531,6 @@
 			packageReferences = (
 				183ECBC82B70E70B006C45B2 /* XCRemoteSwiftPackageReference "keychain-swift" */,
 				183ECBE42B74738B006C45B2 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
-				186E8A252B9B06EC00E65BDE /* XCRemoteSwiftPackageReference "R" */,
 			);
 			productRefGroup = 184DF0B42B6E1C3E00BA6F21 /* Products */;
 			projectDirPath = "";
@@ -688,10 +683,6 @@
 			isa = PBXTargetDependency;
 			target = 184DF0B22B6E1C3E00BA6F21 /* Reports */;
 			targetProxy = 184DF0CF2B6E1C3F00BA6F21 /* PBXContainerItemProxy */;
-		};
-		186E8A292B9B072700E65BDE /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			productRef = 186E8A282B9B072700E65BDE /* RswiftGenerateInternalResources */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1048,14 +1039,6 @@
 				kind = branch;
 			};
 		};
-		186E8A252B9B06EC00E65BDE /* XCRemoteSwiftPackageReference "R" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/mac-cain13/R.swift";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 7.5.0;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1072,16 +1055,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 183ECBE42B74738B006C45B2 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
 			productName = ComposableArchitecture;
-		};
-		186E8A262B9B06EC00E65BDE /* RswiftLibrary */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 186E8A252B9B06EC00E65BDE /* XCRemoteSwiftPackageReference "R" */;
-			productName = RswiftLibrary;
-		};
-		186E8A282B9B072700E65BDE /* RswiftGenerateInternalResources */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 186E8A252B9B06EC00E65BDE /* XCRemoteSwiftPackageReference "R" */;
-			productName = "plugin:RswiftGenerateInternalResources";
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

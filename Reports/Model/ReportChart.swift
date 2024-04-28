@@ -18,13 +18,13 @@ enum ChartType: Equatable {
     var image: Image {
         switch self {
         case .spendingByTrend:
-            return Image(R.image.chartBar)
+            return Image(.chartBar)
         case .line:
-            return Image(R.image.chartLine)
+            return Image(.chartLine)
         case .spendingByTotal:
-            return Image(R.image.chartPie)
+            return Image(.chartPie)
         case .incomeExpensesTable:
-            return Image(R.image.chartTable)
+            return Image(.chartTable)
         }
     }
 }

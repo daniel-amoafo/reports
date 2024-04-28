@@ -106,7 +106,7 @@ struct HomeView: View {
 
     var body: some View {
         ZStack {
-            Color(R.color.surface.primary)
+            Color(.Surface.primary)
                 .ignoresSafeArea()
             VStack(spacing: 0) {
                 ScrollView(showsIndicators: false) {
@@ -192,14 +192,14 @@ private extension HomeView {
             HStack {
                 Text("Saved Reports")
                     .typography(.title3Emphasized)
-                    .foregroundStyle(Color(R.color.text.secondary))
+                    .foregroundStyle(Color(.Text.secondary))
                 Spacer()
             }
             .listRowTop(showHorizontalRule: false)
 
             Button(action: /*@START_MENU_TOKEN@*/{}/*@END_MENU_TOKEN@*/, label: {
                 HStack(spacing: .Spacing.pt12) {
-                    Image(R.image.chartPie)
+                    Image(.chartPie)
                         .resizable()
                         .frame(width: 42, height: 42)
                     VStack(alignment: .leading) {

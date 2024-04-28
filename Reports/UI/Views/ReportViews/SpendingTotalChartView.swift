@@ -112,9 +112,8 @@ struct SpendingTotalChartFeature {
                     guard let group = budgetClient.getCategoryGroup(groupId: id) else {
                         return .none
                     }
+                    var items = state.categories.filter { group.categoryIds.contains($0.id) }
                     // sort entries with the most spent categories taking precedence
-                    var items = state.categories
-                        .filter { group.categoryIds.contains($0.id) }
                     items.sort { $0.value < $1.value }
                     state.catgoriesForCategoryGroup = items
                     state.catgoriesForCategoryGroupName = group.name
@@ -179,14 +178,14 @@ struct SpendingTotalChartView: View {
                 HStack {
                     Text(Strings.categorized)
                         .typography(.title2Emphasized)
-                        .foregroundStyle(Color(R.color.text.secondary))
+                        .foregroundStyle(Color(.Text.secondary))
                     Spacer()
                 }
                 HStack {
                     Text(store.listSubTitle)
                         .typography(store.isListSubTitleALink ? .bodyEmphasized : .body)
                         .foregroundStyle(
-                            store.isListSubTitleALink ? Color(R.color.text.link) : Color(R.color.text.secondary)
+                            store.isListSubTitleALink ? Color(.Text.link) : Color(.Text.secondary)
                         )
                         .underline(store.isListSubTitleALink)
                         .onTapGesture {
@@ -205,10 +204,10 @@ struct SpendingTotalChartView: View {
                             .resizable()
                             .scaledToFit()
                             .frame(width: breadcrumbChevronWidth)
-                            .foregroundStyle(Color(R.color.icon.secondary))
+                            .foregroundStyle(Color(.Icon.secondary))
                         Text(breadcrumbTitle)
                             .typography(.bodyEmphasized)
-                            .foregroundStyle(Color(R.color.text.primary))
+                            .foregroundStyle(Color(.Text.primary))
                     }
                     Spacer()
                 }
@@ -223,11 +222,11 @@ struct SpendingTotalChartView: View {
                     HStack {
                         Text(item.name)
                             .typography(.bodyEmphasized)
-                            .foregroundStyle(Color(R.color.text.primary))
+                            .foregroundStyle(Color(.Text.primary))
                         Spacer()
                         Text(item.valueFormatted)
                             .typography(.bodyEmphasized)
-                            .foregroundStyle(Color(R.color.text.primary))
+                            .foregroundStyle(Color(.Text.primary))
                     }
                 }
                 .buttonStyle(.listRow)

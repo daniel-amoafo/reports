@@ -82,7 +82,7 @@ struct ReportView: View {
 
     var body: some View {
         ZStack {
-            Color(R.color.surface.primary)
+            Color(.Surface.primary)
                 .ignoresSafeArea()
             VStack(spacing: .Spacing.pt8) {
                 Text(Strings.newReportTitle)

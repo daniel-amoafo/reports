@@ -30,7 +30,7 @@ extension ListStyleViewModifier: ViewModifier {
     private var backgroundContent: some View {
         ZStack {
             Rectangle()
-                .fill(color ?? Color(R.color.surface.secondary))
+                .fill(color ?? Color(.Surface.secondary))
                 .clipShape(
                     .rect(
                         topLeadingRadius: rowType.isTopRounded ? cornerRadius : 0,
