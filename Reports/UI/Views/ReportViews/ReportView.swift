@@ -11,17 +11,30 @@ struct ReportFeature {
     struct State: Equatable {
         var inputFields: ReportInputFeature.State
         @Presents var chartGraph: ChartGraph.State?
+        @Presents var confirmationDialog: ConfirmationDialogState<Action.ConfirmationDialog>?
         var scrollToId: String?
-
+        var reportUpdated = false
         fileprivate let chartContainerId = "GraphChartContainer"
+
+        var reportTitle: String {
+            Strings.newReportTitle
+        }
     }
 
     enum Action: BindableAction {
         case binding(BindingAction<State>)
         case inputFields(ReportInputFeature.Action)
         case chartGraph(PresentationAction<ChartGraph.Action>)
+        case confirmationDialog(PresentationAction<ConfirmationDialog>)
         case chartDisplayed
+        case doneButtonTapped
         case onAppear
+
+        enum ConfirmationDialog {
+            case saveNewReport
+            case updateExistingReport
+            case discard
+        }
     }
 
     @Reducer(state: .equatable)
@@ -30,6 +43,7 @@ struct ReportFeature {
     }
 
     @Dependency(\.budgetClient) var budgetClient
+    @Dependency(\.dismiss) var dismiss
 
     var body: some ReducerOf<Self> {
         BindingReducer()
@@ -42,6 +56,20 @@ struct ReportFeature {
                 return .none
             case .chartGraph:
                 return .none
+
+            case let .confirmationDialog(.presented(action)):
+                switch action {
+                case .saveNewReport:
+                    break
+                case .updateExistingReport:
+                    break
+                case .discard:
+                    break
+                }
+                return .run { _ in await dismiss() }
+            case .confirmationDialog:
+                return .none
+
             case let .inputFields(.delegate(.fetchedTransactions(transactions))):
                 switch state.inputFields.chart.type {
                 case .spendingByTotal:
@@ -53,59 +81,98 @@ struct ReportFeature {
                 case .line:
                     break
                 }
+                state.reportUpdated = true
                 state.scrollToId = nil
                 return .run { send in
                     await send(.chartDisplayed, animation: .easeInOut)
                 }
+            case .inputFields:
+                return .none
+
             case .chartDisplayed:
                 state.scrollToId = state.chartContainerId
                 return .none
-            case .inputFields:
-                return .none
+
+            case .doneButtonTapped:
+                if state.reportUpdated {
+                    state.confirmationDialog = makeConfirmDialog()
+                    return .none
+                } else {
+                    return .run { _ in await dismiss() }
+                }
             case .onAppear:
                 return .none
             }
         }
         .ifLet(\.$chartGraph, action: \.chartGraph)
+        .ifLet(\.$confirmationDialog, action: \.confirmationDialog)
         ._printChanges()
     }
 }
 
-private enum Strings {
-    static let newReportTitle = String(localized: "New Report", comment: "the title when a new report is being created")
+extension ReportFeature {
+
+    func makeConfirmDialog() -> ConfirmationDialogState<Action.ConfirmationDialog> {
+        .init {
+            TextState("")
+        } actions: {
+            ButtonState(action: .saveNewReport) {
+                TextState(AppStrings.saveButtonTitle)
+            }
+            ButtonState(role: .destructive, action: .discard) {
+                TextState(Strings.confirmDiscard)
+            }
+            ButtonState(role: .cancel) {
+                TextState(AppStrings.cancelButtonTitle)
+            }
+        } message: {
+            TextState(Strings.confirmSaveNewReport)
+        }
+    }
 
 }
+
+// MARK: -
 
 struct ReportView: View {
 
     @Bindable var store: StoreOf<ReportFeature>
 
     var body: some View {
-        ZStack {
-            Color(.Surface.primary)
-                .ignoresSafeArea()
-            VStack(spacing: .Spacing.pt8) {
-                Text(Strings.newReportTitle)
-                    .typography(.title2Emphasized)
-                ScrollView {
-                    VStack(spacing: .Spacing.pt16) {
-                        ReportInputView(store: store.scope(state: \.inputFields, action: \.inputFields))
+        VStack {
+            ScrollView {
+                VStack(spacing: .Spacing.pt16) {
+                    ReportInputView(store: store.scope(state: \.inputFields, action: \.inputFields))
 
-                        HorizontalDivider()
-                            .opacity(store.chartGraph == nil ? 0 : 1)
+                    HorizontalDivider()
+                        .opacity(store.chartGraph == nil ? 0 : 1)
 
-                        chartGraphView
-                            .id(store.chartContainerId)
-                    }
-                    .scrollTargetLayout()
+                    chartGraphView
+
+                    searchingView
                 }
-                .contentMargins(.all, .Spacing.pt16, for: .scrollContent)
-                .scrollPosition(id: $store.scrollToId, anchor: .top)
+                .scrollTargetLayout()
             }
+            .contentMargins(.all, .Spacing.pt16, for: .scrollContent)
+            .scrollPosition(id: $store.scrollToId, anchor: .top)
         }
+        .confirmationDialog($store.scope(state: \.confirmationDialog, action: \.confirmationDialog))
         .task {
             store.send(.onAppear)
         }
+        .navigationTitle(store.reportTitle)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            Button(AppStrings.doneButtonTitle) {
+                store.send(.doneButtonTapped)
+            }
+            .foregroundStyle(Color(.Text.primary))
+            .fontWeight(.bold)
+        }
+        .background(Color(.Surface.primary))
+        .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
+
     }
 
     var chartGraphView: some View {
@@ -116,17 +183,41 @@ struct ReportView: View {
                 SpendingTotalChartView(store: store)
             }
         }
+        .id(store.chartContainerId)
+    }
+
+    var searchingView: some View {
+        Image(systemName: "exclamationmark.magnifyingglass")
+            .resizable()
+            .scaledToFit()
+            .containerRelativeFrame(.horizontal) { size, _ in
+                size * 0.6
+            }
     }
 }
 
 // MARK: -
 
-#Preview {
-    ReportView(
-        store: .init(initialState: ReportFeature.mockState) {
-            ReportFeature()
-        }
+private enum Strings {
+    static let newReportTitle = String(localized: "New Report", comment: "the title when a new report is being created")
+    static let confirmSaveNewReport = String(
+        localized: "Save New Report?", comment: "Confirmation message when saving a new report message."
     )
+    static let confirmDiscard = String(
+        localized: "Discard", comment: "Confirmation action to not save changes & exit"
+    )
+}
+
+// MARK: -
+
+#Preview {
+    NavigationStack {
+        ReportView(
+            store: .init(initialState: ReportFeature.mockState) {
+                ReportFeature()
+            }
+        )
+    }
 }
 
 private extension ReportFeature {

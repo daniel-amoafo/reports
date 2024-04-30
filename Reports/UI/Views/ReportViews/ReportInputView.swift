@@ -46,6 +46,14 @@ struct ReportInputFeature {
         @CasePathable
         enum Delegate {
             case fetchedTransactions(IdentifiedArrayOf<TransactionEntry>)
+            case didUpdateFetchStatus(FetchStatus)
+        }
+
+        @CasePathable
+        enum FetchStatus: Equatable {
+            case ready
+            case fetching
+            case fetchedTransactions(IdentifiedArrayOf<TransactionEntry>)
         }
     }
 
@@ -313,8 +321,6 @@ struct ReportInputView: View {
 
     var runReportSection: some View {
         HStack {
-            Spacer()
-            Spacer()
             Button {
                 store.send(.runReportTapped, animation: .default)
             } label: {
@@ -329,8 +335,9 @@ struct ReportInputView: View {
             }
             .buttonStyle(.kleonPrimary)
             .disabled(store.isRunReportDisabled)
-            Spacer()
-            Spacer()
+            .containerRelativeFrame(.horizontal) { size, _ in
+                size * 0.7
+            }
         }
         .listRowBottom()
     }

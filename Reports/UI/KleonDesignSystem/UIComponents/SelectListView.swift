@@ -95,7 +95,7 @@ struct SelectListView<Element: Identifiable & CustomStringConvertible>: View {
                     .padding(.horizontal)
                     .toolbar {
                         if showDoneButton {
-                            Button(Strings.doneButtonTitle) {
+                            Button(AppStrings.doneButtonTitle) {
                                 dismiss()
                             }
                             .foregroundStyle(Color(.Text.primary))
@@ -141,10 +141,6 @@ struct SelectListView<Element: Identifiable & CustomStringConvertible>: View {
             }
         }
     }
-}
-
-private enum Strings {
-    static let doneButtonTitle = String(localized: "Done", comment: "Dismisses the current screen")
 }
 
 private enum SelectListViewSelectionMode {

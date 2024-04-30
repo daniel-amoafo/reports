@@ -103,8 +103,10 @@ struct SpendingTotalChartFeature {
                 return .run { send in
                     await send(.entryTapped(id: foundEntry.id))
                 }
+
             case .binding:
                 return .none
+
             case let .entryTapped(id):
                 switch state.contentType {
                 case .categoryGroup:
@@ -126,6 +128,7 @@ struct SpendingTotalChartFeature {
                     state.contentType = .categoryGroup
                 }
                 return .none
+
             case.listSubTitleTapped:
                 state.contentType = .categoryGroup
                 state.catgoriesForCategoryGroup = []
@@ -141,6 +144,10 @@ struct SpendingTotalChartView: View {
 
     @Bindable var store: StoreOf<SpendingTotalChartFeature>
     @ScaledMetric(relativeTo: .body) private var breadcrumbChevronWidth: CGFloat = 5.0
+
+    // Default colors & ordering used in Apple Charts. This array is used to map the category colors
+    // in the chart to the entries displayed in the list.
+    private let colors = [Color.blue, .green, .orange, .purple, .red, .cyan, .yellow]
 
     var body: some View {
         VStack(spacing: .Spacing.pt24) {
@@ -164,8 +171,7 @@ struct SpendingTotalChartView: View {
                 .cornerRadius(4)
                 .foregroundStyle(by: .value(Strings.chartNameKey, item.name))
             }
-            .chartLegend(.visible)
-            .chartLegend(alignment: .bottom)
+            .chartLegend()
             .scaledToFit()
             .chartAngleSelection(value: $store.rawSelectedGraphValue)
         }
@@ -183,11 +189,10 @@ struct SpendingTotalChartView: View {
                 }
                 HStack {
                     Text(store.listSubTitle)
-                        .typography(store.isListSubTitleALink ? .bodyEmphasized : .body)
+                        .typography(.bodyEmphasized)
                         .foregroundStyle(
                             store.isListSubTitleALink ? Color(.Text.link) : Color(.Text.secondary)
                         )
-                        .underline(store.isListSubTitleALink)
                         .onTapGesture {
                             if store.isListSubTitleALink {
                                 store.send(.listSubTitleTapped, animation: .default)
@@ -220,6 +225,9 @@ struct SpendingTotalChartView: View {
                     store.send(.entryTapped(id: item.id), animation: .default)
                 } label: {
                     HStack {
+                        BasicChartSymbolShape.circle
+                            .foregroundStyle(colorFor(item))
+                            .frame(width: 8, height: 8)
                         Text(item.name)
                             .typography(.bodyEmphasized)
                             .foregroundStyle(Color(.Text.primary))
@@ -237,6 +245,12 @@ struct SpendingTotalChartView: View {
                 .listRowBottom()
         }
         .backgroundShadow()
+    }
+
+    // Colors are mapped using Apple chart ordering
+    private func colorFor(_ item: TabulatedDataItem) -> Color {
+        let index = store.selectedContent.firstIndex(of: item) ?? 0
+        return colors[index % colors.count]
     }
 }
 

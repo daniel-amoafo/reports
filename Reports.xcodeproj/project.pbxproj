@@ -45,6 +45,8 @@
 		186E8A402B9BE5E800E65BDE /* ListStyleViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186E8A3F2B9BE5E800E65BDE /* ListStyleViewModifier.swift */; };
 		186E8A442B9C3AD500E65BDE /* KleonButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186E8A432B9C3AD500E65BDE /* KleonButtonStyle.swift */; };
 		186E8A462B9C4BB500E65BDE /* Color+Adjust.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186E8A452B9C4BB500E65BDE /* Color+Adjust.swift */; };
+		1882CF4E2BDE3D7200EA0B05 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 1882CF4D2BDE3D7200EA0B05 /* Localizable.xcstrings */; };
+		1894264B2BDFB6D700C06018 /* AppStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1894264A2BDFB6D700C06018 /* AppStrings.swift */; };
 		189641AF2B9C72BE00716258 /* AnimationConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189641AE2B9C72BE00716258 /* AnimationConstants.swift */; };
 		189641BB2B9C8CFE00716258 /* ReportChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189641BA2B9C8CFD00716258 /* ReportChart.swift */; };
 		189641BE2B9D675900716258 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189641BD2B9D675900716258 /* SettingsView.swift */; };
@@ -132,6 +134,8 @@
 		186E8A3F2B9BE5E800E65BDE /* ListStyleViewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListStyleViewModifier.swift; sourceTree = "<group>"; };
 		186E8A432B9C3AD500E65BDE /* KleonButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KleonButtonStyle.swift; sourceTree = "<group>"; };
 		186E8A452B9C4BB500E65BDE /* Color+Adjust.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Adjust.swift"; sourceTree = "<group>"; };
+		1882CF4D2BDE3D7200EA0B05 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		1894264A2BDFB6D700C06018 /* AppStrings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStrings.swift; sourceTree = "<group>"; };
 		189641AE2B9C72BE00716258 /* AnimationConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationConstants.swift; sourceTree = "<group>"; };
 		189641BA2B9C8CFD00716258 /* ReportChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportChart.swift; sourceTree = "<group>"; };
 		189641BD2B9D675900716258 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -393,6 +397,7 @@
 				184DF0B62B6E1C3E00BA6F21 /* ReportsApp.swift */,
 				18C3BFCA2B87522200E444C8 /* Logger.swift */,
 				186E8A1D2B99872F00E65BDE /* ConfigProvider.swift */,
+				1894264A2BDFB6D700C06018 /* AppStrings.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -402,6 +407,7 @@
 			children = (
 				18C3BFCD2B8AE9EC00E444C8 /* Fonts */,
 				186E8A1C2B99631200E65BDE /* BaseConfig.xcconfig */,
+				1882CF4D2BDE3D7200EA0B05 /* Localizable.xcstrings */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -559,6 +565,7 @@
 				18C3BFDE2B8AE9EC00E444C8 /* Cairo-Medium.ttf in Resources */,
 				18C3BFDA2B8AE9EC00E444C8 /* OpenSans-SemiBold.ttf in Resources */,
 				18C3BFE52B8AE9EC00E444C8 /* OpenSans-Regular.ttf in Resources */,
+				1882CF4E2BDE3D7200EA0B05 /* Localizable.xcstrings in Resources */,
 				184DF0BB2B6E1C3E00BA6F21 /* Assets.xcassets in Resources */,
 				18C3BFE32B8AE9EC00E444C8 /* Cairo-Bold.ttf in Resources */,
 				18C3BFDB2B8AE9EC00E444C8 /* Cairo-ExtraBold.ttf in Resources */,
@@ -635,6 +642,7 @@
 				183ECBC52B70E10C006C45B2 /* Atomic.swift in Sources */,
 				183ECBED2B747460006C45B2 /* Collection+Additions.swift in Sources */,
 				186E8A312B9B169C00E65BDE /* CGFloat+DesignStyleMetrics.swift in Sources */,
+				1894264B2BDFB6D700C06018 /* AppStrings.swift in Sources */,
 				186E8A462B9C4BB500E65BDE /* Color+Adjust.swift in Sources */,
 				183ECBC32B70E0E3006C45B2 /* InMemoryKeyValueStore.swift in Sources */,
 				18C3BFB02B81874000E444C8 /* AppIntroLoginView.swift in Sources */,

@@ -179,10 +179,12 @@ private extension HomeView {
                     )
                 }
             }
-            .popover(
+            .fullScreenCover(
                 item: $store.scope(state: \.destination?.popoverNewReport, action: \.destination.popoverNewReport)
             ) { store in
-                ReportView(store: store)
+                NavigationStack {
+                    ReportView(store: store)
+                }
             }
         }
     }
@@ -218,6 +220,9 @@ private extension HomeView {
 
                 }
                 .buttonStyle(.kleonPrimary)
+                .containerRelativeFrame(.horizontal) { size, _ in
+                    size * 0.7
+                }
             }
             .listRowBottom()
         }

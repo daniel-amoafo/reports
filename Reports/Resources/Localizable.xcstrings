@@ -1,0 +1,183 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "" : {
+
+    },
+    "[Select budget text]" : {
+
+    },
+    "%@" : {
+
+    },
+    "A bar chart showing spending trends" : {
+      "comment" : "description text of the spending trend chart"
+    },
+    "A pie chart showing spending totals by category" : {
+      "comment" : "description text of the spending total chart"
+    },
+    "A table summarising income & expenses for each category in a month" : {
+      "comment" : "description text of the income expense chart"
+    },
+    "All Accounts" : {
+      "comment" : "A special account instance indicating all available accounts should be selected for the report."
+    },
+    "All Categories" : {
+      "comment" : "The collective name for top level category groups"
+    },
+    "Aug 23 - Dec 23, Main Budget" : {
+
+    },
+    "Budget Reports" : {
+      "comment" : "The home screen main title"
+    },
+    "Cancel" : {
+      "comment" : "Button title to stop the current action and return to previous state."
+    },
+    "Categories" : {
+      "comment" : "title for list of categories for the selected data set"
+    },
+    "Chart" : {
+      "comment" : "the title name for the chart section"
+    },
+    "Discard" : {
+      "comment" : "Confirmation action to not save changes & exit"
+    },
+    "Done" : {
+      "comment" : "Button title to dismiss the current screen."
+    },
+    "From" : {
+      "comment" : "the start date field title"
+    },
+    "Hello" : {
+
+    },
+    "Hello World" : {
+
+    },
+    "Hmm, something went wrong.\nPlease Try Again" : {
+      "comment" : "text displayed when unable to load screen into a valid state. Ask the user to retry"
+    },
+    "Home" : {
+      "comment" : "Home screen tab title name"
+    },
+    "Income v Expense" : {
+      "comment" : "The title for a chart displaying income and expenses"
+    },
+    "Login into YNAB" : {
+
+    },
+    "Main Budget" : {
+
+    },
+    "Mode" : {
+
+    },
+    "More Info" : {
+      "comment" : "the title to as ection that displays more descriptive text about the chart"
+    },
+    "Multi Selection" : {
+
+    },
+    "Name" : {
+      "comment" : "the key name used by voice over when reading the chart name"
+    },
+    "New Report" : {
+      "comment" : "the title when a new report is being created"
+    },
+    "No selection allowed" : {
+
+    },
+    "Outline" : {
+
+    },
+    "Please select an account for the report" : {
+      "comment" : "the account for which the transactions the report will be based on"
+    },
+    "Primary" : {
+
+    },
+    "Primary Disabled" : {
+
+    },
+    "Reconnect" : {
+      "comment" : "Button title when unable to load app to a valid state"
+    },
+    "Reports" : {
+      "comment" : "Saved Reports screen tab title name"
+    },
+    "Run" : {
+      "comment" : "Generates a new report"
+    },
+    "Save" : {
+      "comment" : "Button title to save the current setting or report"
+    },
+    "Save New Report?" : {
+      "comment" : "Confirmation message when saving a new report message."
+    },
+    "Saved Reports" : {
+
+    },
+    "Saved Reports 📈" : {
+
+    },
+    "Secondary" : {
+
+    },
+    "Select Account" : {
+      "comment" : "title for selecting the bank account to run report from"
+    },
+    "Selected Values:" : {
+
+    },
+    "Settings" : {
+      "comment" : "Settings screen tab title name"
+    },
+    "Settings View ⚙️" : {
+
+    },
+    "Show done button" : {
+
+    },
+    "Single" : {
+
+    },
+    "Size Categories" : {
+
+    },
+    "Spending Total" : {
+      "comment" : "The title for a chart displaying spending totals by category"
+    },
+    "Spending Trend" : {
+      "comment" : "The title for a chart displaying spending by trend"
+    },
+    "Spending Trends" : {
+
+    },
+    "This is a bottom row" : {
+
+    },
+    "This is a middle row" : {
+
+    },
+    "This is a top row" : {
+
+    },
+    "To" : {
+      "comment" : "the end date field title"
+    },
+    "Total Spending" : {
+
+    },
+    "Uncategorized" : {
+      "comment" : "Category title for transactions without a formal category"
+    },
+    "Value" : {
+      "comment" : "the key name used by voice over when reading chart values"
+    },
+    "View All" : {
+
+    }
+  },
+  "version" : "1.0"
+}
