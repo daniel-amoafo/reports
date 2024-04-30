@@ -15,8 +15,8 @@ struct ReportInputFeature {
         var toDate: Date = .aWeekFrom(.now)
         var accounts: IdentifiedArrayOf<Account>?
         var selectedAccountId: String?
-        var reportLoading = false
         var showAccountList = false
+        var fetchStatus: Action.FetchStatus = .ready
 
         var selectedAccountName: String? {
             guard let selectedAccountId else { return nil }
@@ -29,6 +29,19 @@ struct ReportInputFeature {
 
         var isRunReportDisabled: Bool {
             !isAccountSelected
+        }
+
+        var isReportFetching: Bool {
+            return fetchStatus == .fetching
+        }
+
+        var isReportFetchingLoadingOrErrored: Bool {
+            switch fetchStatus {
+            case .fetching, .error:
+                return true
+            case .ready:
+                return false
+            }
         }
     }
 
@@ -53,7 +66,7 @@ struct ReportInputFeature {
         enum FetchStatus: Equatable {
             case ready
             case fetching
-            case fetchedTransactions(IdentifiedArrayOf<TransactionEntry>)
+            case error(ReportFetchError)
         }
     }
 
@@ -79,16 +92,20 @@ struct ReportInputFeature {
                 return .none
 
             case .runReportTapped:
-                guard !state.reportLoading else { return .none }
-                state.reportLoading = true
+                guard !state.isReportFetching else { return .none }
+                state.fetchStatus = .fetching
                 return .run { [state] send in
                     await fetchReport(state: state, send: send)
                 }
 
             case let .runReportReponse(transactions):
-                // call report graph
-                state.reportLoading = false
-                return .send(.delegate(.fetchedTransactions(transactions)), animation: .default)
+                if transactions.isEmpty {
+                    state.fetchStatus = .error(.noResults)
+                    return .none
+                } else {
+                    state.fetchStatus = .ready
+                    return .send(.delegate(.fetchedTransactions(transactions)), animation: .default)
+                }
 
             case let .selectAccountRowTapped(isActive):
                 state.showAccountList = isActive
@@ -327,10 +344,10 @@ struct ReportInputView: View {
                 ZStack {
                     Text(Strings.runReportTitle)
                         .typography(.title3Emphasized)
-                        .opacity(store.reportLoading ? 0 : 1)
+                        .opacity(store.isReportFetching ? 0 : 1)
                     ProgressView()
                         .tint(Color(.Button.primaryTitle))
-                        .opacity(store.reportLoading ? 1 : 0)
+                        .opacity(store.isReportFetching ? 1 : 0)
                 }
             }
             .buttonStyle(.kleonPrimary)

@@ -147,9 +147,11 @@ struct ReportView: View {
                     HorizontalDivider()
                         .opacity(store.chartGraph == nil ? 0 : 1)
 
-                    chartGraphView
-
-                    searchingView
+                    if store.inputFields.isReportFetchingLoadingOrErrored {
+                        searchingView
+                    } else {
+                        chartGraphView
+                    }
                 }
                 .scrollTargetLayout()
             }
@@ -187,12 +189,22 @@ struct ReportView: View {
     }
 
     var searchingView: some View {
-        Image(systemName: "exclamationmark.magnifyingglass")
-            .resizable()
-            .scaledToFit()
-            .containerRelativeFrame(.horizontal) { size, _ in
-                size * 0.6
-            }
+        Image(systemName:
+                store.inputFields.isReportFetching ? "text.magnifyingglass" : "exclamationmark.magnifyingglass"
+        )
+        .resizable()
+        .scaledToFit()
+        .containerRelativeFrame(.horizontal) { size, _ in
+            size * 0.5
+        }
+        .foregroundStyle(
+            .linearGradient(colors: [.purple, .orange, .pink], startPoint: .topLeading, endPoint: .bottomTrailing)
+        )
+        // display pulsating image when actively searching
+        .symbolEffect(.pulse.byLayer, options: .repeating, isActive: store.inputFields.isReportFetching)
+        // switch from search with text image to exclaimation when there
+        .contentTransition(store.inputFields.isReportFetching ? .identity : .symbolEffect(.replace.byLayer))
+        .padding(.vertical)
     }
 }
 
@@ -210,10 +222,20 @@ private enum Strings {
 
 // MARK: -
 
-#Preview {
+#Preview("Standard") {
     NavigationStack {
         ReportView(
             store: .init(initialState: ReportFeature.mockState) {
+                ReportFeature()
+            }
+        )
+    }
+}
+
+#Preview("Searching") {
+    NavigationStack {
+        ReportView(
+            store: .init(initialState: ReportFeature.mockSearch) {
                 ReportFeature()
             }
         )
@@ -225,4 +247,8 @@ private extension ReportFeature {
     static var mockState: ReportFeature.State {
         .init(inputFields: .init(chart: .mock, accounts: .mocks))
      }
+
+    static var mockSearch: ReportFeature.State {
+        .init(inputFields: .init(chart: .mock, accounts: .mocks, fetchStatus: .fetching))
+    }
 }

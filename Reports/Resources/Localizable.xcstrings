@@ -88,6 +88,9 @@
     "No selection allowed" : {
 
     },
+    "No transactions were found for the provided dates" : {
+      "comment" : "Error message displayed when no results are found for the selected date range."
+    },
     "Outline" : {
 
     },

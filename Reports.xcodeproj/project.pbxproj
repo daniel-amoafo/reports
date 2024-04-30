@@ -72,6 +72,7 @@
 		18C3BFE42B8AE9EC00E444C8 /* OpenSans-SemiBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 18C3BFD82B8AE9EC00E444C8 /* OpenSans-SemiBoldItalic.ttf */; };
 		18C3BFE52B8AE9EC00E444C8 /* OpenSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 18C3BFD92B8AE9EC00E444C8 /* OpenSans-Regular.ttf */; };
 		18C3BFE92B8B6FA100E444C8 /* BudgetSystemService+ConfigTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C3BFE82B8B6FA100E444C8 /* BudgetSystemService+ConfigTests.swift */; };
+		18E7BAF52BE0CE6D00C0468E /* ReportFetchError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E7BAF42BE0CE6D00C0468E /* ReportFetchError.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -164,6 +165,7 @@
 		18C3BFD92B8AE9EC00E444C8 /* OpenSans-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "OpenSans-Regular.ttf"; sourceTree = "<group>"; };
 		18C3BFE62B8B5F4E00E444C8 /* BudgetSystemService.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; name = BudgetSystemService.xctestplan; path = Packages/BudgetSystemService/BudgetSystemService.xctestplan; sourceTree = "<group>"; };
 		18C3BFE82B8B6FA100E444C8 /* BudgetSystemService+ConfigTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BudgetSystemService+ConfigTests.swift"; sourceTree = "<group>"; };
+		18E7BAF42BE0CE6D00C0468E /* ReportFetchError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportFetchError.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -387,6 +389,7 @@
 				186A80FC2BCCC5DE0015FFC7 /* ReportInputView.swift */,
 				18A514C82BD5001300B072DE /* SpendingTotalChartView.swift */,
 				180003542BD8D40E003C2804 /* TabulatedDataItem.swift */,
+				18E7BAF42BE0CE6D00C0468E /* ReportFetchError.swift */,
 			);
 			path = ReportViews;
 			sourceTree = "<group>";
@@ -651,6 +654,7 @@
 				183ECBDF2B747085006C45B2 /* FloatingTitleRow.swift in Sources */,
 				183ECBEC2B747460006C45B2 /* String+Additions.swift in Sources */,
 				186A80EB2BCA57F90015FFC7 /* BackgroundShadowViewModifier.swift in Sources */,
+				18E7BAF52BE0CE6D00C0468E /* ReportFetchError.swift in Sources */,
 				180003552BD8D40F003C2804 /* TabulatedDataItem.swift in Sources */,
 				186E8A242B9AF45200E65BDE /* HomeView.swift in Sources */,
 				189641C12B9D67CE00716258 /* SavedReportsView.swift in Sources */,
