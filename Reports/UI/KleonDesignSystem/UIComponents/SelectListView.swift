@@ -66,7 +66,7 @@ struct SelectListView<Element: Identifiable & CustomStringConvertible>: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color(.Surface.primary)
+                Color.Surface.primary
                     .ignoresSafeArea()
                 ScrollView {
                     VStack(spacing: 0) {
@@ -98,7 +98,7 @@ struct SelectListView<Element: Identifiable & CustomStringConvertible>: View {
                             Button(AppStrings.doneButtonTitle) {
                                 dismiss()
                             }
-                            .foregroundStyle(Color(.Text.primary))
+                            .foregroundStyle(Color.Text.primary)
                             .fontWeight(.bold)
                         }
                     }
@@ -197,7 +197,7 @@ private struct ContainerView: View {
                 }
             }
             .frame(height: 300)
-            .foregroundStyle(Color(.Text.primary))
+            .foregroundStyle(Color.Text.primary)
 
             VStack {
                 Divider()

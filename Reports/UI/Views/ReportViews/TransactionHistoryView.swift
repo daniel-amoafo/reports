@@ -78,7 +78,7 @@ private extension TransactionHistoryView {
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal)
-                .background(Color(.Surface.sectionHeader))
+                .background(Color.Surface.sectionHeader)
         }
         .listRowBackground(Color.clear)
         .listRowSeparator(.hidden)
@@ -91,10 +91,10 @@ private extension TransactionHistoryView {
                 VStack(alignment: .leading, spacing: .Spacing.pt4) {
                     Text(item.payeeName ?? "[No Payee Details]")
                         .typography(.headlineEmphasized)
-                        .foregroundStyle(Color(.Text.primary))
+                        .foregroundStyle(Color.Text.primary)
                     Text(item.categoryName ?? "[No Category Name]")
                         .typography(.bodyEmphasized)
-                        .foregroundStyle(Color(.Text.secondary))
+                        .foregroundStyle(Color.Text.secondary)
                 }
                 Spacer()
                 Text(item.amountFormatted())

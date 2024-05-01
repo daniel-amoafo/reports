@@ -127,7 +127,7 @@ struct ReportsApp: App {
     var body: some Scene {
         WindowGroup {
             ZStack {
-                Color(.Surface.primary)
+                Color.Surface.primary
                     .ignoresSafeArea()
                 switch store.authStatus {
                 case .unknown:

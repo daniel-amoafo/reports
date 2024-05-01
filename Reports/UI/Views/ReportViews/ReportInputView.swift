@@ -184,7 +184,7 @@ struct ReportInputView: View {
                         VStack(alignment: .leading, spacing: 0) {
                             Text(Strings.chartTitle)
                                 .typography(.title2Emphasized)
-                                .foregroundStyle(Color(.Text.secondary))
+                                .foregroundStyle(Color.Text.secondary)
                             Text(store.chart.name)
                                 .typography(.headlineEmphasized)
                         }
@@ -216,7 +216,7 @@ struct ReportInputView: View {
                                 }
                             )
                             .buttonStyle(.plain)
-                            .foregroundStyle(Color(.Text.secondary))
+                            .foregroundStyle(Color.Text.secondary)
                             Spacer()
                         }
                         // Chart description text when expanded
@@ -224,13 +224,13 @@ struct ReportInputView: View {
                             HStack(spacing: 0) {
                                 Text(store.chart.description)
                                     .typography(.body)
-                                    .foregroundStyle(Color(.Text.secondary))
+                                    .foregroundStyle(Color.Text.secondary)
                                     .padding()
                             }
                             .frame(maxWidth: .infinity)
                             .background(
                                 RoundedRectangle(cornerRadius: 16.0)
-                                    .fill(Color(.Surface.tertiary))
+                                    .fill(Color.Surface.tertiary)
                             )
                         }
                     }
@@ -240,7 +240,7 @@ struct ReportInputView: View {
             .background(
                 RoundedRectangle(cornerRadius: .Corner.rd8)
                     .fill(Color.clear)
-                    .stroke(Color(.Border.secondary), lineWidth: 1.0)
+                    .stroke(Color.Border.secondary, lineWidth: 1.0)
             )
         }
         .listRowTop()
@@ -252,7 +252,7 @@ struct ReportInputView: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: iconWidth)
-                .foregroundStyle(Color(.Icon.secondary))
+                .foregroundStyle(Color.Icon.secondary)
                 .alignmentGuide(.iconAndTitleAlignment, computeValue: { dimension in
                     dimension[VerticalAlignment.center]
                 })
@@ -280,7 +280,7 @@ struct ReportInputView: View {
                     }
                 )
             }
-            .foregroundStyle(Color(.Text.secondary))
+            .foregroundStyle(Color.Text.secondary)
         }
         .listRow()
     }
@@ -296,7 +296,7 @@ struct ReportInputView: View {
                             .resizable()
                             .scaledToFit()
                             .frame(width: iconWidth)
-                            .foregroundStyle(Color(.Icon.secondary))
+                            .foregroundStyle(Color.Icon.secondary)
                             .alignmentGuide(
                                 .iconAndTitleAlignment,
                                 computeValue: { dimension in dimension[VerticalAlignment.center] }
@@ -305,7 +305,7 @@ struct ReportInputView: View {
                         VStack(alignment: .leading, spacing: .Spacing.pt8) {
                             Text(Strings.selectAccountTitle)
                                 .typography(.bodyEmphasized)
-                                .foregroundStyle(Color(.Text.secondary))
+                                .foregroundStyle(Color.Text.secondary)
                                 .alignmentGuide(
                                     .iconAndTitleAlignment,
                                     computeValue: { dimension in dimension[VerticalAlignment.center] }
@@ -315,13 +315,13 @@ struct ReportInputView: View {
                                 .typography(store.isAccountSelected ? .body : .bodyItalic)
                                 .foregroundStyle(
                                     store.isAccountSelected ?
-                                    Color(.Text.primary) : Color(.Text.secondary)
+                                    Color.Text.primary : Color.Text.secondary
                                 )
                         }
                         Spacer()
                     }
                     Image(systemName: "chevron.right")
-                        .foregroundStyle(Color(.Icon.secondary))
+                        .foregroundStyle(Color.Icon.secondary)
                         .padding(.trailing, .Spacing.pt8)
                 }
             }
@@ -347,7 +347,7 @@ struct ReportInputView: View {
                         .typography(.title3Emphasized)
                         .opacity(store.isReportFetching ? 0 : 1)
                     ProgressView()
-                        .tint(Color(.Button.primaryTitle))
+                        .tint(Color.Button.primaryTitle)
                         .opacity(store.isReportFetching ? 1 : 0)
                 }
             }

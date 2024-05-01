@@ -106,7 +106,7 @@ struct HomeView: View {
 
     var body: some View {
         ZStack {
-            Color(.Surface.primary)
+            Color.Surface.primary
                 .ignoresSafeArea()
             VStack(spacing: 0) {
                 ScrollView(showsIndicators: false) {
@@ -194,7 +194,7 @@ private extension HomeView {
             HStack {
                 Text("Saved Reports")
                     .typography(.title3Emphasized)
-                    .foregroundStyle(Color(.Text.secondary))
+                    .foregroundStyle(Color.Text.secondary)
                 Spacer()
             }
             .listRowTop(showHorizontalRule: false)

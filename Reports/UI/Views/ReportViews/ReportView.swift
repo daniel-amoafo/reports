@@ -168,7 +168,7 @@ struct ReportView: View {
             Button(AppStrings.doneButtonTitle) {
                 store.send(.doneButtonTapped)
             }
-            .foregroundStyle(Color(.Text.primary))
+            .foregroundStyle(Color.Text.primary)
             .fontWeight(.bold)
         }
         .background(Color.Surface.primary)
@@ -214,7 +214,7 @@ private extension ReportView {
             if case let .error(err) = store.inputFields.fetchStatus {
                 Text(err.localizedDescription)
                     .typography(.bodyEmphasized)
-                    .foregroundStyle(Color(.Text.primary))
+                    .foregroundStyle(Color.Text.primary)
                     .multilineTextAlignment(.center)
             }
         }

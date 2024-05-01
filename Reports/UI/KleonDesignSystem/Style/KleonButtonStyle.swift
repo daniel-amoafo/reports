@@ -60,11 +60,11 @@ extension KleonButtonStyle.Theme {
         let baseColor: Color
         switch self {
         case .primary:
-            baseColor = Color(.Button.primaryTitle)
+            baseColor = Color.Button.primaryTitle
         case .secondary:
-            baseColor = Color(.Button.secondaryTitle)
+            baseColor = Color.Button.secondaryTitle
         case .outline:
-            baseColor = isPressed ? .black : Color(.Button.outline)
+            baseColor = isPressed ? .black : Color.Button.outline
         }
         if isPressed || !isEnabled {
             return baseColor.opacity(0.5)
@@ -76,9 +76,9 @@ extension KleonButtonStyle.Theme {
         let baseColor: Color
         switch self {
         case .primary:
-            baseColor = isEnabled ? Color(.Button.primary) : Color(.Button.primaryDisabled)
+            baseColor = isEnabled ? Color.Button.primary : Color.Button.primaryDisabled
         case .secondary:
-            baseColor = Color(.Button.secondary)
+            baseColor = Color.Button.secondary
         case .outline:
             if isPressed {
                 baseColor = .gray.lighter(by: isDarkColorScheme ? 0 : 50)
@@ -98,7 +98,7 @@ extension KleonButtonStyle.Theme {
         case .primary, .secondary:
             baseColor = .clear
         case .outline:
-            baseColor = isPressed ? .gray : Color(.Button.outline)
+            baseColor = isPressed ? .gray : Color.Button.outline
         }
         guard isPressed else {
             return baseColor

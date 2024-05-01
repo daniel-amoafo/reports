@@ -184,14 +184,14 @@ struct SpendingTotalChartView: View {
                 HStack {
                     Text(Strings.categorized)
                         .typography(.title2Emphasized)
-                        .foregroundStyle(Color(.Text.secondary))
+                        .foregroundStyle(Color.Text.secondary)
                     Spacer()
                 }
                 HStack {
                     Text(store.listSubTitle)
                         .typography(.bodyEmphasized)
                         .foregroundStyle(
-                            store.isListSubTitleALink ? Color(.Text.link) : Color(.Text.secondary)
+                            store.isListSubTitleALink ? Color.Text.link : Color.Text.secondary
                         )
                         .onTapGesture {
                             if store.isListSubTitleALink {
@@ -209,10 +209,10 @@ struct SpendingTotalChartView: View {
                             .resizable()
                             .scaledToFit()
                             .frame(width: breadcrumbChevronWidth)
-                            .foregroundStyle(Color(.Icon.secondary))
+                            .foregroundStyle(Color.Icon.secondary)
                         Text(breadcrumbTitle)
                             .typography(.bodyEmphasized)
-                            .foregroundStyle(Color(.Text.primary))
+                            .foregroundStyle(Color.Text.primary)
                     }
                     Spacer()
                 }
@@ -230,11 +230,11 @@ struct SpendingTotalChartView: View {
                             .frame(width: 8, height: 8)
                         Text(item.name)
                             .typography(.bodyEmphasized)
-                            .foregroundStyle(Color(.Text.primary))
+                            .foregroundStyle(Color.Text.primary)
                         Spacer()
                         Text(item.valueFormatted)
                             .typography(.bodyEmphasized)
-                            .foregroundStyle(Color(.Text.primary))
+                            .foregroundStyle(Color.Text.primary)
                     }
                 }
                 .buttonStyle(.listRow)

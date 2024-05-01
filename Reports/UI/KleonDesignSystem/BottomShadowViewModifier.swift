@@ -13,8 +13,8 @@ struct BottomShadowViewModifier: ViewModifier {
 
     private var shadow: some View {
         Rectangle()
-            .fill(Color(.Surface.primary))
-            .shadow(color: Color(.Shadow.shadowBottom), radius: 4, x: 0, y: 4)
+            .fill(Color.Surface.primary)
+            .shadow(color: Color.Shadow.shadowBottom, radius: 4, x: 0, y: 4)
             .opacity(opacity)
     }
 }
