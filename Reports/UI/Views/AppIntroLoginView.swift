@@ -55,8 +55,8 @@ struct AppIntroLoginView: View {
                 self.store.send(.authorizeButtonTapped)
             }
             .buttonStyle(.kleonPrimary)
-            .containerRelativeFrame(.horizontal) { size, _ in
-                size * 0.7
+            .containerRelativeFrame(.horizontal) { length, _ in
+                length * 0.7
             }
         }
         .padding(.horizontal)

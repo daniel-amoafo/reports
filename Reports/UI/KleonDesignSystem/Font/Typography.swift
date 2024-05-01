@@ -4,11 +4,6 @@ import SwiftUI
 
 public enum Typography: String, CaseIterable {
 
-    case body
-    case bodyEmphasized
-    case bodyItalic
-    case bodyItalicEmphasized
-    case headlineEmphasized
     case largeTitle
     case largeTitleEmphasized
     case title1
@@ -16,6 +11,13 @@ public enum Typography: String, CaseIterable {
     case title2
     case title2Emphasized
     case title3Emphasized
+    case headlineEmphasized
+    case subheadline
+    case subheadlineEmphasized
+    case body
+    case bodyEmphasized
+    case bodyItalic
+    case bodyItalicEmphasized
 
 }
 
@@ -30,24 +32,20 @@ public extension Typography {
         case .bodyItalic: return .openSansItalic
         case .bodyItalicEmphasized: return .openSansSemiBoldItalic
         case .headlineEmphasized: return .cairoSemiBold
-        case .largeTitle: return .cairoRegular
-        case .largeTitleEmphasized: return .openSansSemiBold
-        case .title1: return .cairoRegular
-        case .title1Emphasized: return .cairoBold
-        case .title2: return .cairoRegular
-        case .title2Emphasized: return .cairoBold
-        case .title3Emphasized: return .cairoBold
+        case .largeTitle, .largeTitleEmphasized, .title1, .title2, .subheadline: return .cairoRegular
+        case .title1Emphasized, .title2Emphasized, .title3Emphasized, .subheadlineEmphasized: return .cairoBold
         }
     }
 
     var textStyle: Font.TextStyle {
         switch self {
-        case .body, .bodyItalic, .bodyEmphasized, .bodyItalicEmphasized: return .body
-        case .headlineEmphasized: return .headline
         case .largeTitle, .largeTitleEmphasized: return .largeTitle
         case .title1, .title1Emphasized: return .title
         case .title2, .title2Emphasized: return .title2
         case .title3Emphasized: return .title3
+        case .headlineEmphasized: return .headline
+        case .subheadline, .subheadlineEmphasized: return .subheadline
+        case .body, .bodyItalic, .bodyEmphasized, .bodyItalicEmphasized: return .body
         }
     }
 
@@ -66,12 +64,13 @@ public extension Typography {
 
     var defaultSize: CGFloat {
         switch self {
-        case .body, .bodyItalic, .bodyEmphasized, .bodyItalicEmphasized: return 12
-        case .headlineEmphasized: return 16
         case .largeTitle, .largeTitleEmphasized: return 34
         case .title1, .title1Emphasized: return 28
         case .title2, .title2Emphasized: return 22
         case .title3Emphasized: return 18
+        case .headlineEmphasized: return 16
+        case .subheadline, .subheadlineEmphasized: return 14
+        case .body, .bodyItalic, .bodyEmphasized, .bodyItalicEmphasized: return 12
         }
     }
 }

@@ -10,6 +10,8 @@ extension ReportChart {
     static let mock: ReportChart = Self.makeDefaultCharts()[0]
 }
 
+// MARK: - Account
+
 extension IdentifiedArray where ID == Account.ID, Element == Account {
 
     static let mocks: Self = [
@@ -18,6 +20,8 @@ extension IdentifiedArray where ID == Account.ID, Element == Account {
         .init(id: "03", name: "Appleseed Account", deleted: false),
     ]
 }
+
+// MARK: - BudgetSummary
 
 extension IdentifiedArray where Element == BudgetSummary, ID == BudgetSummary.ID {
 
@@ -41,20 +45,39 @@ extension IdentifiedArray where Element == BudgetSummary, ID == BudgetSummary.ID
     ]
 }
 
+// MARK: - CategoryGroup
+
 extension IdentifiedArray where Element == CategoryGroup, ID == CategoryGroup.ID {
 
     static let mocks: Self = [
-        .init(id: "CG1", name: "Fixed Expenses", hidden: false, deleted: false, categoryIds: ["CAT1"]),
-        .init(id: "CG2", name: "Transportation", hidden: false, deleted: false, categoryIds: ["CAT2", "CAT3"]),
+        .init(
+            id: "CG-FIX-EXP",
+            name: "Fixed Expenses",
+            hidden: false,
+            deleted: false,
+            categoryIds: ["CAT-RENT"]
+        ),
+        .init(
+            id: "CG-TRANS",
+            name: "Transportation",
+            hidden: false,
+            deleted: false,
+            categoryIds: [
+                "CAT-TRAIN",
+                "CAT-TAXI",
+            ]
+        ),
     ]
 }
+
+// MARK: - Category
 
 extension IdentifiedArray where Element == BudgetSystemService.Category, ID == BudgetSystemService.Category.ID {
 
     static let mocks: Self = [
         .init(
-            id: "CAT1",
-            categoryGroupId: "GC1",
+            id: "CAT-RENT",
+            categoryGroupId: "CG-FIX-EXP",
             name: "Rent",
             hidden: false,
             note: nil,
@@ -62,8 +85,8 @@ extension IdentifiedArray where Element == BudgetSystemService.Category, ID == B
             deleted: false
         ),
         .init(
-            id: "CAT2",
-            categoryGroupId: "GC2",
+            id: "CAT-TRAIN",
+            categoryGroupId: "CG-TRANS",
             name: "Train Ticket",
             hidden: false,
             note: nil,
@@ -71,16 +94,27 @@ extension IdentifiedArray where Element == BudgetSystemService.Category, ID == B
             deleted: false
         ),
         .init(
-            id: "CAT3",
-            categoryGroupId: "GC2",
+            id: "CAT-TAXI",
+            categoryGroupId: "CG-TRANS",
             name: "Taxi / Uber",
             hidden: false,
             note: nil,
             balance: Money(20.00, currency: .AUD),
             deleted: false
         ),
+        .init(
+            id: "CAT-GROCERIES",
+            categoryGroupId: "CG-FIX-EXP",
+            name: "Groceries",
+            hidden: false,
+            note: nil,
+            balance: Money(89.50, currency: .AUD),
+            deleted: false
+        ),
     ]
 }
+
+// MARK: - TransactionEntry
 
 extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEntry.ID {
 
@@ -89,38 +123,55 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
             id: "T1",
             date: Date.iso8601Formatter.date(from: "2024-02-01")!,
             money: Money(Decimal(-100), currency: .AUD),
+            payeeName: "Woolworths",
             accountId: "A1",
             accountName: "Account First",
             categoryId: "C1",
             categoryName: "Groceries",
-            categoryGroupId: "CG01",
-            categoryGroupName: "Acme",
+            categoryGroupId: "CG-FIX-EXP",
+            categoryGroupName: "Fixed Expenses",
             transferAccountId: nil,
             deleted: false
         ),
         .init(
             id: "T2",
-            date: Date.iso8601Formatter.date(from: "2024-03-04")!,
+            date: Date.iso8601Formatter.date(from: "2024-02-01")!,
             money: Money(Decimal(-123.45), currency: .AUD),
+            payeeName: "Opal",
             accountId: "A1",
             accountName: "Account First",
-            categoryId: "C2",
-            categoryName: "Electricity Bill",
-            categoryGroupId: "CG02",
-            categoryGroupName: "Bills",
+            categoryId: "CAT-TRAIN",
+            categoryName: "Train Ticket",
+            categoryGroupId: "CG-TRANS",
+            categoryGroupName: "Transport",
             transferAccountId: nil,
             deleted: false
         ),
         .init(
             id: "T3",
-            date: Date.iso8601Formatter.date(from: "2024-04-05")!,
+            date: Date.iso8601Formatter.date(from: "2024-03-05")!,
             money: Money(Decimal(-299.99), currency: .AUD),
+            payeeName: "Landlord",
             accountId: "A2",
             accountName: "Account Second",
-            categoryId: "C3",
+            categoryId: "CAT-RENT",
             categoryName: "Rent",
-            categoryGroupId: "CG03",
-            categoryGroupName: "Home Expenses",
+            categoryGroupId: "CG-FIX-EXP",
+            categoryGroupName: "Fixed Expenses",
+            transferAccountId: nil,
+            deleted: false
+        ),
+        .init(
+            id: "T4",
+            date: Date.iso8601Formatter.date(from: "2024-04-24")!,
+            money: Money(Decimal(-37.60), currency: .AUD),
+            payeeName: "Uber",
+            accountId: "A2",
+            accountName: "Account Second",
+            categoryId: "CAT-TAXI",
+            categoryName: "Taxi / Uber",
+            categoryGroupId: "CG-TRANS",
+            categoryGroupName: "Transport",
             transferAccountId: nil,
             deleted: false
         ),
@@ -133,26 +184,13 @@ extension BudgetClient {
 
     public static var preview: BudgetClient {
         .init(
-            provider: .preview,
-            selectedBudgetId: IdentifiedArrayOf<BudgetSummary>.mocks[0].id,
-            authorizationStatus: .loggedIn
+            budgetSummaries: .mocks,
+            accounts: .mocks,
+            categoryGroups: .mocks,
+            categories: .mocks,
+            authorizationStatus: .loggedIn,
+            selectedBudgetId: IdentifiedArrayOf<BudgetSummary>.mocks[0].id
         )
     }
 
-}
-
-extension BudgetProvider {
-
-    public static var preview: Self {
-        .init {
-            IdentifiedArrayOf<BudgetSummary>.mocks.elements
-        } fetchAccounts: { _ in
-            IdentifiedArrayOf<Account>.mocks.elements
-        } fetchCategoryValues: { _ in
-            (IdentifiedArrayOf<CategoryGroup>.mocks.elements,
-             IdentifiedArrayOf<BudgetSystemService.Category>.mocks.elements)
-        } fetchTransactions: { _ in
-            IdentifiedArrayOf<TransactionEntry>.mocks.elements
-        }
-    }
 }

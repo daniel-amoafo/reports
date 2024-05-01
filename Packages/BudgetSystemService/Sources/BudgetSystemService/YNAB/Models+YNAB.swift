@@ -57,6 +57,7 @@ extension TransactionEntry {
 
     init(ynabTransactionDetail ynab: SwiftYNAB.TransactionDetail, currency: Currency, categoryGroup: CategoryGroup?) {
         self.id = ynab.id
+        self.payeeName = ynab.payeeName
         self.accountId = ynab.accountId
         self.accountName = ynab.accountName
         self.categoryId = ynab.categoryId
@@ -75,6 +76,7 @@ extension TransactionEntry {
 
     init(ynabHybridTransaction ynab: HybridTransaction, currency: Currency, categoryGroup: CategoryGroup?) {
         self.id = ynab.id
+        self.payeeName = ynab.payeeName
         self.accountId = ynab.accountId
         self.accountName = ynab.accountName
         self.categoryId = ynab.categoryId

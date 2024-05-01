@@ -176,6 +176,29 @@ public class BudgetClient {
 
 }
 
+// MARK: - Previews Initializer
+
+extension BudgetClient {
+    
+    /// Only for Preview Usage. Sets the published properties with their values for previews
+    public convenience init(
+        budgetSummaries: IdentifiedArrayOf<BudgetSummary>,
+        accounts: IdentifiedArrayOf<Account>,
+        categoryGroups: IdentifiedArrayOf<CategoryGroup>,
+        categories: IdentifiedArrayOf<Category>,
+        authorizationStatus: AuthorizationStatus,
+        selectedBudgetId: String?
+    ) {
+        self.init(provider: .noop)
+        self.budgetSummaries = budgetSummaries
+        self.accounts = accounts
+        self.categoryGroups = categoryGroups
+        self.categories = categories
+        self.authorizationStatus = authorizationStatus
+        self.selectedBudgetId = selectedBudgetId
+    }
+}
+
 // MARK: - Static BudgetClient instances
 
 extension BudgetClient {

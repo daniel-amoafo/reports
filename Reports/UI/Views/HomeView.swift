@@ -220,8 +220,8 @@ private extension HomeView {
 
                 }
                 .buttonStyle(.kleonPrimary)
-                .containerRelativeFrame(.horizontal) { size, _ in
-                    size * 0.7
+                .containerRelativeFrame(.horizontal) { length, _ in
+                    length * 0.7
                 }
             }
             .listRowBottom()

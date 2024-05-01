@@ -53,11 +53,11 @@ struct ReportInputFeature {
         case selectAccountRowTapped(Bool)
         case didSelectAccountId(String?)
         case runReportTapped
-        case runReportReponse(IdentifiedArrayOf<TransactionEntry>)
+        case fetchedTransactionsReponse(IdentifiedArrayOf<TransactionEntry>)
         case onAppear
 
         @CasePathable
-        enum Delegate {
+        enum Delegate: Equatable {
             case fetchedTransactions(IdentifiedArrayOf<TransactionEntry>)
             case didUpdateFetchStatus(FetchStatus)
         }
@@ -95,10 +95,10 @@ struct ReportInputFeature {
                 guard !state.isReportFetching else { return .none }
                 state.fetchStatus = .fetching
                 return .run { [state] send in
-                    await fetchReport(state: state, send: send)
+                    await fetchTransactions(state: state, send: send)
                 }
 
-            case let .runReportReponse(transactions):
+            case let .fetchedTransactionsReponse(transactions):
                 if transactions.isEmpty {
                     state.fetchStatus = .error(.noResults)
                     return .none
@@ -118,6 +118,7 @@ struct ReportInputFeature {
             case .onAppear:
                 if state.accounts == nil {
                     guard budgetClient.accounts.isNotEmpty else { return .none }
+                    // by default show transactions for all eligble accounts
                     var accounts = budgetClient.accounts
                     let allAccounts = Account.allAccounts
                     if accounts.insert(allAccounts, at: 0).inserted {
@@ -133,7 +134,7 @@ struct ReportInputFeature {
 
 private extension ReportInputFeature {
 
-    func fetchReport(state: ReportInputFeature.State, send: Send<ReportInputFeature.Action>) async {
+    func fetchTransactions(state: ReportInputFeature.State, send: Send<ReportInputFeature.Action>) async {
         do {
             var filterBy: BudgetProvider.TransactionParameters.FilterByOption?
             if let selectedId = state.selectedAccountId, selectedId != Account.allAccountsId {
@@ -141,7 +142,7 @@ private extension ReportInputFeature {
             }
             let transactions = try await budgetClient
                 .fetchTransactions(startDate: state.fromDate, finishDate: state.toDate, filterBy: filterBy)
-            await send(.runReportReponse(transactions))
+            await send(.fetchedTransactionsReponse(transactions))
         } catch {
             logger.error("error: - \(error.localizedDescription)")
         }
@@ -352,8 +353,8 @@ struct ReportInputView: View {
             }
             .buttonStyle(.kleonPrimary)
             .disabled(store.isRunReportDisabled)
-            .containerRelativeFrame(.horizontal) { size, _ in
-                size * 0.7
+            .containerRelativeFrame(.horizontal) { length, _ in
+                length * 0.7
             }
         }
         .listRowBottom()
@@ -416,20 +417,15 @@ private extension VerticalAlignment {
 // MARK: - Preview
 
 #Preview {
-    NavigationStack {
-        ZStack {
-            Color(.Surface.primary)
-                .ignoresSafeArea()
-            ScrollView {
-                ReportInputView(
-                    store: Store(
-                        initialState: ReportInputFeature.State(chart: .mock, accounts: .mocks)
-                    ) {
-                        ReportInputFeature()
-                    }
-                )
+    ScrollView {
+        ReportInputView(
+            store: Store(
+                initialState: ReportInputFeature.State(chart: .mock, accounts: .mocks)
+            ) {
+                ReportInputFeature()
             }
-            .contentMargins(.all, .Spacing.pt16, for: .scrollContent)
-        }
+        )
     }
+    .contentMargins(.all, .Spacing.pt16, for: .scrollContent)
+    .background(Color.Surface.primary)
 }

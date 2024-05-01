@@ -171,11 +171,14 @@ struct ReportView: View {
             .foregroundStyle(Color(.Text.primary))
             .fontWeight(.bold)
         }
-        .background(Color(.Surface.primary))
+        .background(Color.Surface.primary)
         .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
-
     }
+
+}
+
+private extension ReportView {
 
     var chartGraphView: some View {
         VStack {
@@ -189,26 +192,36 @@ struct ReportView: View {
     }
 
     var searchingView: some View {
-        Image(systemName:
-                store.inputFields.isReportFetching ? "text.magnifyingglass" : "exclamationmark.magnifyingglass"
-        )
-        .resizable()
-        .scaledToFit()
-        .containerRelativeFrame(.horizontal) { size, _ in
-            size * 0.5
+        VStack {
+            Image(
+                systemName: store.inputFields.isReportFetching ?
+                "text.magnifyingglass" : "exclamationmark.magnifyingglass"
+            )
+            .resizable()
+            .scaledToFit()
+            .containerRelativeFrame(.horizontal) { length, _ in
+                length * 0.5
+            }
+            .foregroundStyle(
+                .linearGradient(colors: [.purple, .orange, .pink], startPoint: .topLeading, endPoint: .bottomTrailing)
+            )
+            // display pulsating image when actively searching
+            .symbolEffect(.pulse.byLayer, options: .repeating, isActive: store.inputFields.isReportFetching)
+            // switch from search with text image to exclaimation when there
+            .contentTransition(store.inputFields.isReportFetching ? .identity : .symbolEffect(.replace.byLayer))
+            .padding(.vertical)
+
+            if case let .error(err) = store.inputFields.fetchStatus {
+                Text(err.localizedDescription)
+                    .typography(.bodyEmphasized)
+                    .foregroundStyle(Color(.Text.primary))
+                    .multilineTextAlignment(.center)
+            }
         }
-        .foregroundStyle(
-            .linearGradient(colors: [.purple, .orange, .pink], startPoint: .topLeading, endPoint: .bottomTrailing)
-        )
-        // display pulsating image when actively searching
-        .symbolEffect(.pulse.byLayer, options: .repeating, isActive: store.inputFields.isReportFetching)
-        // switch from search with text image to exclaimation when there
-        .contentTransition(store.inputFields.isReportFetching ? .identity : .symbolEffect(.replace.byLayer))
-        .padding(.vertical)
     }
 }
 
-// MARK: -
+// MARK: - Strings
 
 private enum Strings {
     static let newReportTitle = String(localized: "New Report", comment: "the title when a new report is being created")
@@ -220,12 +233,12 @@ private enum Strings {
     )
 }
 
-// MARK: -
+// MARK: - Previews
 
-#Preview("Standard") {
+#Preview("Input Fields") {
     NavigationStack {
         ReportView(
-            store: .init(initialState: ReportFeature.mockState) {
+            store: .init(initialState: ReportFeature.mockInputFields) {
                 ReportFeature()
             }
         )
@@ -235,7 +248,27 @@ private enum Strings {
 #Preview("Searching") {
     NavigationStack {
         ReportView(
-            store: .init(initialState: ReportFeature.mockSearch) {
+            store: .init(initialState: ReportFeature.mockSearching) {
+                ReportFeature()
+            }
+        )
+    }
+}
+
+#Preview("Fetched Results") {
+    NavigationStack {
+        ReportView(
+            store: .init(initialState: ReportFeature.mockFetchedResults) {
+                ReportFeature()
+            }
+        )
+    }
+}
+
+#Preview("Fetched No Results") {
+    NavigationStack {
+        ReportView(
+            store: .init(initialState: ReportFeature.mockFetchedNoResults) {
                 ReportFeature()
             }
         )
@@ -244,11 +277,50 @@ private enum Strings {
 
 private extension ReportFeature {
 
-    static var mockState: ReportFeature.State {
-        .init(inputFields: .init(chart: .mock, accounts: .mocks))
+    static var selectedAccountId: String {
+        IdentifiedArrayOf<Account>.mocks[0].id
+    }
+
+    static var mockInputFields: ReportFeature.State {
+        .init(
+            inputFields: .init(
+                chart: .mock,
+                accounts: .mocks,
+                selectedAccountId: selectedAccountId
+            )
+        )
      }
 
-    static var mockSearch: ReportFeature.State {
-        .init(inputFields: .init(chart: .mock, accounts: .mocks, fetchStatus: .fetching))
+    static var mockSearching: ReportFeature.State {
+        .init(
+            inputFields: .init(
+                chart: .mock,
+                accounts: .mocks,
+                selectedAccountId: selectedAccountId,
+                fetchStatus: .fetching
+            )
+        )
+    }
+
+    static var mockFetchedResults: ReportFeature.State {
+        .init(
+            inputFields: .init(
+                chart: .mock,
+                accounts: .mocks,
+                selectedAccountId: selectedAccountId
+            ),
+            chartGraph: .spendingByTotal(.init(transactions: .mocks))
+        )
+    }
+
+    static var mockFetchedNoResults: ReportFeature.State {
+        .init(
+            inputFields: .init(
+                chart: .mock,
+                accounts: .mocks,
+                selectedAccountId: selectedAccountId,
+                fetchStatus: .error(.noResults)
+            )
+        )
     }
 }

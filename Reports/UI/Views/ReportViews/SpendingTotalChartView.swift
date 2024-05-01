@@ -70,7 +70,7 @@ struct SpendingTotalChartFeature {
 
     enum Action: BindableAction {
         case binding(BindingAction<State>)
-        case entryTapped(id: String)
+        case rowTapped(id: String)
         case listSubTitleTapped
     }
 
@@ -88,7 +88,7 @@ struct SpendingTotalChartFeature {
             case .binding(\.rawSelectedGraphValue):
                 guard let rawSelected = state.rawSelectedGraphValue else { return .none }
                 var cumulative = Decimal.zero
-                // This approach is lifted from apple example interactive pie chart talk
+                // This approach is lifted from Apple's interactive pie chart WWDC
                 // see https://developer.apple.com/wwdc23/10037
                 let cumulativeArea = state.selectedContent.map {
                     let newCumulative = cumulative + abs($0.value)
@@ -101,13 +101,13 @@ struct SpendingTotalChartFeature {
                     .first(where: { $0.range.contains(rawSelected) }) else { return .none }
 
                 return .run { send in
-                    await send(.entryTapped(id: foundEntry.id))
+                    await send(.rowTapped(id: foundEntry.id))
                 }
 
             case .binding:
                 return .none
 
-            case let .entryTapped(id):
+            case let .rowTapped(id):
                 switch state.contentType {
                 case .categoryGroup:
                     // filter displaying categories for the selected Category Group
@@ -222,7 +222,7 @@ struct SpendingTotalChartView: View {
             // Category rows
             ForEach(store.selectedContent) { item in
                 Button {
-                    store.send(.entryTapped(id: item.id), animation: .default)
+                    store.send(.rowTapped(id: item.id), animation: .default)
                 } label: {
                     HStack {
                         BasicChartSymbolShape.circle
@@ -288,4 +288,5 @@ private enum Strings {
         )
     }
     .contentMargins(.Spacing.pt16)
+    .background(Color.Surface.primary)
 }

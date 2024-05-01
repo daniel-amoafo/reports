@@ -125,6 +125,8 @@ public struct TransactionEntry: Identifiable, Equatable, CustomStringConvertible
 
     public let money: Money
 
+    public let payeeName: String?
+
     /// Id of the account this transaction belongs to
     public let accountId: String
 
@@ -146,13 +148,14 @@ public struct TransactionEntry: Identifiable, Equatable, CustomStringConvertible
     public let deleted: Bool
 
     public var description: String { 
-        "\(id), \(dateFormated()), \(categoryName ?? ""),\(amountFormatted())"
+        "\(id), \(dateFormated), \(categoryName ?? ""),\(amountFormatted())"
     }
 
     public init(
         id: String,
         date: Date,
         money: Money,
+        payeeName: String?,
         accountId: String,
         accountName: String,
         categoryId: String?,
@@ -165,6 +168,7 @@ public struct TransactionEntry: Identifiable, Equatable, CustomStringConvertible
         self.id = id
         self.date = date
         self.money = money
+        self.payeeName = payeeName
         self.accountId = accountId
         self.accountName = accountName
         self.categoryId = categoryId
@@ -175,8 +179,12 @@ public struct TransactionEntry: Identifiable, Equatable, CustomStringConvertible
         self.deleted = deleted
     }
 
-    public func dateFormated() -> String {
-        date.formatted(date: .abbreviated, time: .omitted)
+    public var dateFormated: String {
+        Date.iso8601Formatter.string(from: date)
+    }
+
+    public var dateFormatedLong: String {
+        date.formatted(date: .long, time: .omitted)
     }
 
     public func amountFormatted(formatter suppliedFormatter: NumberFormatter? = nil) -> String {
@@ -187,11 +195,7 @@ public struct TransactionEntry: Identifiable, Equatable, CustomStringConvertible
             precondition(suppliedFormatter.currencyCode == currency.code)
             formatter = suppliedFormatter
         } else {
-            formatter = NumberFormatter()
-            formatter.numberStyle = .currency
-            formatter.currencyCode = currency.code
-            formatter.minimumFractionDigits = currency.minorUnit
-            formatter.maximumFractionDigits = currency.minorUnit
+            formatter = NumberFormatter.formatter(for: currency)
         }
         return formatter.string(for: money.amount) ?? ""
     }

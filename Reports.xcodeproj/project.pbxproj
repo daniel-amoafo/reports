@@ -73,6 +73,8 @@
 		18C3BFE52B8AE9EC00E444C8 /* OpenSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 18C3BFD92B8AE9EC00E444C8 /* OpenSans-Regular.ttf */; };
 		18C3BFE92B8B6FA100E444C8 /* BudgetSystemService+ConfigTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C3BFE82B8B6FA100E444C8 /* BudgetSystemService+ConfigTests.swift */; };
 		18E7BAF52BE0CE6D00C0468E /* ReportFetchError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E7BAF42BE0CE6D00C0468E /* ReportFetchError.swift */; };
+		18E7BAF72BE0E5F300C0468E /* TransactionHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E7BAF62BE0E5F300C0468E /* TransactionHistoryView.swift */; };
+		18E7BAF92BE1081400C0468E /* EdgeInsets+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E7BAF82BE1081400C0468E /* EdgeInsets+Additions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -166,6 +168,8 @@
 		18C3BFE62B8B5F4E00E444C8 /* BudgetSystemService.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; name = BudgetSystemService.xctestplan; path = Packages/BudgetSystemService/BudgetSystemService.xctestplan; sourceTree = "<group>"; };
 		18C3BFE82B8B6FA100E444C8 /* BudgetSystemService+ConfigTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BudgetSystemService+ConfigTests.swift"; sourceTree = "<group>"; };
 		18E7BAF42BE0CE6D00C0468E /* ReportFetchError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportFetchError.swift; sourceTree = "<group>"; };
+		18E7BAF62BE0E5F300C0468E /* TransactionHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionHistoryView.swift; sourceTree = "<group>"; };
+		18E7BAF82BE1081400C0468E /* EdgeInsets+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EdgeInsets+Additions.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -299,6 +303,7 @@
 				183ECBE92B747460006C45B2 /* Collection+Additions.swift */,
 				183ECBE82B747460006C45B2 /* String+Additions.swift */,
 				18C3BFC02B83993200E444C8 /* URL+Additions.swift */,
+				18E7BAF82BE1081400C0468E /* EdgeInsets+Additions.swift */,
 			);
 			path = Additions;
 			sourceTree = "<group>";
@@ -390,6 +395,7 @@
 				18A514C82BD5001300B072DE /* SpendingTotalChartView.swift */,
 				180003542BD8D40E003C2804 /* TabulatedDataItem.swift */,
 				18E7BAF42BE0CE6D00C0468E /* ReportFetchError.swift */,
+				18E7BAF62BE0E5F300C0468E /* TransactionHistoryView.swift */,
 			);
 			path = ReportViews;
 			sourceTree = "<group>";
@@ -620,6 +626,7 @@
 			files = (
 				189641AF2B9C72BE00716258 /* AnimationConstants.swift in Sources */,
 				186A80F22BCBF4990015FFC7 /* ViewRectReader.swift in Sources */,
+				18E7BAF92BE1081400C0468E /* EdgeInsets+Additions.swift in Sources */,
 				1800034D2BD6919B003C2804 /* ReportView.swift in Sources */,
 				186E8A442B9C3AD500E65BDE /* KleonButtonStyle.swift in Sources */,
 				183ECBE12B747085006C45B2 /* Typography.swift in Sources */,
@@ -646,6 +653,7 @@
 				183ECBED2B747460006C45B2 /* Collection+Additions.swift in Sources */,
 				186E8A312B9B169C00E65BDE /* CGFloat+DesignStyleMetrics.swift in Sources */,
 				1894264B2BDFB6D700C06018 /* AppStrings.swift in Sources */,
+				18E7BAF72BE0E5F300C0468E /* TransactionHistoryView.swift in Sources */,
 				186E8A462B9C4BB500E65BDE /* Color+Adjust.swift in Sources */,
 				183ECBC32B70E0E3006C45B2 /* InMemoryKeyValueStore.swift in Sources */,
 				18C3BFB02B81874000E444C8 /* AppIntroLoginView.swift in Sources */,
