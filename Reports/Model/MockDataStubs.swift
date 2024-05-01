@@ -55,17 +55,14 @@ extension IdentifiedArray where Element == CategoryGroup, ID == CategoryGroup.ID
             name: "Fixed Expenses",
             hidden: false,
             deleted: false,
-            categoryIds: ["CAT-RENT"]
+            categoryIds: ["CAT-RENT", "CAT-GROC"]
         ),
         .init(
             id: "CG-TRANS",
             name: "Transportation",
             hidden: false,
             deleted: false,
-            categoryIds: [
-                "CAT-TRAIN",
-                "CAT-TAXI",
-            ]
+            categoryIds: ["CAT-TRAIN", "CAT-TAXI"]
         ),
     ]
 }
@@ -122,11 +119,11 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
         .init(
             id: "T1",
             date: Date.iso8601Formatter.date(from: "2024-02-01")!,
-            money: Money(Decimal(-100), currency: .AUD),
+            money: Money(Decimal(-1_00_00), currency: .AUD),
             payeeName: "Woolworths",
             accountId: "A1",
             accountName: "Account First",
-            categoryId: "C1",
+            categoryId: "CAT-GROC",
             categoryName: "Groceries",
             categoryGroupId: "CG-FIX-EXP",
             categoryGroupName: "Fixed Expenses",
@@ -136,7 +133,7 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
         .init(
             id: "T2",
             date: Date.iso8601Formatter.date(from: "2024-02-01")!,
-            money: Money(Decimal(-123.45), currency: .AUD),
+            money: Money(Decimal(-5_00), currency: .AUD),
             payeeName: "Opal",
             accountId: "A1",
             accountName: "Account First",
@@ -150,7 +147,7 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
         .init(
             id: "T3",
             date: Date.iso8601Formatter.date(from: "2024-03-05")!,
-            money: Money(Decimal(-299.99), currency: .AUD),
+            money: Money(Decimal(-299_99), currency: .AUD),
             payeeName: "Landlord",
             accountId: "A2",
             accountName: "Account Second",
@@ -164,7 +161,7 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
         .init(
             id: "T4",
             date: Date.iso8601Formatter.date(from: "2024-04-24")!,
-            money: Money(Decimal(-37.60), currency: .AUD),
+            money: Money(Decimal(-37_60), currency: .AUD),
             payeeName: "Uber",
             accountId: "A2",
             accountName: "Account Second",

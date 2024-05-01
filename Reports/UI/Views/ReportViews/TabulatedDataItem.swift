@@ -18,8 +18,7 @@ struct TabulatedDataItem: Identifiable, Equatable {
 extension TabulatedDataItem {
 
     var valueFormatted: String {
-        Money(value, currency: currency).stringFormatted(locale: .current)
-//        "some new val"
+        Money(value, currency: currency).amountFormatted
     }
 }
 

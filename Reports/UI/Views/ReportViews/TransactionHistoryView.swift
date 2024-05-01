@@ -1,32 +1,121 @@
 // Created by Daniel Amoafo on 30/4/2024.
 
 import BudgetSystemService
-import IdentifiedCollections
+import ComposableArchitecture
 import SwiftUI
+
+@Reducer
+struct TransactionHistoryFeature {
+
+    @ObservableState
+    struct State: Equatable {
+        let title: String?
+        fileprivate let sections: IdentifiedArrayOf<SectionData>
+
+        init(transactions: [TransactionEntry], title: String?) {
+            self.sections = Self.mapToSectionData(transactions)
+            self.title = title
+        }
+
+        fileprivate static func mapToSectionData(_ transactions: [TransactionEntry]) -> IdentifiedArrayOf<SectionData> {
+            // transactions by date followed by money amount
+            let sortedByDateAndAmount = transactions.sorted {
+                return ($0.date, $0.money) < ($1.date, $1.money)
+            }
+
+            return sortedByDateAndAmount.reduce(into: IdentifiedArrayOf<SectionData>()) { dict, entry in
+                let title = entry.dateFormatedLong
+                if var section = dict[id: title] {
+                    section.entries.append(entry)
+                    dict[id: title] = section
+                } else {
+                    dict[id: title] = .init(title: title, entries: [entry])
+                }
+            }
+        }
+    }
+}
 
 struct TransactionHistoryView: View {
 
-    private let sections: IdentifiedArrayOf<SectionData>
-
-    init(transactions: [TransactionEntry]) {
-        sections = Self.mapToSectionData(transactions)
-    }
+    var store: StoreOf<TransactionHistoryFeature>
 
     var body: some View {
         ZStack {
             Color.Surface.primary
                 .ignoresSafeArea()
-            if sections.isEmpty {
+            if store.sections.isEmpty {
                 noTransactions
             } else {
                 transactionsList
             }
         }
     }
-
 }
 
 private extension TransactionHistoryView {
+
+    var transactionsList: some View {
+        List {
+            if let title = store.title {
+                Section {
+                    Text(title)
+                        .typography(.title2Emphasized)
+                        .foregroundStyle(Color.Text.secondary)
+                        .padding(.horizontal)
+                }
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+                .listRowInsets(.zero)
+            }
+
+            // Category Sections
+            ForEach(store.sections) { section in
+                sectionView(for: section)
+            }
+        }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+    }
+
+    func sectionView(for section: SectionData) -> some View {
+        Section {
+            ForEach(section.entries) { entry in
+                rowView(for: entry)
+            }
+        } header: {
+            Text(section.title)
+                .typography(.subheadlineEmphasized)
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal)
+                .background(Color.Surface.sectionHeader)
+        }
+        .listRowBackground(Color.clear)
+        .listRowSeparator(.hidden)
+        .listRowInsets(.zero)
+    }
+
+    func rowView(for entry: TransactionEntry) -> some View {
+        VStack(spacing: 0) {
+            HStack {
+                VStack(alignment: .leading, spacing: .Spacing.pt4) {
+                    Text(entry.payeeName ?? "[No Payee Details]")
+                        .typography(.headlineEmphasized)
+                        .foregroundStyle(Color.Text.primary)
+                    Text(entry.accountName)
+                        .typography(.bodyEmphasized)
+                        .foregroundStyle(Color.Text.secondary)
+                }
+                Spacer()
+                Text(entry.amountFormatted)
+                    .typography(.headlineEmphasized)
+            }
+            .padding(.horizontal)
+            .padding(.vertical, .Spacing.pt8)
+            HorizontalDivider()
+        }
+    }
 
     var noTransactions: some View {
         VStack(spacing: .Spacing.pt16) {
@@ -56,72 +145,9 @@ private extension TransactionHistoryView {
         }
         .padding(.horizontal)
     }
-
-    var transactionsList: some View {
-        List {
-            ForEach(sections) { section in
-                sectionView(for: section)
-            }
-        }
-        .listStyle(.plain)
-        .scrollContentBackground(.hidden)
-    }
-
-    func sectionView(for section: SectionData) -> some View {
-        Section {
-            ForEach(section.items) { item in
-                rowView(for: item)
-            }
-        } header: {
-            Text(section.title)
-                .typography(.subheadlineEmphasized)
-                .foregroundStyle(.white)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal)
-                .background(Color.Surface.sectionHeader)
-        }
-        .listRowBackground(Color.clear)
-        .listRowSeparator(.hidden)
-        .listRowInsets(.zero)
-    }
-
-    func rowView(for item: TransactionEntry) -> some View {
-        VStack(spacing: 0) {
-            HStack {
-                VStack(alignment: .leading, spacing: .Spacing.pt4) {
-                    Text(item.payeeName ?? "[No Payee Details]")
-                        .typography(.headlineEmphasized)
-                        .foregroundStyle(Color.Text.primary)
-                    Text(item.categoryName ?? "[No Category Name]")
-                        .typography(.bodyEmphasized)
-                        .foregroundStyle(Color.Text.secondary)
-                }
-                Spacer()
-                Text(item.amountFormatted())
-                    .typography(.headlineEmphasized)
-            }
-            .padding(.horizontal)
-            .padding(.vertical, .Spacing.pt8)
-            HorizontalDivider()
-        }
-    }
-
-    static func mapToSectionData(_ transactions: [TransactionEntry]) -> IdentifiedArrayOf<SectionData> {
-        let sortedByDateAndAmount = transactions.sorted {
-            return ($0.date, $0.money) < ($1.date, $1.money)
-        }
-
-        return sortedByDateAndAmount.reduce(into: IdentifiedArrayOf<SectionData>()) { dict, entry in
-            let title = entry.dateFormatedLong
-            if var section = dict[id: title] {
-                section.items.append(entry)
-                dict[id: title] = section
-            } else {
-                dict[id: title] = .init(title: title, items: [entry])
-            }
-       }
-    }
 }
+
+// MARK: -
 
 private enum Strings {
     static let noTransactioinsText = String(
@@ -131,18 +157,41 @@ private enum Strings {
 
 /// A simple struct to group transactions by date.
 /// This allows the entries to be represented as sections in a list.
-private struct SectionData: Identifiable {
+private struct SectionData: Identifiable, Equatable {
     let title: String
-    var items: [TransactionEntry]
+    var entries: [TransactionEntry]
     var id: String { title }
 }
 
-// MARK: - Preview
+// MARK: - Previews
 
 #Preview("Transactions Listed") {
-    TransactionHistoryView(transactions: IdentifiedArrayOf<TransactionEntry>.mocks.elements)
+    NavigationStack {
+        TransactionHistoryView(
+            store: .init(initialState: TransactionHistoryFeature.mockState) {
+                TransactionHistoryFeature()
+            }
+        )
+    }
 }
 
 #Preview("No Transactions") {
-    TransactionHistoryView(transactions: [])
+    NavigationStack {
+        TransactionHistoryView(
+            store: .init(initialState: TransactionHistoryFeature.mockStateNoTransactions) {
+                TransactionHistoryFeature()
+            }
+        )
+    }
+}
+
+private extension TransactionHistoryFeature {
+
+    static var mockState: TransactionHistoryFeature.State {
+        .init(transactions: IdentifiedArrayOf<TransactionEntry>.mocks.elements, title: "Groceries")
+    }
+
+    static var mockStateNoTransactions: TransactionHistoryFeature.State {
+        .init(transactions: [], title: "Entertianment")
+    }
 }

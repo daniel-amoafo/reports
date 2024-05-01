@@ -70,8 +70,14 @@ struct SpendingTotalChartFeature {
 
     enum Action: BindableAction {
         case binding(BindingAction<State>)
+        case delegate(Delegate)
         case rowTapped(id: String)
         case listSubTitleTapped
+
+        @CasePathable
+        enum Delegate {
+            case categoryTapped(IdentifiedArrayOf<TransactionEntry>)
+        }
     }
 
     enum ContentType: Equatable {
@@ -104,9 +110,6 @@ struct SpendingTotalChartFeature {
                     await send(.rowTapped(id: foundEntry.id))
                 }
 
-            case .binding:
-                return .none
-
             case let .rowTapped(id):
                 switch state.contentType {
                 case .categoryGroup:
@@ -122,16 +125,21 @@ struct SpendingTotalChartFeature {
                     state.contentType = .categoriesByCategoryGroup
 
                 case .categoriesByCategoryGroup:
-                    // drill down t
-                    state.catgoriesForCategoryGroup = []
-                    state.catgoriesForCategoryGroupName = nil
-                    state.contentType = .categoryGroup
+                    // find all transactions for the selected category
+                    let categoryTransactions = state.transactions.filter {
+                        $0.categoryId == id
+                    }
+                    return .send(.delegate(.categoryTapped(categoryTransactions)))
                 }
                 return .none
 
-            case.listSubTitleTapped:
+            case .listSubTitleTapped:
                 state.contentType = .categoryGroup
                 state.catgoriesForCategoryGroup = []
+                state.catgoriesForCategoryGroupName = nil
+                return .none
+
+            case .binding, .delegate:
                 return .none
             }
         }
@@ -281,10 +289,9 @@ private enum Strings {
 #Preview {
     ScrollView {
         SpendingTotalChartView(
-            store: .init(
-                initialState: .init(transactions: .mocks),
-                reducer: { SpendingTotalChartFeature() }
-            )
+            store: .init(initialState: .init(transactions: .mocks)) {
+                 SpendingTotalChartFeature()
+            }
         )
     }
     .contentMargins(.Spacing.pt16)

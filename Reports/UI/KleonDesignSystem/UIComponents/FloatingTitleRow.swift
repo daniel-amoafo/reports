@@ -17,7 +17,7 @@ struct FloatingTitleRow: View {
     init(
         title: String? = nil,
         text: Binding<String>,
-        displayType: DisplayType =  .textField,
+        displayType: DisplayType = .textField,
         typography: Typography = .body,
         titleColor: Color = Color(.secondaryLabel),
         textColor: Color = Color(.label),

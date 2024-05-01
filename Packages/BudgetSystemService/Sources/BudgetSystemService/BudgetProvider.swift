@@ -57,7 +57,7 @@ public extension BudgetProvider {
         fetchTransactions: { _ in return [] }
     )
 
-    /// A variant of the client that is not authenticated throwing an error when any property is invoked.
+    /// Static BudgetProvider that is not authenticated, throwing an error when any property is invoked.
     static let notAuthorized = BudgetProvider(
         fetchBudgetSummaries: { throw isNotAuthorizedError() },
         fetchAccounts: { _ in throw isNotAuthorizedError() },
@@ -66,6 +66,6 @@ public extension BudgetProvider {
     )
 
     private static func isNotAuthorizedError() -> BudgetClientError {
-        BudgetClientError.makeIsNotAuthorized()
+        .makeIsNotAuthorized()
     }
 }

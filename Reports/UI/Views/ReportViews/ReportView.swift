@@ -12,6 +12,7 @@ struct ReportFeature {
         var inputFields: ReportInputFeature.State
         @Presents var chartGraph: ChartGraph.State?
         @Presents var confirmationDialog: ConfirmationDialogState<Action.ConfirmationDialog>?
+        @Presents var destination: Destination.State?
         var scrollToId: String?
         var reportUpdated = false
         fileprivate let chartContainerId = "GraphChartContainer"
@@ -26,6 +27,7 @@ struct ReportFeature {
         case inputFields(ReportInputFeature.Action)
         case chartGraph(PresentationAction<ChartGraph.Action>)
         case confirmationDialog(PresentationAction<ConfirmationDialog>)
+        case destination(PresentationAction<Destination.Action>)
         case chartDisplayed
         case doneButtonTapped
         case onAppear
@@ -42,6 +44,11 @@ struct ReportFeature {
         case spendingByTotal(SpendingTotalChartFeature)
     }
 
+    @Reducer(state: .equatable)
+    enum Destination {
+      case sheet(TransactionHistoryFeature)
+    }
+
     @Dependency(\.budgetClient) var budgetClient
     @Dependency(\.dismiss) var dismiss
 
@@ -52,14 +59,10 @@ struct ReportFeature {
         }
         Reduce { state, action in
             switch action {
-            case .binding:
-                return .none
-            case .chartGraph:
-                return .none
-
             case let .confirmationDialog(.presented(action)):
                 switch action {
                 case .saveNewReport:
+                    // add save logic
                     break
                 case .updateExistingReport:
                     break
@@ -86,7 +89,9 @@ struct ReportFeature {
                 return .run { send in
                     await send(.chartDisplayed, animation: .easeInOut)
                 }
-            case .inputFields:
+            case let .chartGraph(.presented(.spendingByTotal(.delegate(.categoryTapped(transactions))))):
+                let array = transactions.elements
+                state.destination = .sheet(.init(transactions: array, title: array.first?.categoryName))
                 return .none
 
             case .chartDisplayed:
@@ -100,17 +105,19 @@ struct ReportFeature {
                 } else {
                     return .run { _ in await dismiss() }
                 }
-            case .onAppear:
+
+            case .onAppear, .inputFields, .chartGraph, .binding, .destination:
                 return .none
             }
         }
         .ifLet(\.$chartGraph, action: \.chartGraph)
         .ifLet(\.$confirmationDialog, action: \.confirmationDialog)
+        .ifLet(\.$destination, action: \.destination)
         ._printChanges()
     }
 }
 
-extension ReportFeature {
+private extension ReportFeature {
 
     func makeConfirmDialog() -> ConfirmationDialogState<Action.ConfirmationDialog> {
         .init {
@@ -157,6 +164,12 @@ struct ReportView: View {
             }
             .contentMargins(.all, .Spacing.pt16, for: .scrollContent)
             .scrollPosition(id: $store.scrollToId, anchor: .top)
+        }
+        .popover(
+          item: $store.scope(state: \.destination?.sheet, action: \.destination.sheet)
+        ) { store in
+            TransactionHistoryView(store: store)
+                .presentationDetents([.medium])
         }
         .confirmationDialog($store.scope(state: \.confirmationDialog, action: \.confirmationDialog))
         .task {
@@ -309,7 +322,8 @@ private extension ReportFeature {
                 accounts: .mocks,
                 selectedAccountId: selectedAccountId
             ),
-            chartGraph: .spendingByTotal(.init(transactions: .mocks))
+            chartGraph: .spendingByTotal(.init(transactions: .mocks)),
+            reportUpdated: true
         )
     }
 

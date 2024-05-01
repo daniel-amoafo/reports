@@ -42,15 +42,8 @@ public extension Money {
 
 public extension Money {
     
-    func stringFormatted(locale: Locale) -> String {
-        let formatter = NumberFormatter()
-        formatter.locale = locale
-        formatter.numberStyle = .currency
-        formatter.currencyCode = currency.code
-        formatter.minimumFractionDigits = currency.minorUnit
-        formatter.maximumFractionDigits = currency.minorUnit
-        formatter.usesGroupingSeparator = true
-
+    var amountFormatted: String {
+        let formatter = CurrencyFormatter.forCurrency(currency: currency)
         return formatter.string(for: toMajorUnitAmount) ?? ""
     }
 }

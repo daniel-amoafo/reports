@@ -148,7 +148,7 @@ public struct TransactionEntry: Identifiable, Equatable, CustomStringConvertible
     public let deleted: Bool
 
     public var description: String { 
-        "\(id), \(dateFormated), \(categoryName ?? ""),\(amountFormatted())"
+        "\(id), \(dateFormated), \(categoryName ?? ""), \(amountFormatted)"
     }
 
     public init(
@@ -187,16 +187,7 @@ public struct TransactionEntry: Identifiable, Equatable, CustomStringConvertible
         date.formatted(date: .long, time: .omitted)
     }
 
-    public func amountFormatted(formatter suppliedFormatter: NumberFormatter? = nil) -> String {
-
-        let formatter: NumberFormatter
-        let currency = money.currency
-        if let suppliedFormatter {
-            precondition(suppliedFormatter.currencyCode == currency.code)
-            formatter = suppliedFormatter
-        } else {
-            formatter = NumberFormatter.formatter(for: currency)
-        }
-        return formatter.string(for: money.amount) ?? ""
+    public var amountFormatted: String {
+        return  money.amountFormatted
     }
 }
