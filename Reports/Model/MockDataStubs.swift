@@ -5,6 +5,11 @@ import Foundation
 import IdentifiedCollections
 import MoneyCommon
 
+/**
+ Mocked values on this page are used to populate SwiftUI Previews and sample data for Unit Tests.
+ Note: Changing values may lead to expectation failures in tests. Update test accordingly where needed/
+ */
+
 extension ReportChart {
 
     static let mock: ReportChart = Self.makeDefaultCharts()[0]
@@ -173,18 +178,50 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
             deleted: false
         ),
     ]
+
+    static let mocksTwo: Self = [
+        .init(
+            id: "T1",
+            date: Date.iso8601Formatter.date(from: "2024-06-01")!,
+            money: Money(Decimal(-5_00), currency: .AUD),
+            payeeName: "Taxi",
+            accountId: "A1",
+            accountName: "Account First",
+            categoryId: "CAT-TAXI",
+            categoryName: "Taxi / Uber",
+            categoryGroupId: "CG-TRANS",
+            categoryGroupName: "Transport",
+            transferAccountId: nil,
+            deleted: false
+        ),
+        .init(
+            id: "T2",
+            date: Date.iso8601Formatter.date(from: "2024-07-15")!,
+            money: Money(Decimal(-10_50), currency: .AUD),
+            payeeName: "Landlord",
+            accountId: "A2",
+            accountName: "Account Second",
+            categoryId: "CAT-RENT",
+            categoryName: "Rent",
+            categoryGroupId: "CG-FIX-EXP",
+            categoryGroupName: "Fixed Expenses",
+            transferAccountId: nil,
+            deleted: false
+        ),
+    ]
 }
 
 // MARK: - BudgetClient
 
 extension BudgetClient {
 
-    public static var preview: BudgetClient {
+    public static var testsAndPreviews: BudgetClient {
         .init(
             budgetSummaries: .mocks,
             accounts: .mocks,
             categoryGroups: .mocks,
             categories: .mocks,
+            transactions: .mocks,
             authorizationStatus: .loggedIn,
             selectedBudgetId: IdentifiedArrayOf<BudgetSummary>.mocks[0].id
         )

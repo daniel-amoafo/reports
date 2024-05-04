@@ -51,13 +51,13 @@ extension BudgetClient: DependencyKey {
     }
 
     public static var previewValue: BudgetClient {
-        BudgetClient.preview
+        .testsAndPreviews
     }
 }
 
 extension BudgetClient: TestDependencyKey {
     public static var testValue: BudgetClient {
-        return BudgetClient(provider: BudgetProvider.noop)
+        .testsAndPreviews
     }
 }
 

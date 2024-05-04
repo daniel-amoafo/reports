@@ -126,45 +126,52 @@ struct ReportsApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ZStack {
-                Color.Surface.primary
-                    .ignoresSafeArea()
-                switch store.authStatus {
-                case .unknown:
-                    VStack {
-                        // check if reattempt of loading is required by user if connection timeout reached.
-                        if store.showRetryLoading {
-                            Text(Strings.reconnectText)
-                                .typography(.title3Emphasized)
-                                .multilineTextAlignment(.center)
-                            HStack {
-                                Spacer().frame(minWidth: 20.0)
-                                Button(Strings.reconnectButtonTitle) {
-                                    store.send(.onAppear, animation: .default)
-                                }
-                                .buttonStyle(.kleonOutline)
-                                Spacer().frame(minWidth: 20.0)
-                            }
-                        } else {
-                            ProgressView()
-                        }
+            // during tests, dont run main app code as this may conflict with tests runs
+            if !_XCTIsTesting {
+                rootView
+                    .onOpenURL(perform: { url in
+                        store.send(.onOpenURL(url))
+                    })
+                    .task {
+                        store.send(.onAppear)
                     }
-                    .padding()
-                case .loggedIn:
-                    MainTabView(
-                        store: store.scope(state: \.mainTab, action: \.mainTab)
-                    )
-                case .loggedOut:
-                    AppIntroLoginView(
-                        store: store.scope(state: \.appIntroLogin, action: \.appIntroLogin)
-                    )
-                }
             }
-            .onOpenURL(perform: { url in
-                store.send(.onOpenURL(url))
-            })
-            .task {
-                store.send(.onAppear)
+        }
+    }
+
+    private var rootView: some View {
+        ZStack {
+            Color.Surface.primary
+                .ignoresSafeArea()
+            switch store.authStatus {
+            case .unknown:
+                VStack {
+                    // check if reattempt of loading is required by user if connection timeout reached.
+                    if store.showRetryLoading {
+                        Text(Strings.reconnectText)
+                            .typography(.title3Emphasized)
+                            .multilineTextAlignment(.center)
+                        HStack {
+                            Spacer().frame(minWidth: 20.0)
+                            Button(Strings.reconnectButtonTitle) {
+                                store.send(.onAppear, animation: .default)
+                            }
+                            .buttonStyle(.kleonOutline)
+                            Spacer().frame(minWidth: 20.0)
+                        }
+                    } else {
+                        ProgressView()
+                    }
+                }
+                .padding()
+            case .loggedIn:
+                MainTabView(
+                    store: store.scope(state: \.mainTab, action: \.mainTab)
+                )
+            case .loggedOut:
+                AppIntroLoginView(
+                    store: store.scope(state: \.appIntroLogin, action: \.appIntroLogin)
+                )
             }
         }
     }

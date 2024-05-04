@@ -186,10 +186,22 @@ extension BudgetClient {
         accounts: IdentifiedArrayOf<Account>,
         categoryGroups: IdentifiedArrayOf<CategoryGroup>,
         categories: IdentifiedArrayOf<Category>,
+        transactions: IdentifiedArrayOf<TransactionEntry>,
         authorizationStatus: AuthorizationStatus,
         selectedBudgetId: String?
     ) {
-        self.init(provider: .noop)
+        let provider = BudgetProvider {
+            budgetSummaries.elements
+        } fetchAccounts: { budgetId in
+            accounts.elements
+        } fetchCategoryValues: { _ in
+            (categoryGroups.elements, categories.elements)
+        } fetchTransactions: { _ in
+            transactions.elements
+        }
+        self.init(provider: provider)
+
+        // set the published values so previews work and not dependent on async routines
         self.budgetSummaries = budgetSummaries
         self.accounts = accounts
         self.categoryGroups = categoryGroups

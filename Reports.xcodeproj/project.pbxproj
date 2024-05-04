@@ -31,6 +31,7 @@
 		184DF0C92B6E1C3F00BA6F21 /* ReportsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184DF0C82B6E1C3F00BA6F21 /* ReportsTests.swift */; };
 		184DF0D32B6E1C3F00BA6F21 /* ReportsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184DF0D22B6E1C3F00BA6F21 /* ReportsUITests.swift */; };
 		184DF0D52B6E1C3F00BA6F21 /* ReportsUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184DF0D42B6E1C3F00BA6F21 /* ReportsUITestsLaunchTests.swift */; };
+		1868BAC12BE5260000757E78 /* ReportFeatureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1868BAC02BE5260000757E78 /* ReportFeatureTests.swift */; };
 		186A80E72BC9F8450015FFC7 /* ChartButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186A80E62BC9F8450015FFC7 /* ChartButtonView.swift */; };
 		186A80EB2BCA57F90015FFC7 /* BackgroundShadowViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186A80EA2BCA57F90015FFC7 /* BackgroundShadowViewModifier.swift */; };
 		186A80F22BCBF4990015FFC7 /* ViewRectReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186A80F12BCBF4990015FFC7 /* ViewRectReader.swift */; };
@@ -75,6 +76,8 @@
 		18E7BAF52BE0CE6D00C0468E /* ReportFetchError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E7BAF42BE0CE6D00C0468E /* ReportFetchError.swift */; };
 		18E7BAF72BE0E5F300C0468E /* TransactionHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E7BAF62BE0E5F300C0468E /* TransactionHistoryView.swift */; };
 		18E7BAF92BE1081400C0468E /* EdgeInsets+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E7BAF82BE1081400C0468E /* EdgeInsets+Additions.swift */; };
+		18E7BB002BE21CC900C0468E /* ReportInputFeatureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E7BAFF2BE21CC900C0468E /* ReportInputFeatureTests.swift */; };
+		18E7BB022BE3491C00C0468E /* Date+Formatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E7BB012BE3491C00C0468E /* Date+Formatter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -122,6 +125,7 @@
 		184DF0D22B6E1C3F00BA6F21 /* ReportsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportsUITests.swift; sourceTree = "<group>"; };
 		184DF0D42B6E1C3F00BA6F21 /* ReportsUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportsUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		184DF0E12B6E1D3500BA6F21 /* BudgetSystemService */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BudgetSystemService; path = Packages/BudgetSystemService; sourceTree = "<group>"; };
+		1868BAC02BE5260000757E78 /* ReportFeatureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportFeatureTests.swift; sourceTree = "<group>"; };
 		186A80E62BC9F8450015FFC7 /* ChartButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartButtonView.swift; sourceTree = "<group>"; };
 		186A80EA2BCA57F90015FFC7 /* BackgroundShadowViewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundShadowViewModifier.swift; sourceTree = "<group>"; };
 		186A80F12BCBF4990015FFC7 /* ViewRectReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewRectReader.swift; sourceTree = "<group>"; };
@@ -170,6 +174,8 @@
 		18E7BAF42BE0CE6D00C0468E /* ReportFetchError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportFetchError.swift; sourceTree = "<group>"; };
 		18E7BAF62BE0E5F300C0468E /* TransactionHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionHistoryView.swift; sourceTree = "<group>"; };
 		18E7BAF82BE1081400C0468E /* EdgeInsets+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EdgeInsets+Additions.swift"; sourceTree = "<group>"; };
+		18E7BAFF2BE21CC900C0468E /* ReportInputFeatureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportInputFeatureTests.swift; sourceTree = "<group>"; };
+		18E7BB012BE3491C00C0468E /* Date+Formatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Formatter.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -361,10 +367,12 @@
 		184DF0C72B6E1C3F00BA6F21 /* ReportsTests */ = {
 			isa = PBXGroup;
 			children = (
+				186E8A1F2B998C2A00E65BDE /* ConfigProviderTests.swift */,
 				18C3BFE72B8B6F9200E444C8 /* Additons */,
 				183ECBCB2B710FC0006C45B2 /* KeyValueStore */,
+				18E7BAFC2BE21C7800C0468E /* UI */,
 				184DF0C82B6E1C3F00BA6F21 /* ReportsTests.swift */,
-				186E8A1F2B998C2A00E65BDE /* ConfigProviderTests.swift */,
+				18E7BB012BE3491C00C0468E /* Date+Formatter.swift */,
 			);
 			path = ReportsTests;
 			sourceTree = "<group>";
@@ -447,6 +455,31 @@
 				18C3BFC22B8399C600E444C8 /* URLTests.swift */,
 			);
 			path = Additons;
+			sourceTree = "<group>";
+		};
+		18E7BAFC2BE21C7800C0468E /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				18E7BAFD2BE21C9600C0468E /* Views */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		18E7BAFD2BE21C9600C0468E /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				18E7BAFE2BE21C9E00C0468E /* ReportViews */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		18E7BAFE2BE21C9E00C0468E /* ReportViews */ = {
+			isa = PBXGroup;
+			children = (
+				18E7BAFF2BE21CC900C0468E /* ReportInputFeatureTests.swift */,
+				1868BAC02BE5260000757E78 /* ReportFeatureTests.swift */,
+			);
+			path = ReportViews;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -675,8 +708,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				183ECBCD2B724835006C45B2 /* SecureKeyValueStoreTests.swift in Sources */,
+				18E7BB002BE21CC900C0468E /* ReportInputFeatureTests.swift in Sources */,
+				1868BAC12BE5260000757E78 /* ReportFeatureTests.swift in Sources */,
 				18C3BFE92B8B6FA100E444C8 /* BudgetSystemService+ConfigTests.swift in Sources */,
 				18C3BFC32B8399C600E444C8 /* URLTests.swift in Sources */,
+				18E7BB022BE3491C00C0468E /* Date+Formatter.swift in Sources */,
 				184DF0C92B6E1C3F00BA6F21 /* ReportsTests.swift in Sources */,
 				186E8A202B998C2A00E65BDE /* ConfigProviderTests.swift in Sources */,
 			);

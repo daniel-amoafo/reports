@@ -190,7 +190,8 @@ private enum Factory {
             .init(
                 id: "T1",
                 date: Date.iso8601Formatter.date(from: "2024-02-01")!,
-                money: Money(Decimal(-100), currency: .AUD),
+                money: Money(Decimal(-100), currency: .AUD), 
+                payeeName: "Coles",
                 accountId: "A1",
                 accountName: "Account First",
                 categoryId: "C1",
@@ -203,7 +204,8 @@ private enum Factory {
             .init(
                 id: "T2",
                 date: Date.iso8601Formatter.date(from: "2024-03-04")!,
-                money: Money(Decimal(-123.45), currency: .AUD),
+                money: Money(Decimal(-123.45), currency: .AUD), 
+                payeeName: "Engerix",
                 accountId: "A1",
                 accountName: "Account First",
                 categoryId: "C2",
@@ -216,7 +218,8 @@ private enum Factory {
             .init(
                 id: "T3",
                 date: Date.iso8601Formatter.date(from: "2024-04-05")!,
-                money: Money(Decimal(-299.99), currency: .AUD),
+                money: Money(Decimal(-299.99), currency: .AUD), 
+                payeeName: "Landlord",
                 accountId: "A2",
                 accountName: "Account Second",
                 categoryId: "C3",

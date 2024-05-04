@@ -46,10 +46,11 @@ struct ReportFeature {
 
     @Reducer(state: .equatable)
     enum Destination {
-      case sheet(TransactionHistoryFeature)
+      case transactionHistory(TransactionHistoryFeature)
     }
 
     @Dependency(\.budgetClient) var budgetClient
+    @Dependency(\.isPresented) var isPresented
     @Dependency(\.dismiss) var dismiss
 
     var body: some ReducerOf<Self> {
@@ -69,7 +70,11 @@ struct ReportFeature {
                 case .discard:
                     break
                 }
-                return .run { _ in await dismiss() }
+                return .run { _ in
+                    if isPresented {
+                        await dismiss()
+                    }
+                }
             case .confirmationDialog:
                 return .none
 
@@ -91,7 +96,7 @@ struct ReportFeature {
                 }
             case let .chartGraph(.presented(.spendingByTotal(.delegate(.categoryTapped(transactions))))):
                 let array = transactions.elements
-                state.destination = .sheet(.init(transactions: array, title: array.first?.categoryName))
+                state.destination = .transactionHistory(.init(transactions: array, title: array.first?.categoryName))
                 return .none
 
             case .chartDisplayed:
@@ -103,7 +108,11 @@ struct ReportFeature {
                     state.confirmationDialog = makeConfirmDialog()
                     return .none
                 } else {
-                    return .run { _ in await dismiss() }
+                    return .run { _ in
+                        if isPresented {
+                            await dismiss()
+                        }
+                    }
                 }
 
             case .onAppear, .inputFields, .chartGraph, .binding, .destination:
@@ -166,7 +175,7 @@ struct ReportView: View {
             .scrollPosition(id: $store.scrollToId, anchor: .top)
         }
         .popover(
-          item: $store.scope(state: \.destination?.sheet, action: \.destination.sheet)
+          item: $store.scope(state: \.destination?.transactionHistory, action: \.destination.transactionHistory)
         ) { store in
             TransactionHistoryView(store: store)
                 .presentationDetents([.medium])

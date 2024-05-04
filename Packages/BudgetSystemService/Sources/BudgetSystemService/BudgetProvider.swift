@@ -49,14 +49,6 @@ public struct BudgetProvider {
 
 public extension BudgetProvider {
 
-    /// Static BudgetProvider that does nothing
-    static let noop = BudgetProvider(
-        fetchBudgetSummaries: { return [] },
-        fetchAccounts: { _ in return [] }, 
-        fetchCategoryValues: { _ in return ([],[]) },
-        fetchTransactions: { _ in return [] }
-    )
-
     /// Static BudgetProvider that is not authenticated, throwing an error when any property is invoked.
     static let notAuthorized = BudgetProvider(
         fetchBudgetSummaries: { throw isNotAuthorizedError() },
