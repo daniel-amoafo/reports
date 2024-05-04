@@ -72,7 +72,6 @@ struct Home {
             }
         }
         .ifLet(\.$destination, action: \.destination)
-        ._printChanges()
     }
 }
 

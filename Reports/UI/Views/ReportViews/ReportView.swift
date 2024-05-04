@@ -122,7 +122,6 @@ struct ReportFeature {
         .ifLet(\.$chartGraph, action: \.chartGraph)
         .ifLet(\.$confirmationDialog, action: \.confirmationDialog)
         .ifLet(\.$destination, action: \.destination)
-        ._printChanges()
     }
 }
 

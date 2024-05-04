@@ -17,6 +17,7 @@ struct SpendingTotalChartFeature {
         var contentType: SpendingTotalChartFeature.ContentType
 
         var rawSelectedGraphValue: Decimal?
+        var selectedGraphItem: TabulatedDataItem?
 
         // Populated at initialization
         fileprivate let categoryGroups: IdentifiedArrayOf<TabulatedDataItem>
@@ -66,12 +67,13 @@ struct SpendingTotalChartFeature {
                 return catgoriesForCategoryGroupName
             }
         }
+
     }
 
     enum Action: BindableAction {
         case binding(BindingAction<State>)
         case delegate(Delegate)
-        case rowTapped(id: String)
+        case listRowTapped(id: String)
         case listSubTitleTapped
 
         @CasePathable
@@ -104,13 +106,13 @@ struct SpendingTotalChartFeature {
                 }
 
                 guard let foundEntry = cumulativeArea
-                    .first(where: { $0.range.contains(rawSelected) }) else { return .none }
+                    .first(where: { $0.range.contains(rawSelected) }),
+                      let item = state.selectedContent[id: foundEntry.id]
+                else { return .none }
+                state.selectedGraphItem = state.selectedGraphItem == item ? nil : item
+                return .none
 
-                return .run { send in
-                    await send(.rowTapped(id: foundEntry.id))
-                }
-
-            case let .rowTapped(id):
+            case let .listRowTapped(id):
                 switch state.contentType {
                 case .categoryGroup:
                     // filter displaying categories for the selected Category Group
@@ -123,6 +125,7 @@ struct SpendingTotalChartFeature {
                     state.catgoriesForCategoryGroup = items
                     state.catgoriesForCategoryGroupName = group.name
                     state.contentType = .categoriesByCategoryGroup
+                    state.selectedGraphItem = nil
 
                 case .categoriesByCategoryGroup:
                     // find all transactions for the selected category
@@ -137,6 +140,7 @@ struct SpendingTotalChartFeature {
                 state.contentType = .categoryGroup
                 state.catgoriesForCategoryGroup = []
                 state.catgoriesForCategoryGroupName = nil
+                state.selectedGraphItem = nil
                 return .none
 
             case .binding, .delegate:
@@ -170,6 +174,7 @@ struct SpendingTotalChartView: View {
     private var chart: some View {
         VStack(spacing: .Spacing.pt16) {
             Chart(store.selectedContent) { item in
+                let highlight = store.selectedGraphItem == nil || item.id == store.selectedGraphItem?.id
                 SectorMark(
                     angle: .value(Strings.chartValueKey, abs(item.value)),
                     innerRadius: .ratio(0.618),
@@ -178,10 +183,25 @@ struct SpendingTotalChartView: View {
                 )
                 .cornerRadius(4)
                 .foregroundStyle(by: .value(Strings.chartNameKey, item.name))
+                .opacity(highlight ? 1.0 : 0.4)
             }
             .chartLegend()
             .scaledToFit()
             .chartAngleSelection(value: $store.rawSelectedGraphValue)
+            .chartOverlay { chartProxy in
+                GeometryReader { geometry in
+                    let frame = geometry[chartProxy.plotFrame!]
+                    VStack {
+                        Text(store.selectedGraphItem?.name ?? "")
+                            .typography(.title3Emphasized)
+                            .foregroundStyle(Color.Text.secondary)
+                        Text((store.selectedGraphItem?.valueFormatted ?? ""))
+                            .typography(.title2Emphasized)
+                            .foregroundStyle(Color.Text.primary)
+                    }
+                    .position(x: frame.midX, y: frame.midY)
+                }
+            }
         }
     }
 
@@ -230,7 +250,7 @@ struct SpendingTotalChartView: View {
             // Category rows
             ForEach(store.selectedContent) { item in
                 Button {
-                    store.send(.rowTapped(id: item.id), animation: .default)
+                    store.send(.listRowTapped(id: item.id), animation: .default)
                 } label: {
                     HStack {
                         BasicChartSymbolShape.circle
@@ -260,6 +280,7 @@ struct SpendingTotalChartView: View {
         let index = store.selectedContent.firstIndex(of: item) ?? 0
         return colors[index % colors.count]
     }
+
 }
 
 // MARK: -
