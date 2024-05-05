@@ -69,6 +69,13 @@ extension IdentifiedArray where Element == CategoryGroup, ID == CategoryGroup.ID
             deleted: false,
             categoryIds: ["CAT-TRAIN", "CAT-TAXI"]
         ),
+        .init(
+            id: "CG-ENTERTAINMENT",
+            name: "Entertainment",
+            hidden: false,
+            deleted: false,
+            categoryIds: ["CAT-MOVIES", "CAT-CONCERT"]
+        ),
     ]
 }
 
@@ -113,6 +120,24 @@ extension IdentifiedArray where Element == BudgetSystemService.Category, ID == B
             balance: Money(89.50, currency: .AUD),
             deleted: false
         ),
+        .init(
+            id: "CAT-MOVIES",
+            categoryGroupId: "CG-ENTERTAINMENT",
+            name: "Movies",
+            hidden: false,
+            note: nil,
+            balance: Money(42, currency: .AUD),
+            deleted: false
+        ),
+        .init(
+            id: "CAT-CONCERT",
+            categoryGroupId: "CG-ENTERTAINMENT",
+            name: "Concert",
+            hidden: false,
+            note: nil,
+            balance: Money(80, currency: .AUD),
+            deleted: false
+        ),
     ]
 }
 
@@ -152,7 +177,7 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
         .init(
             id: "T3",
             date: Date.iso8601Formatter.date(from: "2024-03-05")!,
-            money: Money(Decimal(-299_99), currency: .AUD),
+            money: Money(Decimal(-99_99), currency: .AUD),
             payeeName: "Landlord",
             accountId: "A2",
             accountName: "Account Second",
@@ -174,6 +199,48 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
             categoryName: "Taxi / Uber",
             categoryGroupId: "CG-TRANS",
             categoryGroupName: "Transport",
+            transferAccountId: nil,
+            deleted: false
+        ),
+        .init(
+            id: "T5",
+            date: Date.iso8601Formatter.date(from: "2024-04-28")!,
+            money: Money(Decimal(-20_00), currency: .AUD),
+            payeeName: "IRH Party",
+            accountId: "A2",
+            accountName: "Account Second",
+            categoryId: "CAT-CONCERT",
+            categoryName: "Concert",
+            categoryGroupId: "CG-ENTERTAINMENT",
+            categoryGroupName: "Entertainment",
+            transferAccountId: nil,
+            deleted: false
+        ),
+        .init(
+            id: "T6",
+            date: Date.iso8601Formatter.date(from: "2024-05-02")!,
+            money: Money(Decimal(-60_00), currency: .AUD),
+            payeeName: "The Midnights",
+            accountId: "A3",
+            accountName: "Account Third",
+            categoryId: "CAT-CONCERT",
+            categoryName: "Concert",
+            categoryGroupId: "CG-ENTERTAINMENT",
+            categoryGroupName: "Entertainment",
+            transferAccountId: nil,
+            deleted: false
+        ),
+        .init(
+            id: "T7",
+            date: Date.iso8601Formatter.date(from: "2024-03-11")!,
+            money: Money(Decimal(-42_00), currency: .AUD),
+            payeeName: "Hoyts",
+            accountId: "A2",
+            accountName: "Account Second",
+            categoryId: "CAT-Movies",
+            categoryName: "Movies",
+            categoryGroupId: "CG-ENTERTAINMENT",
+            categoryGroupName: "Entertainment",
             transferAccountId: nil,
             deleted: false
         ),

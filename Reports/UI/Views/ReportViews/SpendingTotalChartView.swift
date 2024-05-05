@@ -94,7 +94,10 @@ struct SpendingTotalChartFeature {
         Reduce { state, action in
             switch action {
             case .binding(\.rawSelectedGraphValue):
-                guard let rawSelected = state.rawSelectedGraphValue else { return .none }
+                guard let rawSelected = state.rawSelectedGraphValue else {
+                    state.selectedGraphItem = nil
+                    return .none
+                }
                 var cumulative = Decimal.zero
                 // This approach is lifted from Apple's interactive pie chart WWDC
                 // see https://developer.apple.com/wwdc23/10037
@@ -109,7 +112,7 @@ struct SpendingTotalChartFeature {
                     .first(where: { $0.range.contains(rawSelected) }),
                       let item = state.selectedContent[id: foundEntry.id]
                 else { return .none }
-                state.selectedGraphItem = state.selectedGraphItem == item ? nil : item
+                state.selectedGraphItem = item
                 return .none
 
             case let .listRowTapped(id):
@@ -190,16 +193,21 @@ struct SpendingTotalChartView: View {
             .chartAngleSelection(value: $store.rawSelectedGraphValue)
             .chartOverlay { chartProxy in
                 GeometryReader { geometry in
-                    let frame = geometry[chartProxy.plotFrame!]
-                    VStack {
-                        Text(store.selectedGraphItem?.name ?? "")
-                            .typography(.title3Emphasized)
-                            .foregroundStyle(Color.Text.secondary)
-                        Text((store.selectedGraphItem?.valueFormatted ?? ""))
-                            .typography(.title2Emphasized)
-                            .foregroundStyle(Color.Text.primary)
+                    if let plotFrame = chartProxy.plotFrame,
+                       let name = store.selectedGraphItem?.name,
+                       let amount = store.selectedGraphItem?.valueFormatted
+                    {
+                        let frame = geometry[plotFrame]
+                        VStack {
+                            Text(name)
+                                .typography(.title3Emphasized)
+                                .foregroundStyle(Color.Text.secondary)
+                            Text(amount)
+                                .typography(.title2Emphasized)
+                                .foregroundStyle(Color.Text.primary)
+                        }
+                        .position(x: frame.midX, y: frame.midY)
                     }
-                    .position(x: frame.midX, y: frame.midY)
                 }
             }
         }
