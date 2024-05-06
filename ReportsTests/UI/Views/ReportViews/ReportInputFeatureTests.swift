@@ -8,7 +8,7 @@ import XCTest
 final class ReportInputFeatureTests: XCTestCase {
 
     var store: TestStoreOf<ReportInputFeature>!
-    let chart = ReportChart.makeDefaultCharts()[0]
+    let chart = ReportChart.firstChart
     let startDate = Date.dateFormatter.date(from: "2024/01/01")!
     let endDate = Date.dateFormatter.date(from: "2024/05/30")!
 

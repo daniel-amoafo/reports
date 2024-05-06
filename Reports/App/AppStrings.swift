@@ -12,4 +12,8 @@ enum AppStrings {
         localized: "Save",
         comment: "Button title to save the current setting or report"
     )
+    static let allAccountsName = String(
+        localized: "All Accounts",
+        comment: "A special account instance indicating all available accounts should be selected for the report."
+    )
 }

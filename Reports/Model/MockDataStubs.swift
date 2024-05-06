@@ -12,7 +12,7 @@ import MoneyCommon
 
 extension ReportChart {
 
-    static let mock: ReportChart = Self.makeDefaultCharts()[0]
+    static let mock: ReportChart = Self.firstChart
 }
 
 // MARK: - Account

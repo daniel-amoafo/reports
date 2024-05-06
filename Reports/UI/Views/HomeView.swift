@@ -2,6 +2,7 @@
 
 import BudgetSystemService
 import ComposableArchitecture
+import SwiftData
 import SwiftUI
 
 @Reducer
@@ -13,6 +14,8 @@ struct Home {
         var selectedBudgetId: String?
         var budgetList: IdentifiedArrayOf<BudgetSummary>?
         var charts: [ReportChart] = []
+        var savedReports: [SavedReport] = []
+        var savedReportsCount: Int = 0
 
         var selectedBudgetName: String? {
             guard let selectedBudgetId else { return nil }
@@ -25,7 +28,11 @@ struct Home {
         case didTapSelectBudgetButton
         case didUpdateSelectedBudgetId(String?)
         case didSelectChart(ReportChart)
+        case didUpdateSavedReports
+        case delegate(Delegate)
+        case viewAllButtonTapped
         case onAppear
+        case task
     }
 
     @Reducer(state: .equatable)
@@ -34,8 +41,17 @@ struct Home {
         case popoverNewReport(ReportFeature)
     }
 
+    @CasePathable
+    enum Delegate {
+        case navigate(to: MainTab.Tab)
+    }
+
+    // MARK: Dependencies
+
     @Dependency(\.budgetClient) var budgetClient
     @Dependency(\.configProvider) var configProvider
+    @Dependency(\.savedReportQuery) var savedReportQuery
+    @Dependency(\.continuousClock) var clock
 
     let logger = LogFactory.create(category: .home)
 
@@ -47,27 +63,48 @@ struct Home {
                 // it's a copy and therefore does not update the original instance. .scope(...) func needs a store. :-/
                 state.destination = .popoverSelectBudget(state)
                 return .none
+
             case let .didUpdateSelectedBudgetId(selectedBudgetId):
-                guard state.selectedBudgetId != selectedBudgetId else {
-                    return .none
-                }
+                guard state.selectedBudgetId != selectedBudgetId else { return .none }
                 state.selectedBudgetId = selectedBudgetId
                 logger.debug("selectedBudgetId updated to: \(selectedBudgetId ?? "[nil]")")
                 return .run { _ in
                     guard let selectedBudgetId else { return }
                     updateBudgetClientSelectedBudgetId(selectedBudgetId)
                 }
+
             case let .didSelectChart(chart):
                 state.destination = .popoverNewReport(
                     ReportFeature.State(inputFields: .init(chart: chart))
                 )
                 return .none
+
+            case .didUpdateSavedReports:
+                let (savedReports, total) = fetchSavedReports()
+                state.savedReports = savedReports
+                state.savedReportsCount = total
+                return .none
+
+            case .viewAllButtonTapped:
+                return .send(.delegate(.navigate(to: .reports)))
+
             case .onAppear:
                 state.budgetList = budgetClient.budgetSummaries
                 state.selectedBudgetId = budgetClient.selectedBudgetId
                 state.charts = configProvider.charts
-                return .none
-            case .destination:
+                return .run { send in
+                    await send(.didUpdateSavedReports)
+                }
+
+            case .task:
+                return .run { send in
+                    for await _ in await savedReportQuery.didUpdateNotification() {
+                        try? await clock.sleep(for: .seconds(0.5))
+                        await send(.didUpdateSavedReports, animation: .smooth)
+                    }
+                }
+
+            case .destination, .delegate:
                 return .none
             }
         }
@@ -90,10 +127,24 @@ private extension Home {
             logger.error("Error attempting to update selectedBudgetId: \(error.localizedDescription)")
         }
     }
-}
 
-private enum Strings {
-    static let title = String(localized: "Budget Reports", comment: "The home screen main title")
+    func fetchSavedReports() -> ([SavedReport], Int) {
+        do {
+            var descriptor = FetchDescriptor<SavedReport>(
+                sortBy: [
+                    .init(\.lastModifield, order: .reverse)
+                ]
+            )
+            descriptor.fetchLimit = 4
+            let savedReports = try savedReportQuery.fetch(descriptor)
+            let total = try savedReportQuery.fetchCount(FetchDescriptor<SavedReport>())
+            return (savedReports, total)
+        } catch {
+            logger.error("\(error.localizedDescription)")
+            return ([], 0)
+        }
+    }
+
 }
 
 struct HomeView: View {
@@ -102,6 +153,7 @@ struct HomeView: View {
     private let logger = LogFactory.create(category: .home)
 
     @State private var viewAllFrame: CGRect = .zero
+    private let maxDisplayedSavedReports = 3
 
     var body: some View {
         ZStack {
@@ -127,7 +179,9 @@ struct HomeView: View {
         .onAppear {
             store.send(.onAppear)
         }
-
+        .task {
+            await store.send(.task).finish()
+        }
     }
 }
 
@@ -158,7 +212,7 @@ private extension HomeView {
                     if let budgetName = store.selectedBudgetName {
                         Text(budgetName)
                     } else {
-                        Text("[Select budget text]")
+                        Text(Strings.selectBudgetTitle)
                     }
                     Spacer()
                     Image(systemName: "chevron.right")
@@ -166,7 +220,7 @@ private extension HomeView {
             })
             .buttonStyle(.listRowSingle)
             .backgroundShadow()
-            .padding(.horizontal, .Spacing.pt16)
+            .padding(.horizontal)
             .popover(item: $store.scope(
                 state: \.destination?.popoverSelectBudget,
                 action: \.destination.popoverSelectBudget
@@ -191,44 +245,82 @@ private extension HomeView {
     var savedReportsSectionView: some View {
         VStack(spacing: 0) {
             HStack {
-                Text("Saved Reports")
+                Text(Strings.savedReportsButtonTitle)
                     .typography(.title3Emphasized)
                     .foregroundStyle(Color.Text.secondary)
                 Spacer()
             }
             .listRowTop(showHorizontalRule: false)
 
-            Button(action: /*@START_MENU_TOKEN@*/{}/*@END_MENU_TOKEN@*/, label: {
-                HStack(spacing: .Spacing.pt12) {
-                    Image(.chartPie)
-                        .resizable()
-                        .frame(width: 42, height: 42)
-                    VStack(alignment: .leading) {
-                        Text("Spending Trends")
-                            .typography(.headlineEmphasized)
-                        Text("Aug 23 - Dec 23, Main Budget")
-                            .typography(.bodyEmphasized)
-                    }
-                    Spacer()
-                }
-            })
-            .buttonStyle(.listRow)
-
-            VStack {
-                Button("View All") {
-
-                }
-                .buttonStyle(.kleonPrimary)
-                .containerRelativeFrame(.horizontal) { length, _ in
-                    length * 0.7
-                }
+            if store.savedReports.isEmpty {
+                Text("[No Reports]")
+            } else {
+                savedReportsListView
             }
-            .listRowBottom()
         }
         .backgroundShadow()
         .padding(.horizontal, .Spacing.pt16)
     }
+
+    var savedReportsListView: some View {
+        VStack(spacing: 0) {
+            ForEach(store.savedReports.prefix(maxDisplayedSavedReports)) { savedReport in
+                if let reportType = ReportChart.defaultCharts[id: savedReport.chartId] {
+                    Button(action: {}, label: {
+                        HStack(spacing: .Spacing.pt12) {
+                            reportType.type.image
+                                .resizable()
+                                .frame(width: 42, height: 42)
+                            VStack(alignment: .leading) {
+                                Text(savedReport.name)
+                                    .typography(.headlineEmphasized)
+                                    .foregroundStyle(Color.Text.primary)
+                                Text(reportType.name)
+                                    .typography(.bodyEmphasized)
+                                    .foregroundStyle(Color.Text.secondary)
+                            }
+                            Spacer()
+                        }
+                    })
+                    .buttonStyle(.listRow)
+                }
+            }
+
+            // Footer row with View All button if needed
+            VStack {
+                if store.savedReports.count > maxDisplayedSavedReports {
+                    Button(String(format: Strings.viewAllButtonTitle, arguments: [store.savedReportsCount])) {
+                        store.send(.viewAllButtonTapped)
+                    }
+                    .buttonStyle(.kleonPrimary)
+                    .containerRelativeFrame(.horizontal) { length, _ in
+                        length * 0.7
+                    }
+                } else {
+                    Text("")
+                }
+            }
+            .listRowBottom()
+        }
+    }
 }
+
+// MARK: -
+
+private enum Strings {
+    static let title = String(localized: "Budget Reports", comment: "The home screen main title")
+    static let savedReportsButtonTitle = String(localized: "Saved Reports", comment: "List Title for Saved Reports")
+    static let viewAllButtonTitle = String(
+        localized: "View All (%d)",
+        comment: "Move to the Saved Report screen. Displays count of reports saved."
+    )
+    static let selectBudgetTitle = String(
+        localized: "Select a budget",
+        comment: "Placeholder text if no budget has been set."
+    )
+}
+
+// MARK: - Previews
 
 #Preview {
     NavigationStack {

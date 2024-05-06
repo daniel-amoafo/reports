@@ -15,10 +15,14 @@ struct ReportFeature {
         @Presents var destination: Destination.State?
         var scrollToId: String?
         var reportUpdated = false
-        fileprivate let chartContainerId = "GraphChartContainer"
+        var showSavedReportNameAlert = false
+        var savedReportName: String = ""
 
-        var reportTitle: String {
-            Strings.newReportTitle
+        var reportTitle: String { Strings.newReportTitle }
+        var chartContainerId: String { "GraphChartContainer" }
+        var saveReportSuggestedName: String {
+            "\(inputFields.fromDate.formatted(date: .abbreviated, time: .omitted)) - " +
+            "\(inputFields.toDate.formatted(date: .abbreviated, time: .omitted))"
         }
     }
 
@@ -28,6 +32,8 @@ struct ReportFeature {
         case chartGraph(PresentationAction<ChartGraph.Action>)
         case confirmationDialog(PresentationAction<ConfirmationDialog>)
         case destination(PresentationAction<Destination.Action>)
+        case showSavedReportNameAlert(isPresented: Bool)
+        case savedReportName(shouldSave: Bool)
         case chartDisplayed
         case doneButtonTapped
         case onAppear
@@ -37,6 +43,7 @@ struct ReportFeature {
             case updateExistingReport
             case discard
         }
+
     }
 
     @Reducer(state: .equatable)
@@ -52,6 +59,9 @@ struct ReportFeature {
     @Dependency(\.budgetClient) var budgetClient
     @Dependency(\.isPresented) var isPresented
     @Dependency(\.dismiss) var dismiss
+    @Dependency(\.savedReportQuery) var savedReportQuery
+
+    let logger = LogFactory.create(category: "Report")
 
     var body: some ReducerOf<Self> {
         BindingReducer()
@@ -63,8 +73,9 @@ struct ReportFeature {
             case let .confirmationDialog(.presented(action)):
                 switch action {
                 case .saveNewReport:
-                    // add save logic
-                    break
+                    state.savedReportName = state.saveReportSuggestedName
+                    state.showSavedReportNameAlert = true
+                    return .none
                 case .updateExistingReport:
                     break
                 case .discard:
@@ -75,8 +86,16 @@ struct ReportFeature {
                         await dismiss()
                     }
                 }
-            case .confirmationDialog:
-                return .none
+
+            case let .savedReportName(shouldSave):
+                state.showSavedReportNameAlert = false
+                guard shouldSave else { return .none }
+                saveReport(name: state.savedReportName, inputFields: state.inputFields)
+                return .run { _ in
+                    if isPresented {
+                        await dismiss()
+                    }
+                }
 
             case let .inputFields(.delegate(.fetchedTransactions(transactions))):
                 switch state.inputFields.chart.type {
@@ -94,6 +113,7 @@ struct ReportFeature {
                 return .run { send in
                     await send(.chartDisplayed, animation: .easeInOut)
                 }
+
             case let .chartGraph(.presented(.spendingByTotal(.delegate(.categoryTapped(transactions))))):
                 let array = transactions.elements
                 state.destination = .transactionHistory(.init(transactions: array, title: array.first?.categoryName))
@@ -105,7 +125,7 @@ struct ReportFeature {
 
             case .doneButtonTapped:
                 if state.reportUpdated {
-                    state.confirmationDialog = makeConfirmDialog()
+                    state.confirmationDialog = makeConfirmSaveDialog()
                     return .none
                 } else {
                     return .run { _ in
@@ -115,7 +135,8 @@ struct ReportFeature {
                     }
                 }
 
-            case .onAppear, .inputFields, .chartGraph, .binding, .destination:
+            case .onAppear, .inputFields, .chartGraph, .binding,
+                .destination, .confirmationDialog, .showSavedReportNameAlert:
                 return .none
             }
         }
@@ -127,7 +148,7 @@ struct ReportFeature {
 
 private extension ReportFeature {
 
-    func makeConfirmDialog() -> ConfirmationDialogState<Action.ConfirmationDialog> {
+    func makeConfirmSaveDialog() -> ConfirmationDialogState<Action.ConfirmationDialog> {
         .init {
             TextState("")
         } actions: {
@@ -145,9 +166,25 @@ private extension ReportFeature {
         }
     }
 
+    func saveReport(name: String, inputFields: ReportInputFeature.State) {
+        do {
+            let savedReport = SavedReport(
+                name: name,
+                fromDate: inputFields.fromDateFormatted,
+                toDate: inputFields.toDateFormatted,
+                chartId: inputFields.chart.id,
+                selectedAccountId: inputFields.selectedAccountId,
+                lastModified: .now
+            )
+            try savedReportQuery.add(savedReport)
+        } catch {
+            logger.error("\(error.localizedDescription)")
+        }
+    }
+
 }
 
-// MARK: -
+// MARK: - View
 
 struct ReportView: View {
 
@@ -155,23 +192,7 @@ struct ReportView: View {
 
     var body: some View {
         VStack {
-            ScrollView {
-                VStack(spacing: .Spacing.pt16) {
-                    ReportInputView(store: store.scope(state: \.inputFields, action: \.inputFields))
-
-                    HorizontalDivider()
-                        .opacity(store.chartGraph == nil ? 0 : 1)
-
-                    if store.inputFields.isReportFetchingLoadingOrErrored {
-                        searchingView
-                    } else {
-                        chartGraphView
-                    }
-                }
-                .scrollTargetLayout()
-            }
-            .contentMargins(.all, .Spacing.pt16, for: .scrollContent)
-            .scrollPosition(id: $store.scrollToId, anchor: .top)
+            mainScrollingContent
         }
         .popover(
           item: $store.scope(state: \.destination?.transactionHistory, action: \.destination.transactionHistory)
@@ -180,6 +201,20 @@ struct ReportView: View {
                 .presentationDetents([.medium])
         }
         .confirmationDialog($store.scope(state: \.confirmationDialog, action: \.confirmationDialog))
+        .alert(
+            Text(Strings.saveReportAlertTitle),
+            isPresented: $store.showSavedReportNameAlert.sending(\.showSavedReportNameAlert),
+            actions: {
+                TextField(Strings.saveReportPlaceholder, text: $store.savedReportName)
+                Button(AppStrings.saveButtonTitle, action: { store.send(.savedReportName(shouldSave: true)) })
+                    .disabled(store.savedReportName.isEmpty)
+                Button(
+                    AppStrings.cancelButtonTitle,
+                    role: .cancel,
+                    action: { store.send(.savedReportName(shouldSave: false)) }
+                )
+            }
+        )
         .task {
             store.send(.onAppear)
         }
@@ -200,6 +235,26 @@ struct ReportView: View {
 }
 
 private extension ReportView {
+
+    var mainScrollingContent: some View {
+        ScrollView {
+            VStack(spacing: .Spacing.pt16) {
+                ReportInputView(store: store.scope(state: \.inputFields, action: \.inputFields))
+
+                HorizontalDivider()
+                    .opacity(store.chartGraph == nil ? 0 : 1)
+
+                if store.inputFields.isReportFetchingLoadingOrErrored {
+                    searchingView
+                } else {
+                    chartGraphView
+                }
+            }
+            .scrollTargetLayout()
+        }
+        .contentMargins(.all, .Spacing.pt16, for: .scrollContent)
+        .scrollPosition(id: $store.scrollToId, anchor: .top)
+    }
 
     var chartGraphView: some View {
         VStack {
@@ -249,8 +304,12 @@ private enum Strings {
     static let confirmSaveNewReport = String(
         localized: "Save New Report?", comment: "Confirmation message when saving a new report message."
     )
-    static let confirmDiscard = String(
-        localized: "Discard", comment: "Confirmation action to not save changes & exit"
+    static let confirmDiscard = String(localized: "Discard", comment: "Confirmation action to not save changes & exit")
+    static let saveReportAlertTitle = String(
+        localized: "Save Report Name", comment: "Title for alert when a report name is required for saving."
+    )
+    static let saveReportPlaceholder = String(
+        localized: "Enter a report name", comment: "Placeholder text advising to enter a report name for saving."
     )
 }
 

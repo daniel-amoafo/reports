@@ -8,8 +8,8 @@ import XCTest
 final class ReportFeatureTests: XCTestCase {
 
     var store: TestStoreOf<ReportFeature>!
-    // assume first entry is .spendingByTotal chart type.
-    let chart = ReportChart.makeDefaultCharts()[0]
+    // assume first entry is the .spendingByTotal chart type.
+    let chart = ReportChart.firstChart
 
     @MainActor
     func testConfirmationDialogSave() async throws {

@@ -4,7 +4,7 @@
     "" : {
 
     },
-    "[Select budget text]" : {
+    "[No Reports]" : {
 
     },
     "%@" : {
@@ -45,6 +45,9 @@
     },
     "Done" : {
       "comment" : "Button title to dismiss the current screen."
+    },
+    "Enter a report name" : {
+      "comment" : "Placeholder text advising to enter a report name for saving."
     },
     "From" : {
       "comment" : "the start date field title"
@@ -121,14 +124,17 @@
     "Save New Report?" : {
       "comment" : "Confirmation message when saving a new report message."
     },
-    "Saved Reports" : {
-
+    "Save Report Name" : {
+      "comment" : "Title for alert when a report name is required for saving."
     },
-    "Saved Reports 📈" : {
-
+    "Saved Reports" : {
+      "comment" : "List Title for Saved Reports"
     },
     "Secondary" : {
 
+    },
+    "Select a budget" : {
+      "comment" : "Placeholder text if no budget has been set."
     },
     "Select Account" : {
       "comment" : "title for selecting the bank account to run report from"
@@ -157,9 +163,6 @@
     "Spending Trend" : {
       "comment" : "The title for a chart displaying spending by trend"
     },
-    "Spending Trends" : {
-
-    },
     "This is a bottom row" : {
 
     },
@@ -167,6 +170,9 @@
 
     },
     "This is a top row" : {
+
+    },
+    "Title" : {
 
     },
     "To" : {
@@ -181,8 +187,8 @@
     "Value" : {
       "comment" : "the key name used by voice over when reading chart values"
     },
-    "View All" : {
-
+    "View All (%d)" : {
+      "comment" : "Move to the Saved Report screen. Displays count of reports saved."
     }
   },
   "version" : "1.0"

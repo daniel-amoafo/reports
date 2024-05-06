@@ -18,7 +18,7 @@ class ConfigProvider {
     init(defaultStore: KeyValueStore = UserDefaults.standard, secureStore: KeyValueStore = SecureKeyValueStore()) {
         self.defaultStore = defaultStore
         self.secureStore = secureStore
-        self.charts = ReportChart.makeDefaultCharts()
+        self.charts = ReportChart.defaultCharts.elements
     }
 
     private var infoDict: [String: Any]? {

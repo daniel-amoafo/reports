@@ -1,5 +1,6 @@
 // Created by Daniel Amoafo on 9/3/2024.
 
+import IdentifiedCollections
 import SwiftUI
 
 struct ReportChart: Identifiable, Equatable {
@@ -7,6 +8,33 @@ struct ReportChart: Identifiable, Equatable {
     let name: String
     let description: String
     let type: ChartType
+
+    static let defaultCharts: IdentifiedArrayOf<Self> = {
+        [
+            .init(
+                id: "spendingTotal",
+                name: Strings.spendingTotalTitle,
+                description: Strings.spendingTotalDescription,
+                type: .spendingByTotal
+            ),
+            .init(
+                id: "spendingTrend",
+                name: Strings.spendingTrendTitle,
+                description: Strings.spendingTrendDescription,
+                type: .spendingByTrend
+            ),
+            .init(
+                id: "incomeVexpense",
+                name: Strings.incomeExpenseTitle,
+                description: Strings.incomeExpenseDescription,
+                type: .incomeExpensesTable
+            ),
+        ]
+    }()
+
+    static var firstChart: Self {
+        defaultCharts.elements[0]
+    }
 }
 
 enum ChartType: Equatable {
@@ -56,29 +84,6 @@ extension ReportChart {
             localized: "A table summarising income & expenses for each category in a month",
             comment: "description text of the income expense chart"
         )
-    }
-
-    static func makeDefaultCharts() -> [ReportChart] {
-        [
-            .init(
-                id: "spendingTotal",
-                name: Strings.spendingTotalTitle,
-                description: Strings.spendingTotalDescription,
-                type: .spendingByTotal
-            ),
-            .init(
-                id: "spendingTrend",
-                name: Strings.spendingTrendTitle,
-                description: Strings.spendingTrendDescription,
-                type: .spendingByTrend
-            ),
-            .init(
-                id: "incomeVexpense",
-                name: Strings.incomeExpenseTitle,
-                description: Strings.incomeExpenseDescription,
-                type: .incomeExpensesTable
-            ),
-        ]
     }
 
 }

@@ -32,6 +32,9 @@
 		184DF0D32B6E1C3F00BA6F21 /* ReportsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184DF0D22B6E1C3F00BA6F21 /* ReportsUITests.swift */; };
 		184DF0D52B6E1C3F00BA6F21 /* ReportsUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184DF0D42B6E1C3F00BA6F21 /* ReportsUITestsLaunchTests.swift */; };
 		1868BAC12BE5260000757E78 /* ReportFeatureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1868BAC02BE5260000757E78 /* ReportFeatureTests.swift */; };
+		1868BAC62BE7881900757E78 /* SavedReport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1868BAC52BE7881900757E78 /* SavedReport.swift */; };
+		1868BAC82BE78C2900757E78 /* Database.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1868BAC72BE78C2900757E78 /* Database.swift */; };
+		1868BACA2BE791B600757E78 /* SavedReportQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1868BAC92BE791B600757E78 /* SavedReportQuery.swift */; };
 		186A80E72BC9F8450015FFC7 /* ChartButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186A80E62BC9F8450015FFC7 /* ChartButtonView.swift */; };
 		186A80EB2BCA57F90015FFC7 /* BackgroundShadowViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186A80EA2BCA57F90015FFC7 /* BackgroundShadowViewModifier.swift */; };
 		186A80F22BCBF4990015FFC7 /* ViewRectReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186A80F12BCBF4990015FFC7 /* ViewRectReader.swift */; };
@@ -126,6 +129,9 @@
 		184DF0D42B6E1C3F00BA6F21 /* ReportsUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportsUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		184DF0E12B6E1D3500BA6F21 /* BudgetSystemService */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BudgetSystemService; path = Packages/BudgetSystemService; sourceTree = "<group>"; };
 		1868BAC02BE5260000757E78 /* ReportFeatureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportFeatureTests.swift; sourceTree = "<group>"; };
+		1868BAC52BE7881900757E78 /* SavedReport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedReport.swift; sourceTree = "<group>"; };
+		1868BAC72BE78C2900757E78 /* Database.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Database.swift; sourceTree = "<group>"; };
+		1868BAC92BE791B600757E78 /* SavedReportQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedReportQuery.swift; sourceTree = "<group>"; };
 		186A80E62BC9F8450015FFC7 /* ChartButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartButtonView.swift; sourceTree = "<group>"; };
 		186A80EA2BCA57F90015FFC7 /* BackgroundShadowViewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundShadowViewModifier.swift; sourceTree = "<group>"; };
 		186A80F12BCBF4990015FFC7 /* ViewRectReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewRectReader.swift; sourceTree = "<group>"; };
@@ -345,6 +351,7 @@
 				18C3BFAE2B806A7500E444C8 /* Info.plist */,
 				18C3BFBB2B82309200E444C8 /* App */,
 				183ECBE72B747460006C45B2 /* Additions */,
+				1868BAC42BE785E400757E78 /* Database */,
 				189641B62B9C8CC000716258 /* Model */,
 				183ECBBD2B70DFE1006C45B2 /* KeyValueStore */,
 				18C3BFCC2B8AE9EC00E444C8 /* Resources */,
@@ -386,11 +393,21 @@
 			path = ReportsUITests;
 			sourceTree = "<group>";
 		};
+		1868BAC42BE785E400757E78 /* Database */ = {
+			isa = PBXGroup;
+			children = (
+				1868BAC72BE78C2900757E78 /* Database.swift */,
+				1868BAC92BE791B600757E78 /* SavedReportQuery.swift */,
+			);
+			path = Database;
+			sourceTree = "<group>";
+		};
 		189641B62B9C8CC000716258 /* Model */ = {
 			isa = PBXGroup;
 			children = (
 				189641BA2B9C8CFD00716258 /* ReportChart.swift */,
 				180003502BD796D0003C2804 /* MockDataStubs.swift */,
+				1868BAC52BE7881900757E78 /* SavedReport.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -663,6 +680,7 @@
 				1800034D2BD6919B003C2804 /* ReportView.swift in Sources */,
 				186E8A442B9C3AD500E65BDE /* KleonButtonStyle.swift in Sources */,
 				183ECBE12B747085006C45B2 /* Typography.swift in Sources */,
+				1868BACA2BE791B600757E78 /* SavedReportQuery.swift in Sources */,
 				18C3BFBF2B82370B00E444C8 /* BudgetSystemService+Config.swift in Sources */,
 				189641BB2B9C8CFE00716258 /* ReportChart.swift in Sources */,
 				183ECBE02B747085006C45B2 /* SelectListView.swift in Sources */,
@@ -684,11 +702,13 @@
 				186A80F52BCC013F0015FFC7 /* BottomShadowViewModifier.swift in Sources */,
 				183ECBC52B70E10C006C45B2 /* Atomic.swift in Sources */,
 				183ECBED2B747460006C45B2 /* Collection+Additions.swift in Sources */,
+				1868BAC62BE7881900757E78 /* SavedReport.swift in Sources */,
 				186E8A312B9B169C00E65BDE /* CGFloat+DesignStyleMetrics.swift in Sources */,
 				1894264B2BDFB6D700C06018 /* AppStrings.swift in Sources */,
 				18E7BAF72BE0E5F300C0468E /* TransactionHistoryView.swift in Sources */,
 				186E8A462B9C4BB500E65BDE /* Color+Adjust.swift in Sources */,
 				183ECBC32B70E0E3006C45B2 /* InMemoryKeyValueStore.swift in Sources */,
+				1868BAC82BE78C2900757E78 /* Database.swift in Sources */,
 				18C3BFB02B81874000E444C8 /* AppIntroLoginView.swift in Sources */,
 				18C3BFB22B820AEA00E444C8 /* SFSafariView.swift in Sources */,
 				186E8A382B9B34BA00E65BDE /* ListRowButtonStyle.swift in Sources */,

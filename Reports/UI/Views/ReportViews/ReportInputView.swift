@@ -43,6 +43,9 @@ struct ReportInputFeature {
                 return false
             }
         }
+
+        var fromDateFormatted: String { Date.iso8601Formatter.string(from: fromDate) }
+        var toDateFormatted: String { Date.iso8601Formatter.string(from: toDate) }
     }
 
     enum Action {
@@ -104,7 +107,7 @@ struct ReportInputFeature {
                     return .none
                 } else {
                     state.fetchStatus = .ready
-                    return .send(.delegate(.fetchedTransactions(transactions)), animation: .default)
+                    return .send(.delegate(.fetchedTransactions(transactions)), animation: .smooth)
                 }
 
             case let .selectAccountRowTapped(isActive):
@@ -381,10 +384,6 @@ private enum Strings {
         localized: "Please select an account for the report",
         comment: "the account for which the transactions the report will be based on"
     )
-    static let allAccountsName = String(
-        localized: "All Accounts",
-        comment: "A special account instance indicating all available accounts should be selected for the report."
-    )
 }
 
 // MARK: - Private
@@ -394,7 +393,7 @@ private extension Account {
     static var allAccountsId: String { "CW_ALL_ACCOUNTS" }
 
     static var allAccounts: Account {
-        .init(id: allAccountsId, name: Strings.allAccountsName, deleted: false)
+        .init(id: allAccountsId, name: AppStrings.allAccountsName, deleted: false)
     }
 }
 

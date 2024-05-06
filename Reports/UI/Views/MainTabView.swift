@@ -25,10 +25,15 @@ struct MainTab {
         }
         Reduce { state, action in
             switch action {
-            case .home:
+            case let .home(.delegate(.navigate(to: tab))):
+                state.currentTab = tab
                 return .none
+
             case let .selectTab(tab):
                 state.currentTab = tab
+                return .none
+
+            case .home:
                 return .none
             }
         }

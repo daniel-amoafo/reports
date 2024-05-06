@@ -50,7 +50,7 @@ struct ChartButtonView: View {
 #Preview("All Charts") {
     ScrollView(.horizontal) {
         HStack(spacing: .Spacing.pt16) {
-            ForEach(ReportChart.makeDefaultCharts()) { chart in
+            ForEach(ReportChart.defaultCharts) { chart in
                 ChartButtonView(title: chart.name, image: chart.type.image) {
                     // perform button action here
                 }

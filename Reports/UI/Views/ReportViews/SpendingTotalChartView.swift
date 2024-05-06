@@ -195,8 +195,7 @@ struct SpendingTotalChartView: View {
                 GeometryReader { geometry in
                     if let plotFrame = chartProxy.plotFrame,
                        let name = store.selectedGraphItem?.name,
-                       let amount = store.selectedGraphItem?.valueFormatted
-                    {
+                       let amount = store.selectedGraphItem?.valueFormatted {
                         let frame = geometry[plotFrame]
                         VStack {
                             Text(name)

@@ -3,6 +3,7 @@
 import BudgetSystemService
 import Combine
 import ComposableArchitecture
+import SwiftData
 import SwiftUI
 
 private var subscribers: Set<AnyCancellable> = []
@@ -124,11 +125,20 @@ struct ReportsApp: App {
         AppFeature()
     }
 
+    var modelContext: ModelContext {
+        @Dependency(\.database) var database
+        guard let modelContext = try? database.context() else {
+            fatalError("Could not find modelcontext")
+        }
+        return modelContext
+    }
+
     var body: some Scene {
         WindowGroup {
             // during tests, dont run main app code as this may conflict with tests runs
             if !_XCTIsTesting {
                 rootView
+                    .modelContext(modelContext)
                     .onOpenURL(perform: { url in
                         store.send(.onOpenURL(url))
                     })
