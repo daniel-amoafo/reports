@@ -24,18 +24,36 @@ struct SavedReportQuery {
 
 extension SavedReportQuery: DependencyKey {
 
+    static let liveValue = Self.live
+
+    static let testValue = Self(
+        fetchAll: unimplemented("\(Self.self).fetch"),
+        fetch: unimplemented("\(Self.self).fetchDescriptor"),
+        fetchCount: unimplemented("\(Self.self).fetchCountDescriptor"),
+        add: unimplemented("\(Self.self).add"),
+        delete: unimplemented("\(Self.self).delete"),
+        didUpdateNotification: unimplemented("\(Self.self).didUpdateNotification")
+    )
+
+    // Previews use an in memory modelContext so data is not written to a persistent database.
+    static var previewValue = Self.live
+}
+
+private extension SavedReportQuery {
+
     private static var logger: Logger { LogFactory.create(category: "SavedReportQuery") }
 
     private static var modelContext: ModelContext {
         do {
             @Dependency(\.database.context) var context
-            return try context()
+            let ctx = try context()
+            return ctx
         } catch {
             fatalError(error.localizedDescription)
         }
     }
 
-    static let liveValue = Self {
+    private static let live = Self {
         do {
             let descriptor = FetchDescriptor<SavedReport>(
                 sortBy: [SortDescriptor(\.lastModifield, order: .reverse)]
@@ -104,26 +122,6 @@ extension SavedReportQuery: DependencyKey {
                 .map { _ in }
         )
     }
-
-    static let testValue = Self(
-        fetchAll: unimplemented("\(Self.self).fetch"),
-        fetch: unimplemented("\(Self.self).fetchDescriptor"),
-        fetchCount: unimplemented("\(Self.self).fetchCountDescriptor"),
-        add: unimplemented("\(Self.self).add"),
-        delete: unimplemented("\(Self.self).delete"),
-        didUpdateNotification: unimplemented("\(Self.self).didUpdateNotification")
-    )
-
-    static var previewValue = Self.noop
-
-    private static let noop = Self(
-        fetchAll: { [] },
-        fetch: { _ in [] },
-        fetchCount: { _ in 0 },
-        add: { _ in },
-        delete: { _ in },
-        didUpdateNotification: { AsyncStream {} }
-    )
 }
 
 extension DependencyValues {

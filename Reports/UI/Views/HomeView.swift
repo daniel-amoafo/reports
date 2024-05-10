@@ -6,16 +6,16 @@ import SwiftData
 import SwiftUI
 
 @Reducer
-struct Home {
+struct HomeFeature {
 
     @ObservableState
     struct State: Equatable {
-        @Presents var destination: Destination.State?
         var selectedBudgetId: String?
         var budgetList: IdentifiedArrayOf<BudgetSummary>?
         var charts: [ReportChart] = []
         var savedReports: [SavedReport] = []
         var savedReportsCount: Int = 0
+        var showSelectBudgetScreen = false
 
         var selectedBudgetName: String? {
             guard let selectedBudgetId else { return nil }
@@ -24,26 +24,22 @@ struct Home {
     }
 
     enum Action {
-        case destination(PresentationAction<Destination.Action>)
         case didTapSelectBudgetButton
         case didUpdateSelectedBudgetId(String?)
         case didSelectChart(ReportChart)
         case didUpdateSavedReports
+        case didSelectSavedReport(SavedReport)
         case delegate(Delegate)
+        case showSelectBudgetTapped(Bool)
         case viewAllButtonTapped
         case onAppear
         case task
     }
 
-    @Reducer(state: .equatable)
-    enum Destination {
-        case popoverSelectBudget(Home)
-        case popoverNewReport(ReportFeature)
-    }
-
     @CasePathable
     enum Delegate {
         case navigate(to: MainTab.Tab)
+        case presentReport(ReportFeature.State.SourceData)
     }
 
     // MARK: Dependencies
@@ -59,9 +55,7 @@ struct Home {
         Reduce { state, action in
             switch action {
             case .didTapSelectBudgetButton:
-                // needs reviewing: the state object passed is not correct.
-                // it's a copy and therefore does not update the original instance. .scope(...) func needs a store. :-/
-                state.destination = .popoverSelectBudget(state)
+                state.showSelectBudgetScreen = true
                 return .none
 
             case let .didUpdateSelectedBudgetId(selectedBudgetId):
@@ -74,16 +68,18 @@ struct Home {
                 }
 
             case let .didSelectChart(chart):
-                state.destination = .popoverNewReport(
-                    ReportFeature.State(inputFields: .init(chart: chart))
-                )
-                return .none
+                let sourceData = ReportFeature.State.SourceData.new(.init(chart: chart))
+                return .send(.delegate(.presentReport(sourceData)))
 
             case .didUpdateSavedReports:
                 let (savedReports, total) = fetchSavedReports()
                 state.savedReports = savedReports
                 state.savedReportsCount = total
                 return .none
+
+            case let .didSelectSavedReport(savedReport):
+                let sourceData = ReportFeature.State.SourceData.existing(savedReport)
+                return .send(.delegate(.presentReport(sourceData)))
 
             case .viewAllButtonTapped:
                 return .send(.delegate(.navigate(to: .reports)))
@@ -104,15 +100,14 @@ struct Home {
                     }
                 }
 
-            case .destination, .delegate:
+            case .delegate, .showSelectBudgetTapped:
                 return .none
             }
         }
-        .ifLet(\.$destination, action: \.destination)
     }
 }
 
-private extension Home {
+private extension HomeFeature {
 
     var isSelectedBudgetIdSet: Bool {
         budgetClient.selectedBudgetId != nil
@@ -148,7 +143,7 @@ private extension Home {
 }
 
 struct HomeView: View {
-    @Bindable var store: StoreOf<Home>
+    @Bindable var store: StoreOf<HomeFeature>
     @State var selectedString: String?
     private let logger = LogFactory.create(category: .home)
 
@@ -209,6 +204,7 @@ private extension HomeView {
             }, label: {
                 HStack {
                     Image(systemName: "note.text")
+                        .foregroundStyle(Color.Icon.secondary)
                     if let budgetName = store.selectedBudgetName {
                         Text(budgetName)
                     } else {
@@ -221,22 +217,12 @@ private extension HomeView {
             .buttonStyle(.listRowSingle)
             .backgroundShadow()
             .padding(.horizontal)
-            .popover(item: $store.scope(
-                state: \.destination?.popoverSelectBudget,
-                action: \.destination.popoverSelectBudget
-            )) { _ in
+            .popover(isPresented: $store.showSelectBudgetScreen.sending(\.showSelectBudgetTapped)) {
                 if let budgetList = store.budgetList {
                     SelectListView<BudgetSummary>(
                         items: budgetList,
                         selectedItem: $store.selectedBudgetId.sending(\.didUpdateSelectedBudgetId)
                     )
-                }
-            }
-            .fullScreenCover(
-                item: $store.scope(state: \.destination?.popoverNewReport, action: \.destination.popoverNewReport)
-            ) { store in
-                NavigationStack {
-                    ReportView(store: store)
                 }
             }
         }
@@ -253,7 +239,7 @@ private extension HomeView {
             .listRowTop(showHorizontalRule: false)
 
             if store.savedReports.isEmpty {
-                Text("[No Reports]")
+                Text("[No Reports]") // fix UI
             } else {
                 savedReportsListView
             }
@@ -266,7 +252,9 @@ private extension HomeView {
         VStack(spacing: 0) {
             ForEach(store.savedReports.prefix(maxDisplayedSavedReports)) { savedReport in
                 if let reportType = ReportChart.defaultCharts[id: savedReport.chartId] {
-                    Button(action: {}, label: {
+                    Button(action: {
+                        store.send(.didSelectSavedReport(savedReport))
+                    }, label: {
                         HStack(spacing: .Spacing.pt12) {
                             reportType.type.image
                                 .resizable()
@@ -325,8 +313,8 @@ private enum Strings {
 #Preview {
     NavigationStack {
         HomeView(
-            store: Store(initialState: Home.State()) {
-                Home()
+            store: Store(initialState: HomeFeature.State()) {
+                HomeFeature()
             }
         )
     }

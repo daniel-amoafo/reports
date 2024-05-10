@@ -8,9 +8,14 @@ private let _accessTokenKey = "ynab-access-token"
 
 extension BudgetClient {
 
-    func updateYnabProvider(_ accessToken: String) {
-        Self.storeAccessToken(accessToken: accessToken)
+    func updateYnabProvider(_ accessToken: String, store: KeyValueStore = SecureKeyValueStore()) {
+        Self.storeAccessToken(accessToken: accessToken, store: store)
         updateProvider(.ynab(accessToken: accessToken))
+    }
+
+    func logout(store: KeyValueStore = SecureKeyValueStore()) {
+        Self.storeAccessToken(accessToken: nil, store: store)
+        updateProvider(.notAuthorized)
     }
 
     static func makeClient(
@@ -24,7 +29,7 @@ extension BudgetClient {
 
         storeAccessToken(accessToken: accessToken, store: store)
 
-        // use the provided budgetProvider otherwise default to ynab budget provider
+        // use the supplied budgetProvider otherwise default to ynab budget provider
         let provider: BudgetProvider = bugdetProvider ?? .ynab(accessToken: accessToken)
 
         @Dependency(\.configProvider) var configProvider
@@ -32,7 +37,11 @@ extension BudgetClient {
         return .init(provider: provider, selectedBudgetId: selectedBudgetId)
     }
 
-    static func storeAccessToken(accessToken: String, store: KeyValueStore = SecureKeyValueStore()) {
+    static func storeAccessToken(accessToken: String?, store: KeyValueStore = SecureKeyValueStore()) {
+        guard let accessToken else {
+            store.removeValue(forKey: _accessTokenKey)
+            return
+        }
         store.set(accessToken, forKey: _accessTokenKey)
     }
 }
@@ -41,7 +50,7 @@ extension BudgetClient: DependencyKey {
 
     public static var liveValue: BudgetClient {
         if case .loggedIn = _liveValue.authorizationStatus {
-            // use the cached client if it's logged in
+            // use the cached client if logged in.
             return _liveValue
         }
 
@@ -50,15 +59,15 @@ extension BudgetClient: DependencyKey {
         return _liveValue
     }
 
-    public static var previewValue: BudgetClient {
+    public static let previewValue: BudgetClient = {
         .testsAndPreviews
-    }
+    }()
 }
 
 extension BudgetClient: TestDependencyKey {
-    public static var testValue: BudgetClient {
+    public static let testValue: BudgetClient = {
         .testsAndPreviews
-    }
+    }()
 }
 
 extension DependencyValues {

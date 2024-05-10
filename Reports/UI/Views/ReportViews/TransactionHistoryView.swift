@@ -57,17 +57,7 @@ private extension TransactionHistoryView {
 
     var transactionsList: some View {
         List {
-            if let title = store.title {
-                Section {
-                    Text(title)
-                        .typography(.title2Emphasized)
-                        .foregroundStyle(Color.Text.secondary)
-                        .padding(.horizontal)
-                }
-                .listRowBackground(Color.clear)
-                .listRowSeparator(.hidden)
-                .listRowInsets(.zero)
-            }
+            headerView
 
             // Category Sections
             ForEach(store.sections) { section in
@@ -76,6 +66,21 @@ private extension TransactionHistoryView {
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
+    }
+
+    @ViewBuilder
+    var headerView: some View {
+        if let title = store.title {
+            Section {
+                Text(title)
+                    .typography(.title2Emphasized)
+                    .foregroundStyle(Color.Text.secondary)
+                    .padding(.horizontal)
+            }
+            .listRowBackground(Color.clear)
+            .listRowSeparator(.hidden)
+            .listRowInsets(.zero)
+        }
     }
 
     func sectionView(for section: SectionData) -> some View {

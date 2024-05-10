@@ -50,20 +50,28 @@ struct AppFeature {
 
             case .appIntroLogin:
                 return .none
+
             case .mainTab:
                 return .none
+
             case let .didUpdateAuthStatus(newStatus):
                 guard newStatus != state.authStatus else { return  .none }
+                let oldStatus = state.authStatus
+                logger.debug("authStatus update new: \(newStatus), old: \(oldStatus)")
                 state.authStatus = newStatus
-                logger.debug("authStatus update: \(newStatus)")
                 return .run { _ in
-                    await loadBudgetClientData()
+                    if newStatus == .loggedIn, oldStatus == .loggedOut {
+                        // make sure we have fresh data if previously loggedOut state
+                        await loadBudgetClientData()
+                    }
                 }
+
             case .checkRetryConnection:
                 if state.authStatus == .unknown {
                     state.showRetryLoading = true
                 }
                 return .none
+
             case .onAppear:
                 state.showRetryLoading = false
                 return .run { [connectionCheckTimeout = state.connectionCheckTimeout] send in
@@ -142,7 +150,7 @@ struct ReportsApp: App {
                     .onOpenURL(perform: { url in
                         store.send(.onOpenURL(url))
                     })
-                    .task {
+                    .onAppear {
                         store.send(.onAppear)
                     }
             }

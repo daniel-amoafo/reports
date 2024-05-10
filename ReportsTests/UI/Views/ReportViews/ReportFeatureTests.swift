@@ -73,8 +73,8 @@ final class ReportFeatureTests: XCTestCase {
     @MainActor
     private func createTestStore(reportUpdated: Bool = false) -> TestStoreOf<ReportFeature> {
         TestStore(
-            initialState: .init(
-                inputFields: ReportInputFeature.State(chart: chart),
+            initialState: try! .init(
+                sourceData: .new(.init(chart: chart)),
                 reportUpdated: reportUpdated
             )
         ) {

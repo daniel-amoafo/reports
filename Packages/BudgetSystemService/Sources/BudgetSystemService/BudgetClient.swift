@@ -170,6 +170,7 @@ public class BudgetClient {
            budgetClientError.isNotAuthorized {
             self.authorizationStatus = .loggedOut
             logger.error("Budget Client is not authorized, status updated to logged out")
+            return
         }
         logger.error("\(error.localizedDescription)")
     }

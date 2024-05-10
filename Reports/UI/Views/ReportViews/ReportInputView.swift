@@ -388,15 +388,6 @@ private enum Strings {
 
 // MARK: - Private
 
-private extension Account {
-
-    static var allAccountsId: String { "CW_ALL_ACCOUNTS" }
-
-    static var allAccounts: Account {
-        .init(id: allAccountsId, name: AppStrings.allAccountsName, deleted: false)
-    }
-}
-
 private extension Date {
     static func aWeekFrom(_ date: Date) -> Date {
         .init(timeInterval: TimeInterval(60*60*24*6), since: date)

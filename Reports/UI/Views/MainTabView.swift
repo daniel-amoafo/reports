@@ -11,17 +11,27 @@ struct MainTab {
     @ObservableState
     struct State: Equatable {
         var currentTab = Tab.home
-        var home = Home.State()
+        var home = HomeFeature.State()
+        var savedReports = SavedReportsFeature.State()
+        @Presents var report: ReportFeature.State?
     }
 
     enum Action {
-        case home(Home.Action)
+        case home(HomeFeature.Action)
+        case savedReports(SavedReportsFeature.Action)
+        case report(PresentationAction<ReportFeature.Action>)
+        case showSavedReport
         case selectTab(Tab)
     }
 
+    let logger = LogFactory.create(category: "MainTab")
+
     var body: some ReducerOf<Self> {
         Scope(state: \.home, action: \.home) {
-            Home()
+            HomeFeature()
+        }
+        Scope(state: \.savedReports, action: \.savedReports) {
+            SavedReportsFeature()
         }
         Reduce { state, action in
             switch action {
@@ -29,22 +39,39 @@ struct MainTab {
                 state.currentTab = tab
                 return .none
 
+            case let .home(.delegate(.presentReport(source))):
+                do {
+                    state.report = try .init(sourceData: source)
+                } catch {
+                    logger.error("\(error.localizedDescription)")
+                    // display user friendly error message
+                }
+                return .none
+
+            case let .savedReports(.delegate(.rowTapped(savedReport))):
+                do {
+                    state.report = try .init(sourceData: .existing(savedReport))
+                } catch {
+                    logger.error("\(error.localizedDescription)")
+                    // display user friendly error message
+                }
+                return .none
+
             case let .selectTab(tab):
                 state.currentTab = tab
                 return .none
 
-            case .home:
+            case .home, .savedReports, .showSavedReport, .report:
                 return .none
             }
+        }
+        .ifLet(\.$report, action: \.report) {
+            ReportFeature()
         }
     }
 }
 
-private enum Strings {
-    static let homeTitle = String(localized: "Home", comment: "Home screen tab title name")
-    static let reportsTitle = String(localized: "Reports", comment: "Saved Reports screen tab title name")
-    static let settingsTitle = String(localized: "Settings", comment: "Settings screen tab title name")
-}
+// MARK: -
 
 struct MainTabView: View {
     @Bindable var store: StoreOf<MainTab>
@@ -63,7 +90,9 @@ struct MainTabView: View {
 
                 // Saved Reports Tab
                 NavigationStack {
-                    SavedReportsView()
+                    SavedReportsView(
+                        store: store.scope(state: \.savedReports, action: \.savedReports)
+                    )
                 }
                 .tag(MainTab.Tab.reports)
                 .tabItem { tabItemView(for: .reports) }
@@ -77,6 +106,11 @@ struct MainTabView: View {
             }
             .toolbarBackground(.visible, for: .tabBar)
         }
+        .fullScreenCover(item: $store.scope(state: \.report, action: \.report)) { store in
+            NavigationStack {
+                ReportView(store: store)
+            }
+        }
     }
 }
 
@@ -84,27 +118,13 @@ private extension MainTabView {
 
     func tabItemView(for tab: MainTab.Tab) -> some View {
         VStack {
-            Text(tabItemTitle(for: tab))
-            Image(systemName: tabItemImageName(for: tab))
-        }
-    }
-
-    func tabItemTitle(for tab: MainTab.Tab) -> String {
-        switch tab {
-        case .home: return Strings.homeTitle
-        case .reports: return Strings.reportsTitle
-        case .settings: return Strings.settingsTitle
-        }
-    }
-
-    func tabItemImageName(for tab: MainTab.Tab) -> String {
-        switch tab {
-        case .home: return "house.fill"
-        case .reports: return "chart.xyaxis.line"
-        case .settings: return "slider.horizontal.3"
+            Text(tab.title)
+            Image(systemName: tab.imageName)
         }
     }
 }
+
+// MARK: - Preview
 
 #Preview {
     MainTabView(

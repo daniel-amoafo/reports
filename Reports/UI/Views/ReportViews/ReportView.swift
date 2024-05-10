@@ -9,20 +9,56 @@ struct ReportFeature {
 
     @ObservableState
     struct State: Equatable {
+
+        enum SourceData {
+            case new(ReportInputFeature.State)
+            case existing(SavedReport)
+        }
+
         var inputFields: ReportInputFeature.State
+        var savedReport: SavedReport?
         @Presents var chartGraph: ChartGraph.State?
         @Presents var confirmationDialog: ConfirmationDialogState<Action.ConfirmationDialog>?
         @Presents var destination: Destination.State?
         var scrollToId: String?
         var reportUpdated = false
         var showSavedReportNameAlert = false
-        var savedReportName: String = ""
 
-        var reportTitle: String { Strings.newReportTitle }
+        fileprivate var savedReportName: String = ""
+
+        var reportTitle: String {
+            guard let savedReportTitle = savedReport?.name else {
+                return Strings.newReportTitle
+            }
+            return savedReportTitle
+        }
         var chartContainerId: String { "GraphChartContainer" }
         var saveReportSuggestedName: String {
             "\(inputFields.fromDate.formatted(date: .abbreviated, time: .omitted)) - " +
             "\(inputFields.toDate.formatted(date: .abbreviated, time: .omitted))"
+        }
+
+        init(
+            sourceData: SourceData,
+            chartGraph: ChartGraph.State? = nil,
+            confirmationDialog: ConfirmationDialogState<Action.ConfirmationDialog>? = nil,
+            destination: Destination.State? = nil,
+            scrollToId: String? = nil,
+            reportUpdated: Bool = false,
+            showSavedReportNameAlert: Bool = false
+        ) throws {
+            // Ensure Report is correctly configured with inputField values.
+            // For a SavedReport, validate values being populated are still valid.
+            let (inputFields, savedReport) = try ReportFeatureSourceLoader.load(sourceData)
+            self.inputFields = inputFields
+            self.savedReport = savedReport
+            self.chartGraph = chartGraph
+            self.confirmationDialog = confirmationDialog
+            self.destination = destination
+            self.scrollToId = scrollToId
+            self.reportUpdated = reportUpdated
+            self.showSavedReportNameAlert = showSavedReportNameAlert
+            self.savedReportName = savedReportName
         }
     }
 
@@ -168,12 +204,14 @@ private extension ReportFeature {
 
     func saveReport(name: String, inputFields: ReportInputFeature.State) {
         do {
+            let selectedAccountId = inputFields.selectedAccountId == Account.allAccountsId ?
+            nil : inputFields.selectedAccountId
             let savedReport = SavedReport(
                 name: name,
                 fromDate: inputFields.fromDateFormatted,
                 toDate: inputFields.toDateFormatted,
                 chartId: inputFields.chart.id,
-                selectedAccountId: inputFields.selectedAccountId,
+                selectedAccountId: selectedAccountId,
                 lastModified: .now
             )
             try savedReportQuery.add(savedReport)
@@ -192,7 +230,7 @@ struct ReportView: View {
 
     var body: some View {
         VStack {
-            mainScrollingContent
+            scrollingContent
         }
         .popover(
           item: $store.scope(state: \.destination?.transactionHistory, action: \.destination.transactionHistory)
@@ -215,7 +253,7 @@ struct ReportView: View {
                 )
             }
         )
-        .task {
+        .onAppear {
             store.send(.onAppear)
         }
         .navigationTitle(store.reportTitle)
@@ -236,7 +274,7 @@ struct ReportView: View {
 
 private extension ReportView {
 
-    var mainScrollingContent: some View {
+    var scrollingContent: some View {
         ScrollView {
             VStack(spacing: .Spacing.pt16) {
                 ReportInputView(store: store.scope(state: \.inputFields, action: \.inputFields))
@@ -355,39 +393,46 @@ private enum Strings {
     }
 }
 
+// swiftlint:disable force_try
 private extension ReportFeature {
 
     static var selectedAccountId: String {
-        IdentifiedArrayOf<Account>.mocks[0].id
+        IdentifiedArrayOf<Account>.mocks[1].id
     }
 
     static var mockInputFields: ReportFeature.State {
-        .init(
-            inputFields: .init(
-                chart: .mock,
-                accounts: .mocks,
-                selectedAccountId: selectedAccountId
+        try! .init(
+            sourceData: .new(
+                .init(
+                    chart: .mock,
+                    accounts: .mocks,
+                    selectedAccountId: selectedAccountId
+                )
             )
         )
-     }
+    }
 
     static var mockSearching: ReportFeature.State {
-        .init(
-            inputFields: .init(
-                chart: .mock,
-                accounts: .mocks,
-                selectedAccountId: selectedAccountId,
-                fetchStatus: .fetching
+        try! .init(
+            sourceData: .new(
+                .init(
+                    chart: .mock,
+                    accounts: .mocks,
+                    selectedAccountId: selectedAccountId,
+                    fetchStatus: .fetching
+                )
             )
         )
     }
 
     static var mockFetchedResults: ReportFeature.State {
-        .init(
-            inputFields: .init(
-                chart: .mock,
-                accounts: .mocks,
-                selectedAccountId: selectedAccountId
+        try! .init(
+            sourceData: .new(
+                .init(
+                    chart: .mock,
+                    accounts: .mocks,
+                    selectedAccountId: selectedAccountId
+                )
             ),
             chartGraph: .spendingByTotal(.init(transactions: .mocks)),
             reportUpdated: true
@@ -395,13 +440,16 @@ private extension ReportFeature {
     }
 
     static var mockFetchedNoResults: ReportFeature.State {
-        .init(
-            inputFields: .init(
-                chart: .mock,
-                accounts: .mocks,
-                selectedAccountId: selectedAccountId,
-                fetchStatus: .error(.noResults)
+        try! .init(
+            sourceData: .new(
+                .init(
+                    chart: .mock,
+                    accounts: .mocks,
+                    selectedAccountId: selectedAccountId,
+                    fetchStatus: .error(.noResults)
+                )
             )
         )
     }
 }
+// swiftlint:enable force_try

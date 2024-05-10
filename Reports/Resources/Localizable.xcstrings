@@ -7,6 +7,9 @@
     "[No Reports]" : {
 
     },
+    "[Show No Saved Reports, create a report first]" : {
+
+    },
     "%@" : {
 
     },
@@ -70,6 +73,9 @@
     "Login into YNAB" : {
 
     },
+    "Logout" : {
+
+    },
     "Main Budget" : {
 
     },
@@ -128,7 +134,7 @@
       "comment" : "Title for alert when a report name is required for saving."
     },
     "Saved Reports" : {
-      "comment" : "List Title for Saved Reports"
+      "comment" : "List Title for Saved Reports\nThe saved reports screen main title"
     },
     "Secondary" : {
 
@@ -145,8 +151,8 @@
     "Settings" : {
       "comment" : "Settings screen tab title name"
     },
-    "Settings View ⚙️" : {
-
+    "Settings ⚙️" : {
+      "comment" : "The settings screen main title"
     },
     "Show done button" : {
 
@@ -170,9 +176,6 @@
 
     },
     "This is a top row" : {
-
-    },
-    "Title" : {
 
     },
     "To" : {

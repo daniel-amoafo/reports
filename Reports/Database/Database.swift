@@ -16,14 +16,14 @@ extension Database: DependencyKey {
     )
 
     @MainActor
-    static var testValue = Self {
-        testContext
-    }
+    static let testValue = Self(
+        context: { testContext }
+    )
 
     @MainActor
-    static var previewValue = Self {
-        testContext
-    }
+    static let previewValue = Self(
+        context: { previewsContext }
+    )
 }
 
 extension DependencyValues {
@@ -35,13 +35,14 @@ extension DependencyValues {
 
 // MARK: -
 
-@MainActor
 private let liveContext: ModelContext = {
     do {
         let savedReport = ModelConfiguration("SavedReportModelConfig", schema: Schema([SavedReport.self]))
 
         let container = try ModelContainer(for: SavedReport.self, configurations: savedReport)
-        return ModelContext(container)
+        let ctx = ModelContext(container)
+        ctx.autosaveEnabled = false
+        return ctx
     } catch {
         fatalError("Failed to create swift data live container - \(error.localizedDescription)")
     }
@@ -49,10 +50,24 @@ private let liveContext: ModelContext = {
 
 @MainActor
 private var testContext: ModelContext {
+    unimplemented("\(ModelContext.self).context")
+}
+
+@MainActor
+private var previewsContext: ModelContext {
     do {
         let savedReport = ModelConfiguration(for: SavedReport.self, isStoredInMemoryOnly: true)
 
-        let container = try ModelContainer(configurations: savedReport)
+        let container = try ModelContainer(for: SavedReport.self, configurations: savedReport)
+        let context = ModelContext(container)
+        for report in SavedReport.previews {
+            context.insert(report)
+        }
+        do {
+            try context.save()
+        } catch {
+            debugPrint("\(error.localizedDescription)")
+        }
         return ModelContext(container)
     } catch {
         fatalError("Failed to create swift data test container - \(error.localizedDescription)")

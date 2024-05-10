@@ -282,7 +282,7 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
 
 extension BudgetClient {
 
-    public static var testsAndPreviews: BudgetClient {
+    static var testsAndPreviews: BudgetClient {
         .init(
             budgetSummaries: .mocks,
             accounts: .mocks,
@@ -294,4 +294,48 @@ extension BudgetClient {
         )
     }
 
+}
+
+// MARK: - SavedReport
+
+extension SavedReport {
+
+    static let previews: [SavedReport] = {
+        [
+            .init(
+                id: UUID(uuidString: "00000000-0000-0000-0000-000000000011")!,
+                name: "Jan 1 2024 - Feb 28 2024",
+                fromDate: "2024-01-01",
+                toDate: "2024-02-28",
+                chartId: ReportChart.firstChart.id,
+                lastModified: Date.iso8601Formatter.date(from: "2024-03-30T14:30")!
+            ),
+            .init(
+                id: UUID(uuidString: "00000000-0000-0000-0000-000000000012")!,
+                name: "My Crazy Month",
+                fromDate: "2024-03-05",
+                toDate: "2024-04-04",
+                chartId: ReportChart.firstChart.id,
+                lastModified: Date.iso8601Formatter.date(from: "2024-05-12T16:45")!
+            ),
+            .init(
+                id: UUID(uuidString: "00000000-0000-0000-0000-000000000013")!,
+                name: "Fantastic Feb spending",
+                fromDate: "2024-02-02",
+                toDate: "2024-02-09",
+                chartId: ReportChart.firstChart.id,
+                selectedAccountId: Account.allAccountsId,
+                lastModified: Date.iso8601Formatter.date(from: "2024-02-12T08:45")!
+            ),
+            .init(
+                id: UUID(uuidString: "00000000-0000-0000-0000-000000000014")!,
+                name: "May day",
+                fromDate: "2024-05-01",
+                toDate: "2024-05-09",
+                chartId: ReportChart.firstChart.id,
+                selectedAccountId: Account.allAccountsId,
+                lastModified: Date.iso8601Formatter.date(from: "2024-05-08T17:12")!
+            ),
+        ]
+    }()
 }

@@ -55,6 +55,8 @@
 		189641BB2B9C8CFE00716258 /* ReportChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189641BA2B9C8CFD00716258 /* ReportChart.swift */; };
 		189641BE2B9D675900716258 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189641BD2B9D675900716258 /* SettingsView.swift */; };
 		189641C12B9D67CE00716258 /* SavedReportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189641C02B9D67CE00716258 /* SavedReportsView.swift */; };
+		18A146B82BEBA69300B4E74F /* ProcessorInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A146B72BEBA69300B4E74F /* ProcessorInfo.swift */; };
+		18A146BA2BECF73B00B4E74F /* ReportFeatureSourceLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A146B92BECF73B00B4E74F /* ReportFeatureSourceLoader.swift */; };
 		18A514C92BD5001300B072DE /* SpendingTotalChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A514C82BD5001300B072DE /* SpendingTotalChartView.swift */; };
 		18C3BFB02B81874000E444C8 /* AppIntroLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C3BFAF2B81874000E444C8 /* AppIntroLoginView.swift */; };
 		18C3BFB22B820AEA00E444C8 /* SFSafariView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C3BFB12B820AEA00E444C8 /* SFSafariView.swift */; };
@@ -76,11 +78,13 @@
 		18C3BFE42B8AE9EC00E444C8 /* OpenSans-SemiBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 18C3BFD82B8AE9EC00E444C8 /* OpenSans-SemiBoldItalic.ttf */; };
 		18C3BFE52B8AE9EC00E444C8 /* OpenSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 18C3BFD92B8AE9EC00E444C8 /* OpenSans-Regular.ttf */; };
 		18C3BFE92B8B6FA100E444C8 /* BudgetSystemService+ConfigTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C3BFE82B8B6FA100E444C8 /* BudgetSystemService+ConfigTests.swift */; };
+		18E42B002BEB295500D47109 /* Account+AllAccounts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E42AFF2BEB295500D47109 /* Account+AllAccounts.swift */; };
 		18E7BAF52BE0CE6D00C0468E /* ReportFetchError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E7BAF42BE0CE6D00C0468E /* ReportFetchError.swift */; };
 		18E7BAF72BE0E5F300C0468E /* TransactionHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E7BAF62BE0E5F300C0468E /* TransactionHistoryView.swift */; };
 		18E7BAF92BE1081400C0468E /* EdgeInsets+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E7BAF82BE1081400C0468E /* EdgeInsets+Additions.swift */; };
 		18E7BB002BE21CC900C0468E /* ReportInputFeatureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E7BAFF2BE21CC900C0468E /* ReportInputFeatureTests.swift */; };
 		18E7BB022BE3491C00C0468E /* Date+Formatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E7BB012BE3491C00C0468E /* Date+Formatter.swift */; };
+		18EF05572BEB005300976055 /* MainTab+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18EF05562BEB005300976055 /* MainTab+Additions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -153,6 +157,8 @@
 		189641BA2B9C8CFD00716258 /* ReportChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportChart.swift; sourceTree = "<group>"; };
 		189641BD2B9D675900716258 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		189641C02B9D67CE00716258 /* SavedReportsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedReportsView.swift; sourceTree = "<group>"; };
+		18A146B72BEBA69300B4E74F /* ProcessorInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessorInfo.swift; sourceTree = "<group>"; };
+		18A146B92BECF73B00B4E74F /* ReportFeatureSourceLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportFeatureSourceLoader.swift; sourceTree = "<group>"; };
 		18A514C22BCFF5FC00B072DE /* MoneyCommon */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = MoneyCommon; path = Packages/MoneyCommon; sourceTree = "<group>"; };
 		18A514C82BD5001300B072DE /* SpendingTotalChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendingTotalChartView.swift; sourceTree = "<group>"; };
 		18C3BFAE2B806A7500E444C8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -177,11 +183,13 @@
 		18C3BFD92B8AE9EC00E444C8 /* OpenSans-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "OpenSans-Regular.ttf"; sourceTree = "<group>"; };
 		18C3BFE62B8B5F4E00E444C8 /* BudgetSystemService.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; name = BudgetSystemService.xctestplan; path = Packages/BudgetSystemService/BudgetSystemService.xctestplan; sourceTree = "<group>"; };
 		18C3BFE82B8B6FA100E444C8 /* BudgetSystemService+ConfigTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BudgetSystemService+ConfigTests.swift"; sourceTree = "<group>"; };
+		18E42AFF2BEB295500D47109 /* Account+AllAccounts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Account+AllAccounts.swift"; path = "Reports/Model/Account+AllAccounts.swift"; sourceTree = SOURCE_ROOT; };
 		18E7BAF42BE0CE6D00C0468E /* ReportFetchError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportFetchError.swift; sourceTree = "<group>"; };
 		18E7BAF62BE0E5F300C0468E /* TransactionHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionHistoryView.swift; sourceTree = "<group>"; };
 		18E7BAF82BE1081400C0468E /* EdgeInsets+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EdgeInsets+Additions.swift"; sourceTree = "<group>"; };
 		18E7BAFF2BE21CC900C0468E /* ReportInputFeatureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportInputFeatureTests.swift; sourceTree = "<group>"; };
 		18E7BB012BE3491C00C0468E /* Date+Formatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Formatter.swift"; sourceTree = "<group>"; };
+		18EF05562BEB005300976055 /* MainTab+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MainTab+Additions.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -316,6 +324,8 @@
 				183ECBE82B747460006C45B2 /* String+Additions.swift */,
 				18C3BFC02B83993200E444C8 /* URL+Additions.swift */,
 				18E7BAF82BE1081400C0468E /* EdgeInsets+Additions.swift */,
+				18EF05562BEB005300976055 /* MainTab+Additions.swift */,
+				18A146B72BEBA69300B4E74F /* ProcessorInfo.swift */,
 			);
 			path = Additions;
 			sourceTree = "<group>";
@@ -405,6 +415,7 @@
 		189641B62B9C8CC000716258 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				18E42AFF2BEB295500D47109 /* Account+AllAccounts.swift */,
 				189641BA2B9C8CFD00716258 /* ReportChart.swift */,
 				180003502BD796D0003C2804 /* MockDataStubs.swift */,
 				1868BAC52BE7881900757E78 /* SavedReport.swift */,
@@ -421,6 +432,7 @@
 				180003542BD8D40E003C2804 /* TabulatedDataItem.swift */,
 				18E7BAF42BE0CE6D00C0468E /* ReportFetchError.swift */,
 				18E7BAF62BE0E5F300C0468E /* TransactionHistoryView.swift */,
+				18A146B92BECF73B00B4E74F /* ReportFeatureSourceLoader.swift */,
 			);
 			path = ReportViews;
 			sourceTree = "<group>";
@@ -665,7 +677,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/zsh;
-			shellScript = "export PATH=\"/opt/homebrew/bin:$PATH\"\n\nif which swiftlint >/dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+			shellScript = "export PATH=\"/opt/homebrew/bin:$PATH\"\n\nif which swiftlint >/dev/null; then\n  swiftlint --fix && swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -679,15 +691,18 @@
 				18E7BAF92BE1081400C0468E /* EdgeInsets+Additions.swift in Sources */,
 				1800034D2BD6919B003C2804 /* ReportView.swift in Sources */,
 				186E8A442B9C3AD500E65BDE /* KleonButtonStyle.swift in Sources */,
+				18E42B002BEB295500D47109 /* Account+AllAccounts.swift in Sources */,
 				183ECBE12B747085006C45B2 /* Typography.swift in Sources */,
 				1868BACA2BE791B600757E78 /* SavedReportQuery.swift in Sources */,
 				18C3BFBF2B82370B00E444C8 /* BudgetSystemService+Config.swift in Sources */,
 				189641BB2B9C8CFE00716258 /* ReportChart.swift in Sources */,
 				183ECBE02B747085006C45B2 /* SelectListView.swift in Sources */,
 				183ECBC12B70E0B6006C45B2 /* KeyValueStore.swift in Sources */,
+				18A146BA2BECF73B00B4E74F /* ReportFeatureSourceLoader.swift in Sources */,
 				183ECBF12B748E90006C45B2 /* HorizontalDivider.swift in Sources */,
 				186E8A222B9AEDB100E65BDE /* MainTabView.swift in Sources */,
 				186A80E72BC9F8450015FFC7 /* ChartButtonView.swift in Sources */,
+				18EF05572BEB005300976055 /* MainTab+Additions.swift in Sources */,
 				18C3BFCB2B87522200E444C8 /* Logger.swift in Sources */,
 				180003512BD796D0003C2804 /* MockDataStubs.swift in Sources */,
 				186E8A1E2B99872F00E65BDE /* ConfigProvider.swift in Sources */,
@@ -711,6 +726,7 @@
 				1868BAC82BE78C2900757E78 /* Database.swift in Sources */,
 				18C3BFB02B81874000E444C8 /* AppIntroLoginView.swift in Sources */,
 				18C3BFB22B820AEA00E444C8 /* SFSafariView.swift in Sources */,
+				18A146B82BEBA69300B4E74F /* ProcessorInfo.swift in Sources */,
 				186E8A382B9B34BA00E65BDE /* ListRowButtonStyle.swift in Sources */,
 				183ECBDF2B747085006C45B2 /* FloatingTitleRow.swift in Sources */,
 				183ECBEC2B747460006C45B2 /* String+Additions.swift in Sources */,
