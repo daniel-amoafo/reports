@@ -57,12 +57,6 @@ final class SecureKeyValueStoreTests: XCTestCase {
         XCTAssertNil(sut.string(forKey: key))
     }
 
-    func removeTestKeyValues() {
-        let testKeys = sut.keys.filter { $0.hasPrefix(Factory.KeyPrefix) }
-        for key in testKeys {
-            sut.removeValue(forKey: key)
-        }
-    }
 }
 
 private enum Factory {

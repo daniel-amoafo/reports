@@ -72,12 +72,13 @@ public class BudgetClient {
 
     public func fetchBudgetSummaries() async {
         do {
+            logger.debug("fetching budget summaries ...")
             let fetchedBudgetSummaries = try await provider.fetchBudgetSummaries()
-            Task {
+            await Task {
                 await MainActor.run {
                     // updating published events on main run loop
                     self.budgetSummaries = IdentifiedArray(uniqueElements: fetchedBudgetSummaries)
-                    // must be logged in to successfully fetch budgetsummaries without error
+                    // must be logged in to successfully fetch budget summaries without error
                     self.authorizationStatus = .loggedIn
 
                     logger.debug("budgetSummaries count(\(self.budgetSummaries.count))")
@@ -88,7 +89,7 @@ public class BudgetClient {
                         logger.debug("selectedBudgetId set to nil")
                     }
                 }
-            }
+            }.value
         } catch {
             await resolveError(error)
         }
@@ -97,6 +98,7 @@ public class BudgetClient {
     /// Fetches account list from budget provider and publishes accounts
     @discardableResult
     public func fetchAccounts() async -> IdentifiedArrayOf<Account> {
+        logger.debug("fetching category accounts...")
         guard let selectedBudgetId, isAuthenticated else { return [] }
         do {
             let fetchedAccounts = try await provider.fetchAccounts(selectedBudgetId)
@@ -114,6 +116,7 @@ public class BudgetClient {
     }
 
     public func fetchCategoryValues() async {
+        logger.debug("fetching category values ...")
         guard let selectedBudgetId, isAuthenticated,
               let currency = budgetSummaries[id: selectedBudgetId]?.currency else { return }
         do {
@@ -139,6 +142,7 @@ public class BudgetClient {
         finishDate: Date,
         filterBy: BudgetProvider.TransactionParameters.FilterByOption? = nil
     ) async throws -> IdentifiedArrayOf<TransactionEntry> {
+        logger.debug("fetching transactions ...")
         guard let selectedBudgetId, let currency = budgetSummaries[id: selectedBudgetId]?.currency else { return [] }
         do {
             let fetchedTransactions = try await provider.fetchTransactions(
@@ -152,10 +156,18 @@ public class BudgetClient {
                 )
             )
                 .filter {
-                    (startDate...finishDate).contains($0.date) &&
+                    // Move filter criteria. Should be provided as an argument
+                    let isOnBudgetAccount: Bool
+                    if let account = accounts[id: $0.accountId] {
+                        isOnBudgetAccount = account.onBudget
+                    } else {
+                        isOnBudgetAccount = false
+                    }
+                    return (startDate...finishDate).contains($0.date) &&
                     $0.categoryGroupName != "Internal Master Category" &&
                     $0.transferAccountId == nil &&
-                    $0.deleted == false
+                    $0.deleted == false &&
+                    isOnBudgetAccount
                 }
             return IdentifiedArray(uniqueElements: fetchedTransactions)
         } catch {

@@ -6,11 +6,15 @@ import Foundation
 enum AppStrings {
     static let doneButtonTitle = String(localized: "Done", comment: "Button title to dismiss the current screen.")
     static let cancelButtonTitle = String(
-        localized: "Cancel", comment: "Button title to stop the current action and return to previous state."
+        localized: "Cancel", comment: "Button title for a cancel action."
     )
     static let saveButtonTitle = String(
         localized: "Save",
-        comment: "Button title to save the current setting or report"
+        comment: "Button title for a save action."
+    )
+    static let okButtonTitle = String(
+        localized: "OK",
+        comment: "Button title for an OK action."
     )
     static let allAccountsName = String(
         localized: "All Accounts",

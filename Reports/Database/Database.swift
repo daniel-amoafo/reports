@@ -11,18 +11,29 @@ struct Database {
 extension Database: DependencyKey {
 
     @MainActor
-    static let liveValue = Self(
-        context: { liveContext }
-    )
+    static let liveValue = {
+        Self(
+            context: {
+                do {
+                    let savedReport = ModelConfiguration("SavedReportModelConfig", schema: Schema([SavedReport.self]))
+
+                    let container = try ModelContainer(for: SavedReport.self, configurations: savedReport)
+                    return ModelContext(container)
+                } catch {
+                    fatalError("Failed to create swift data live container - \(error.localizedDescription)")
+                }
+            }
+        )
+    }()
 
     @MainActor
     static let testValue = Self(
-        context: { testContext }
+        context: { mockContext }
     )
 
     @MainActor
     static let previewValue = Self(
-        context: { previewsContext }
+        context: { mockContext }
     )
 }
 
@@ -35,32 +46,14 @@ extension DependencyValues {
 
 // MARK: -
 
-private let liveContext: ModelContext = {
-    do {
-        let savedReport = ModelConfiguration("SavedReportModelConfig", schema: Schema([SavedReport.self]))
-
-        let container = try ModelContainer(for: SavedReport.self, configurations: savedReport)
-        let ctx = ModelContext(container)
-        ctx.autosaveEnabled = false
-        return ctx
-    } catch {
-        fatalError("Failed to create swift data live container - \(error.localizedDescription)")
-    }
-}()
-
 @MainActor
-private var testContext: ModelContext {
-    unimplemented("\(ModelContext.self).context")
-}
-
-@MainActor
-private var previewsContext: ModelContext {
+private let mockContext: ModelContext = {
     do {
         let savedReport = ModelConfiguration(for: SavedReport.self, isStoredInMemoryOnly: true)
 
         let container = try ModelContainer(for: SavedReport.self, configurations: savedReport)
         let context = ModelContext(container)
-        for report in SavedReport.previews {
+        for report in SavedReport.mocks {
             context.insert(report)
         }
         do {
@@ -72,4 +65,4 @@ private var previewsContext: ModelContext {
     } catch {
         fatalError("Failed to create swift data test container - \(error.localizedDescription)")
     }
-}
+}()

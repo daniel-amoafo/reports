@@ -67,6 +67,7 @@ struct AppFeature {
                 }
 
             case .checkRetryConnection:
+                logger.debug("checkRetryConnection called")
                 if state.authStatus == .unknown {
                     state.showRetryLoading = true
                 }
@@ -146,7 +147,6 @@ struct ReportsApp: App {
             // during tests, dont run main app code as this may conflict with tests runs
             if !_XCTIsTesting {
                 rootView
-                    .modelContext(modelContext)
                     .onOpenURL(perform: { url in
                         store.send(.onOpenURL(url))
                     })
@@ -155,6 +155,7 @@ struct ReportsApp: App {
                     }
             }
         }
+        .modelContext(modelContext)
     }
 
     private var rootView: some View {

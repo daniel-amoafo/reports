@@ -35,7 +35,7 @@
       "comment" : "The home screen main title"
     },
     "Cancel" : {
-      "comment" : "Button title to stop the current action and return to previous state."
+      "comment" : "Button title for a cancel action."
     },
     "Categories" : {
       "comment" : "title for list of categories for the selected data set"
@@ -63,6 +63,9 @@
     },
     "Hmm, something went wrong.\nPlease Try Again" : {
       "comment" : "text displayed when unable to load screen into a valid state. Ask the user to retry"
+    },
+    "Hmmm, the saved report appears invalid. It cannot be opened." : {
+      "comment" : "Message displayed when unable to open a saved report because data is no longer valid"
     },
     "Home" : {
       "comment" : "Home screen tab title name"
@@ -103,6 +106,9 @@
     "No transactions were found for the provided dates" : {
       "comment" : "Error message displayed when no results are found for the selected date range."
     },
+    "OK" : {
+      "comment" : "Button title for an OK action."
+    },
     "Outline" : {
 
     },
@@ -125,13 +131,16 @@
       "comment" : "Generates a new report"
     },
     "Save" : {
-      "comment" : "Button title to save the current setting or report"
+      "comment" : "Button title for a save action."
     },
     "Save New Report?" : {
-      "comment" : "Confirmation message when saving a new report message."
+      "comment" : "Confirmation message when saving a new report."
     },
     "Save Report Name" : {
       "comment" : "Title for alert when a report name is required for saving."
+    },
+    "Saved Report" : {
+      "comment" : "The saved report alert title"
     },
     "Saved Reports" : {
       "comment" : "List Title for Saved Reports\nThe saved reports screen main title"
@@ -186,6 +195,9 @@
     },
     "Uncategorized" : {
       "comment" : "Category title for transactions without a formal category"
+    },
+    "Update Saved Report?" : {
+      "comment" : "Confirmation message when updating an existing saved report."
     },
     "Value" : {
       "comment" : "the key name used by voice over when reading chart values"

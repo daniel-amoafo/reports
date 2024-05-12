@@ -117,6 +117,7 @@ private extension SavedReportQuery {
                         return true
                     }
 
+                    // Save notification did not include inserted or deleted objects
                     return false
                 }
                 .map { _ in }

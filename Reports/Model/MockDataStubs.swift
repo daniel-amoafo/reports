@@ -20,9 +20,9 @@ extension ReportChart {
 extension IdentifiedArray where ID == Account.ID, Element == Account {
 
     static let mocks: Self = [
-        .init(id: "01", name: "Everyday Account", deleted: false),
-        .init(id: "02", name: "Acme Account", deleted: false),
-        .init(id: "03", name: "Appleseed Account", deleted: false),
+        .init(id: "01", name: "Everyday Account", onBudget: true, deleted: false),
+        .init(id: "02", name: "Acme Account", onBudget: true, deleted: false),
+        .init(id: "03", name: "Appleseed Account", onBudget: true, deleted: false),
     ]
 }
 
@@ -300,7 +300,7 @@ extension BudgetClient {
 
 extension SavedReport {
 
-    static let previews: [SavedReport] = {
+    static let mocks: [SavedReport] = {
         [
             .init(
                 id: UUID(uuidString: "00000000-0000-0000-0000-000000000011")!,

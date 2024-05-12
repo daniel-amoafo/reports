@@ -59,7 +59,7 @@ final class ReportInputFeatureTests: XCTestCase {
         XCTAssertFalse(store.state.isRunReportDisabled)
 
         XCTAssertNil(store.state.accounts)
-        let expectedAllAccount = Account(id: "CW_ALL_ACCOUNTS", name: "All Accounts", deleted: false)
+        let expectedAllAccount = Account(id: "CW_ALL_ACCOUNTS", name: "All Accounts", onBudget: true, deleted: false)
         var expectedAccounts = IdentifiedArrayOf<Account>.mocks
         // The buget client service populates accounts. An All Account entry will be added in the onAppear
         // logic if state.account is not initialized with an account list.

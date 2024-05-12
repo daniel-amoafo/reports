@@ -7,12 +7,12 @@ import SwiftData
 final class SavedReport: Identifiable, Equatable {
 
     @Attribute(.unique) let id: UUID
-    let name: String
-    let fromDate: String
-    let toDate: String
-    let chartId: String
-    let selectedAccountId: String?
-    let lastModifield: Date
+    var name: String
+    var fromDate: String
+    var toDate: String
+    var chartId: String
+    var selectedAccountId: String?
+    var lastModifield: Date
 
     init(
         id: UUID = UUID(),

@@ -9,6 +9,7 @@ extension Account {
     init(ynabAccount: SwiftYNAB.Account) {
         self.id = ynabAccount.id
         self.name = ynabAccount.name
+        self.onBudget = ynabAccount.onBudget
         self.deleted = ynabAccount.deleted
     }
 }

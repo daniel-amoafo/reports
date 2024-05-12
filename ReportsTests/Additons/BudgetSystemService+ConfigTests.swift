@@ -97,9 +97,9 @@ private enum Factory {
 extension Array where Element == Account {
 
     static let mocks: Self = [
-        .init(id: "01", name: "First Account", deleted: false),
-        .init(id: "02", name: "Second Account", deleted: false),
-        .init(id: "03", name: "Third Account", deleted: false),
+        .init(id: "01", name: "First Account", onBudget: true, deleted: false),
+        .init(id: "02", name: "Second Account", onBudget: true, deleted: false),
+        .init(id: "03", name: "Third Account", onBudget: true, deleted: false),
     ]
 }
 

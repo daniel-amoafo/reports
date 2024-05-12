@@ -87,3 +87,10 @@ extension ReportChart {
     }
 
 }
+
+extension ReportChart {
+
+    func selectAccountFilter() {
+        
+    }
+}

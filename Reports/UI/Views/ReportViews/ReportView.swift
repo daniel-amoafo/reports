@@ -21,10 +21,8 @@ struct ReportFeature {
         @Presents var confirmationDialog: ConfirmationDialogState<Action.ConfirmationDialog>?
         @Presents var destination: Destination.State?
         var scrollToId: String?
-        var reportUpdated = false
         var showSavedReportNameAlert = false
-
-        fileprivate var savedReportName: String = ""
+        var savedReportName: String = ""
 
         var reportTitle: String {
             guard let savedReportTitle = savedReport?.name else {
@@ -38,13 +36,27 @@ struct ReportFeature {
             "\(inputFields.toDate.formatted(date: .abbreviated, time: .omitted))"
         }
 
+        var hasUnsavedChanges: Bool {
+            if let savedReport {
+                // compare if saved report input fields are equal to current input field values.
+                // if not, there are unsaved changes
+                return !inputFields.isEqual(to: savedReport)
+            }
+
+            if chartGraph != nil {
+                // new report with chart being displayed
+                return true
+            }
+
+            return false
+        }
+
         init(
             sourceData: SourceData,
             chartGraph: ChartGraph.State? = nil,
             confirmationDialog: ConfirmationDialogState<Action.ConfirmationDialog>? = nil,
             destination: Destination.State? = nil,
             scrollToId: String? = nil,
-            reportUpdated: Bool = false,
             showSavedReportNameAlert: Bool = false
         ) throws {
             // Ensure Report is correctly configured with inputField values.
@@ -56,9 +68,7 @@ struct ReportFeature {
             self.confirmationDialog = confirmationDialog
             self.destination = destination
             self.scrollToId = scrollToId
-            self.reportUpdated = reportUpdated
             self.showSavedReportNameAlert = showSavedReportNameAlert
-            self.savedReportName = savedReportName
         }
     }
 
@@ -113,7 +123,9 @@ struct ReportFeature {
                     state.showSavedReportNameAlert = true
                     return .none
                 case .updateExistingReport:
-                    break
+                    state.savedReportName = state.savedReport?.name ?? ""
+                    state.showSavedReportNameAlert = true
+                    return .none
                 case .discard:
                     break
                 }
@@ -126,7 +138,11 @@ struct ReportFeature {
             case let .savedReportName(shouldSave):
                 state.showSavedReportNameAlert = false
                 guard shouldSave else { return .none }
-                saveReport(name: state.savedReportName, inputFields: state.inputFields)
+                saveReport(
+                    name: state.savedReportName,
+                    inputFields: state.inputFields,
+                    existing: state.savedReport
+                )
                 return .run { _ in
                     if isPresented {
                         await dismiss()
@@ -144,7 +160,7 @@ struct ReportFeature {
                 case .line:
                     break
                 }
-                state.reportUpdated = true
+                guard state.chartGraph != nil else { return .none }
                 state.scrollToId = nil
                 return .run { send in
                     await send(.chartDisplayed, animation: .easeInOut)
@@ -160,8 +176,8 @@ struct ReportFeature {
                 return .none
 
             case .doneButtonTapped:
-                if state.reportUpdated {
-                    state.confirmationDialog = makeConfirmSaveDialog()
+                if state.hasUnsavedChanges {
+                    state.confirmationDialog = makeConfirmDialog(isNew: state.savedReport == nil)
                     return .none
                 } else {
                     return .run { _ in
@@ -171,7 +187,14 @@ struct ReportFeature {
                     }
                 }
 
-            case .onAppear, .inputFields, .chartGraph, .binding,
+            case .onAppear:
+                // Run report if we have a Saved Report
+                if state.savedReport != nil {
+                    return state.inputFields.fetchTransactions().map(Action.inputFields)
+                }
+                return .none
+
+            case .inputFields, .chartGraph, .binding,
                 .destination, .confirmationDialog, .showSavedReportNameAlert:
                 return .none
             }
@@ -184,11 +207,11 @@ struct ReportFeature {
 
 private extension ReportFeature {
 
-    func makeConfirmSaveDialog() -> ConfirmationDialogState<Action.ConfirmationDialog> {
+    func makeConfirmDialog(isNew: Bool) -> ConfirmationDialogState<Action.ConfirmationDialog> {
         .init {
             TextState("")
         } actions: {
-            ButtonState(action: .saveNewReport) {
+            ButtonState(action: isNew ? .saveNewReport : .updateExistingReport) {
                 TextState(AppStrings.saveButtonTitle)
             }
             ButtonState(role: .destructive, action: .discard) {
@@ -198,23 +221,35 @@ private extension ReportFeature {
                 TextState(AppStrings.cancelButtonTitle)
             }
         } message: {
-            TextState(Strings.confirmSaveNewReport)
+            TextState(isNew ? Strings.confirmSaveNewReport : Strings.confirmUpdateSavedReport)
         }
     }
 
-    func saveReport(name: String, inputFields: ReportInputFeature.State) {
+    func saveReport(name: String, inputFields: ReportInputFeature.State, existing: SavedReport?) {
         do {
             let selectedAccountId = inputFields.selectedAccountId == Account.allAccountsId ?
             nil : inputFields.selectedAccountId
-            let savedReport = SavedReport(
-                name: name,
-                fromDate: inputFields.fromDateFormatted,
-                toDate: inputFields.toDateFormatted,
-                chartId: inputFields.chart.id,
-                selectedAccountId: selectedAccountId,
-                lastModified: .now
-            )
+
+            let savedReport: SavedReport
+            if let existingReport = existing {
+                existingReport.name = name
+                existingReport.fromDate = inputFields.fromDateFormatted
+                existingReport.toDate = inputFields.toDateFormatted
+                existingReport.selectedAccountId = selectedAccountId
+                existingReport.lastModifield = .now
+                savedReport = existingReport
+            } else {
+                savedReport = SavedReport(
+                    name: name,
+                    fromDate: inputFields.fromDateFormatted,
+                    toDate: inputFields.toDateFormatted,
+                    chartId: inputFields.chart.id,
+                    selectedAccountId: selectedAccountId,
+                    lastModified: .now
+                )
+            }
             try savedReportQuery.add(savedReport)
+
         } catch {
             logger.error("\(error.localizedDescription)")
         }
@@ -240,7 +275,7 @@ struct ReportView: View {
         }
         .confirmationDialog($store.scope(state: \.confirmationDialog, action: \.confirmationDialog))
         .alert(
-            Text(Strings.saveReportAlertTitle),
+            Strings.saveReportAlertTitle,
             isPresented: $store.showSavedReportNameAlert.sending(\.showSavedReportNameAlert),
             actions: {
                 TextField(Strings.saveReportPlaceholder, text: $store.savedReportName)
@@ -340,7 +375,10 @@ private extension ReportView {
 private enum Strings {
     static let newReportTitle = String(localized: "New Report", comment: "the title when a new report is being created")
     static let confirmSaveNewReport = String(
-        localized: "Save New Report?", comment: "Confirmation message when saving a new report message."
+        localized: "Save New Report?", comment: "Confirmation message when saving a new report."
+    )
+    static let confirmUpdateSavedReport = String(
+        localized: "Update Saved Report?", comment: "Confirmation message when updating an existing saved report."
     )
     static let confirmDiscard = String(localized: "Discard", comment: "Confirmation action to not save changes & exit")
     static let saveReportAlertTitle = String(
@@ -434,8 +472,7 @@ private extension ReportFeature {
                     selectedAccountId: selectedAccountId
                 )
             ),
-            chartGraph: .spendingByTotal(.init(transactions: .mocks)),
-            reportUpdated: true
+            chartGraph: .spendingByTotal(.init(transactions: .mocks))
         )
     }
 

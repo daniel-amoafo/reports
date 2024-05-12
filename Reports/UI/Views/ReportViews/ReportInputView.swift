@@ -46,6 +46,39 @@ struct ReportInputFeature {
 
         var fromDateFormatted: String { Date.iso8601Formatter.string(from: fromDate) }
         var toDateFormatted: String { Date.iso8601Formatter.string(from: toDate) }
+
+        func isEqual(to savedReport: SavedReport) -> Bool {
+            savedReport.fromDate == fromDateFormatted &&
+            savedReport.toDate == toDateFormatted &&
+            (savedReport.selectedAccountId == nil || savedReport.selectedAccountId == selectedAccountId)
+        }
+
+        /// The fetchTransaction shared code called from elsewhere like the ReportView
+        /// It's defined in the state function to allow the shared reuse in a performant type manner.
+        /// see https://pointfreeco.github.io/swift-composable-architecture/main/documentation/composablearchitecture/performance/#Sharing-logic-with-actions
+        mutating func fetchTransactions() -> Effect<ReportInputFeature.Action> {
+            guard !isReportFetching else { return .none }
+            fetchStatus = .fetching
+            let filterBy: BudgetProvider.TransactionParameters.FilterByOption?
+            if let selectedId = selectedAccountId, selectedId != Account.allAccountsId {
+                filterBy = .account(accountId: selectedId)
+            } else {
+                filterBy = nil
+            }
+            let fromDate = self.fromDate
+            let toDate = self.toDate
+            return .run { send in
+                do {
+                    @Dependency(\.budgetClient) var budgetClient
+                    let transactions = try await budgetClient
+                        .fetchTransactions(startDate: fromDate, finishDate: toDate, filterBy: filterBy)
+                    await send(.fetchedTransactionsReponse(transactions))
+                } catch {
+                    let logger = LogFactory.create(category: "ReportInput.State")
+                    logger.error("fetch transactions error: - \(error.localizedDescription)")
+                }
+            }
+        }
     }
 
     enum Action {
@@ -95,11 +128,7 @@ struct ReportInputFeature {
                 return .none
 
             case .runReportTapped:
-                guard !state.isReportFetching else { return .none }
-                state.fetchStatus = .fetching
-                return .run { [state] send in
-                    await fetchTransactions(state: state, send: send)
-                }
+                return state.fetchTransactions()
 
             case let .fetchedTransactionsReponse(transactions):
                 if transactions.isEmpty {
@@ -131,23 +160,6 @@ struct ReportInputFeature {
                 }
                 return .none
             }
-        }
-    }
-}
-
-private extension ReportInputFeature {
-
-    func fetchTransactions(state: ReportInputFeature.State, send: Send<ReportInputFeature.Action>) async {
-        do {
-            var filterBy: BudgetProvider.TransactionParameters.FilterByOption?
-            if let selectedId = state.selectedAccountId, selectedId != Account.allAccountsId {
-                filterBy = .account(accountId: selectedId)
-            }
-            let transactions = try await budgetClient
-                .fetchTransactions(startDate: state.fromDate, finishDate: state.toDate, filterBy: filterBy)
-            await send(.fetchedTransactionsReponse(transactions))
-        } catch {
-            logger.error("error: - \(error.localizedDescription)")
         }
     }
 }

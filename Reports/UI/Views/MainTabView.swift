@@ -14,6 +14,7 @@ struct MainTab {
         var home = HomeFeature.State()
         var savedReports = SavedReportsFeature.State()
         @Presents var report: ReportFeature.State?
+        @Presents var alert: AlertState<Action.Alert>?
     }
 
     enum Action {
@@ -22,6 +23,10 @@ struct MainTab {
         case report(PresentationAction<ReportFeature.Action>)
         case showSavedReport
         case selectTab(Tab)
+        case alert(PresentationAction<Alert>)
+
+        @CasePathable
+        enum Alert: Equatable { }
     }
 
     let logger = LogFactory.create(category: "MainTab")
@@ -41,10 +46,10 @@ struct MainTab {
 
             case let .home(.delegate(.presentReport(source))):
                 do {
-                    state.report = try .init(sourceData: source)
+                    state.report = try ReportFeature.State(sourceData: source)
                 } catch {
                     logger.error("\(error.localizedDescription)")
-                    // display user friendly error message
+                    state.alert = .unableToOpenSavedReport
                 }
                 return .none
 
@@ -53,7 +58,7 @@ struct MainTab {
                     state.report = try .init(sourceData: .existing(savedReport))
                 } catch {
                     logger.error("\(error.localizedDescription)")
-                    // display user friendly error message
+                    state.alert = .unableToOpenSavedReport
                 }
                 return .none
 
@@ -61,10 +66,11 @@ struct MainTab {
                 state.currentTab = tab
                 return .none
 
-            case .home, .savedReports, .showSavedReport, .report:
+            case .home, .savedReports, .showSavedReport, .report, .alert:
                 return .none
             }
         }
+        .ifLet(\.$alert, action: \.alert)
         .ifLet(\.$report, action: \.report) {
             ReportFeature()
         }
@@ -106,6 +112,7 @@ struct MainTabView: View {
             }
             .toolbarBackground(.visible, for: .tabBar)
         }
+        .alert($store.scope(state: \.alert, action: \.alert))
         .fullScreenCover(item: $store.scope(state: \.report, action: \.report)) { store in
             NavigationStack {
                 ReportView(store: store)
@@ -122,6 +129,30 @@ private extension MainTabView {
             Image(systemName: tab.imageName)
         }
     }
+}
+
+private extension AlertState {
+
+    static var unableToOpenSavedReport: Self {
+        AlertState {
+            TextState(Strings.savedReportAlert)
+        } actions: {
+            ButtonState(role: .cancel) {
+                TextState(AppStrings.okButtonTitle)
+            }
+        } message: {
+            TextState(Strings.savedReportMessage)
+        }
+    }
+}
+
+private enum Strings {
+    static let savedReportAlert = String(localized: "Saved Report", comment: "The saved report alert title")
+
+    static let savedReportMessage = String(
+        localized: "Hmmm, the saved report appears invalid. It cannot be opened.",
+        comment: "Message displayed when unable to open a saved report because data is no longer valid"
+    )
 }
 
 // MARK: - Preview

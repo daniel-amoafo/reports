@@ -48,22 +48,22 @@ struct SavedReportsFeature {
                 let reportsToDelete = offsets.map { index in
                     state.savedReports[index]
                 }
-//                debugPrint("before savedReports - \(state.savedReports.count)")
-//                state.savedReports = state.savedReports.filter { !reportsToDelete.contains($0) }
-//                debugPrint("after savedReports - \(state.savedReports.count)")
                 deleteSavedReports(reportsToDelete)
                 return .none
+
             case .didUpdateSavedReports:
-                state.savedReports = fetchSavedReports()
-                return .none
+                return fetchSavedReports(state: &state)
+
             case .onAppear:
-                return .send(.didUpdateSavedReports)
+                return fetchSavedReports(state: &state)
+
             case .onTask:
                 return .run { send in
                     for await _ in await savedReportQuery.didUpdateNotification() {
                         await send(.didUpdateSavedReports, animation: .smooth)
                     }
                 }
+
             case .delegate:
                 return .none
             }
@@ -73,12 +73,13 @@ struct SavedReportsFeature {
 
 fileprivate extension SavedReportsFeature {
 
-    func fetchSavedReports() -> [SavedReport] {
+    func fetchSavedReports(state: inout State) -> Effect<Action> {
         do {
-            return try savedReportQuery.fetchAll()
+            state.savedReports = try savedReportQuery.fetchAll()
+            return .none
         } catch {
             logger.error("\(error.localizedDescription)")
-            return []
+            return .none
         }
     }
 

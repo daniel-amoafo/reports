@@ -15,7 +15,7 @@ struct HomeFeature {
         var charts: [ReportChart] = []
         var savedReports: [SavedReport] = []
         var savedReportsCount: Int = 0
-        var showSelectBudgetScreen = false
+        var showSelectBudget = false
 
         var selectedBudgetName: String? {
             guard let selectedBudgetId else { return nil }
@@ -55,7 +55,11 @@ struct HomeFeature {
         Reduce { state, action in
             switch action {
             case .didTapSelectBudgetButton:
-                state.showSelectBudgetScreen = true
+                state.showSelectBudget = true
+                return .none
+
+            case let .showSelectBudgetTapped(isPresented):
+                state.showSelectBudget = isPresented
                 return .none
 
             case let .didUpdateSelectedBudgetId(selectedBudgetId):
@@ -100,7 +104,7 @@ struct HomeFeature {
                     }
                 }
 
-            case .delegate, .showSelectBudgetTapped:
+            case .delegate:
                 return .none
             }
         }
@@ -217,7 +221,7 @@ private extension HomeView {
             .buttonStyle(.listRowSingle)
             .backgroundShadow()
             .padding(.horizontal)
-            .popover(isPresented: $store.showSelectBudgetScreen.sending(\.showSelectBudgetTapped)) {
+            .popover(isPresented: $store.showSelectBudget.sending(\.showSelectBudgetTapped)) {
                 if let budgetList = store.budgetList {
                     SelectListView<BudgetSummary>(
                         items: budgetList,

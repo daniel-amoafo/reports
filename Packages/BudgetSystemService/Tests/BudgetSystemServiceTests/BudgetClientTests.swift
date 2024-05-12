@@ -140,9 +140,9 @@ private enum Factory {
 
     static var accounts: [Account] {
         [
-            .init(id: "01", name: "First", deleted: false),
-            .init(id: "02", name: "Second", deleted: false),
-            .init(id: "03", name: "Third", deleted: false),
+            .init(id: "01", name: "First", onBudget: true, deleted: false),
+            .init(id: "02", name: "Second", onBudget: true, deleted: false),
+            .init(id: "03", name: "Third", onBudget: true, deleted: false),
         ]
     }
 

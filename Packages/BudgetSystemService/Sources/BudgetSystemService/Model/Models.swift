@@ -8,12 +8,14 @@ public struct Account: Identifiable, Equatable, CustomStringConvertible {
 
     public var id: String
     public var name: String
+    public var onBudget: Bool
     public var deleted: Bool
     public var description: String { name }
 
-    public init(id: String, name: String, deleted: Bool) {
+    public init(id: String, name: String, onBudget: Bool, deleted: Bool) {
         self.id = id
         self.name = name
+        self.onBudget = onBudget
         self.deleted = deleted
     }
 }
