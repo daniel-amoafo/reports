@@ -13,6 +13,7 @@ struct SpendingTotalChartFeature {
 
     @ObservableState
     struct State: Equatable {
+        let title: String
         let transactions: IdentifiedArrayOf<TransactionEntry>
         var contentType: SpendingTotalChartFeature.ContentType
 
@@ -29,9 +30,11 @@ struct SpendingTotalChartFeature {
         fileprivate var catgoriesForCategoryGroupName: String?
 
         init(
+            title: String,
             transactions: IdentifiedArrayOf<TransactionEntry>,
             contentType: SpendingTotalChartFeature.ContentType = .categoryGroup
         ) {
+            self.title = title
             self.transactions = transactions
             self.contentType = contentType
             let (groups, categories) = TabulatedDataItem.makeCategoryValues(transactions: transactions)
@@ -48,18 +51,37 @@ struct SpendingTotalChartFeature {
             }
         }
 
-        var listSubTitle: String {
+        var totalName: String {
             switch contentType {
-            case .categoryGroup, .categoriesByCategoryGroup:
-                return Strings.listSubTitleAllCategories
+            case .categoryGroup:
+                return Strings.allCategoriesTitle
+            case .categoriesByCategoryGroup:
+                return String(format: Strings.categoryNameTotal, (catgoriesForCategoryGroupName ?? ""))
             }
         }
 
-        var isListSubTitleALink: Bool {
+        var totalValue: String {
+            let selected = selectedContent
+            guard let currency = selected.elements.first?.currency else {
+                debugPrint("The selected entry has zero categories")
+                return ""
+            }
+            let total = selected.map(\.value).reduce(.zero) { $0 + $1 }
+            return Money(total, currency: currency).amountFormatted
+        }
+
+        var listSubTitle: String {
+            switch contentType {
+            case .categoryGroup, .categoriesByCategoryGroup:
+                return Strings.allCategoriesTitle
+            }
+        }
+
+        var isDisplayingSubCategory: Bool {
             contentType == .categoriesByCategoryGroup
         }
 
-        var listBreadcrumbTitle: String? {
+        var maybeCategoryName: String? {
             switch contentType {
             case .categoryGroup:
                 return nil
@@ -67,14 +89,13 @@ struct SpendingTotalChartFeature {
                 return catgoriesForCategoryGroupName
             }
         }
-
     }
 
     enum Action: BindableAction {
         case binding(BindingAction<State>)
         case delegate(Delegate)
         case listRowTapped(id: String)
-        case listSubTitleTapped
+        case subTitleTapped
 
         @CasePathable
         enum Delegate {
@@ -139,7 +160,7 @@ struct SpendingTotalChartFeature {
                 }
                 return .none
 
-            case .listSubTitleTapped:
+            case .subTitleTapped:
                 state.contentType = .categoryGroup
                 state.catgoriesForCategoryGroup = []
                 state.catgoriesForCategoryGroupName = nil
@@ -166,11 +187,38 @@ struct SpendingTotalChartView: View {
 
     var body: some View {
         VStack(spacing: .Spacing.pt24) {
+            titles
+
             chart
 
             Divider()
 
             listRows
+        }
+    }
+
+    private var titles: some View {
+        VStack {
+            Text(store.title)
+                .typography(.title3Emphasized)
+                .foregroundStyle(Color.Text.secondary)
+            Group {
+                if let categoryName = store.maybeCategoryName {
+                    Button {
+                        store.send(.subTitleTapped, animation: .smooth)
+                    } label: {
+                        HStack {
+                            Text("⬅️")
+                            Text(categoryName)
+                        }
+                    }
+                } else {
+                    Text(Strings.allCategoriesTitle)
+                }
+            }
+            .font(Typography.subheadlineEmphasized.font)
+            .foregroundStyle(Color.Text.primary)
+
         }
     }
 
@@ -193,15 +241,13 @@ struct SpendingTotalChartView: View {
             .chartAngleSelection(value: $store.rawSelectedGraphValue)
             .chartOverlay { chartProxy in
                 GeometryReader { geometry in
-                    if let plotFrame = chartProxy.plotFrame,
-                       let name = store.selectedGraphItem?.name,
-                       let amount = store.selectedGraphItem?.valueFormatted {
+                    if let plotFrame = chartProxy.plotFrame {
                         let frame = geometry[plotFrame]
                         VStack {
-                            Text(name)
+                            Text(store.selectedGraphItem?.name ?? store.totalName)
                                 .typography(.title3Emphasized)
                                 .foregroundStyle(Color.Text.secondary)
-                            Text(amount)
+                            Text(store.selectedGraphItem?.valueFormatted ?? store.totalValue)
                                 .typography(.title2Emphasized)
                                 .foregroundStyle(Color.Text.primary)
                         }
@@ -226,20 +272,20 @@ struct SpendingTotalChartView: View {
                     Text(store.listSubTitle)
                         .typography(.bodyEmphasized)
                         .foregroundStyle(
-                            store.isListSubTitleALink ? Color.Text.link : Color.Text.secondary
+                            store.isDisplayingSubCategory ? Color.Text.link : Color.Text.secondary
                         )
                         .onTapGesture {
-                            if store.isListSubTitleALink {
-                                store.send(.listSubTitleTapped, animation: .default)
+                            if store.isDisplayingSubCategory {
+                                store.send(.subTitleTapped, animation: .default)
                             }
                         }
-                        .accessibilityAddTraits(store.isListSubTitleALink ? .isButton : [])
+                        .accessibilityAddTraits(store.isDisplayingSubCategory ? .isButton : [])
                         .accessibilityAction {
-                            if store.isListSubTitleALink {
-                                store.send(.listSubTitleTapped, animation: .default)
+                            if store.isDisplayingSubCategory {
+                                store.send(.subTitleTapped, animation: .default)
                             }
                         }
-                    if let breadcrumbTitle = store.listBreadcrumbTitle {
+                    if let breadcrumbTitle = store.maybeCategoryName {
                         Image(systemName: "chevron.right")
                             .resizable()
                             .scaledToFit()
@@ -298,9 +344,13 @@ private enum Strings {
         localized: "Categories",
         comment: "title for list of categories for the selected data set"
     )
-    static let listSubTitleAllCategories = String(
+    static let allCategoriesTitle = String(
         localized: "All Categories",
         comment: "The collective name for top level category groups"
+    )
+    static let categoryNameTotal = String(
+        localized: "%@ Total",
+        comment: "A category total. %@ = The selected category "
     )
     static let chartValueKey = String(
         localized: "Value",
@@ -317,7 +367,7 @@ private enum Strings {
 #Preview {
     ScrollView {
         SpendingTotalChartView(
-            store: .init(initialState: .init(transactions: .mocks)) {
+            store: .init(initialState: .init(title: "My Chart Name", transactions: .mocks)) {
                  SpendingTotalChartFeature()
             }
         )

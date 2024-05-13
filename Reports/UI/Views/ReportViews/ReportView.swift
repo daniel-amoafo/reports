@@ -150,9 +150,10 @@ struct ReportFeature {
                 }
 
             case let .inputFields(.delegate(.fetchedTransactions(transactions))):
+                let chartTitle = state.inputFields.chart.name
                 switch state.inputFields.chart.type {
                 case .spendingByTotal:
-                    state.chartGraph = .spendingByTotal(.init(transactions: transactions))
+                    state.chartGraph = .spendingByTotal(.init(title: chartTitle, transactions: transactions))
                 case .spendingByTrend:
                     break
                 case .incomeExpensesTable:
@@ -472,7 +473,7 @@ private extension ReportFeature {
                     selectedAccountId: selectedAccountId
                 )
             ),
-            chartGraph: .spendingByTotal(.init(transactions: .mocks))
+            chartGraph: .spendingByTotal(.init(title: "Spending By Total", transactions: .mocks))
         )
     }
 

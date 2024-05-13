@@ -13,10 +13,16 @@
     "%@" : {
 
     },
-    "A bar chart showing spending trends" : {
+    "%@ Total" : {
+      "comment" : "A category total. %@ = The selected category "
+    },
+    "⬅️" : {
+
+    },
+    "A bar chart showing spending trends." : {
       "comment" : "description text of the spending trend chart"
     },
-    "A pie chart showing spending totals by category" : {
+    "A pie chart showing spending totals by category for budget accounts." : {
       "comment" : "description text of the spending total chart"
     },
     "A table summarising income & expenses for each category in a month" : {
@@ -71,7 +77,7 @@
       "comment" : "Home screen tab title name"
     },
     "Income v Expense" : {
-      "comment" : "The title for a chart displaying income and expenses"
+      "comment" : "The title for a chart displaying income and expenses."
     },
     "Login into YNAB" : {
 
@@ -176,7 +182,7 @@
       "comment" : "The title for a chart displaying spending totals by category"
     },
     "Spending Trend" : {
-      "comment" : "The title for a chart displaying spending by trend"
+      "comment" : "The title for a chart displaying spending by trend for budget accounts."
     },
     "This is a bottom row" : {
 

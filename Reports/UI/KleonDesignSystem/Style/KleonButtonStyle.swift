@@ -98,7 +98,7 @@ extension KleonButtonStyle.Theme {
         case .primary, .secondary:
             baseColor = .clear
         case .outline:
-            baseColor = isPressed ? .gray : Color.Button.outline
+            baseColor = Color.Button.outline
         }
         guard isPressed else {
             return baseColor
