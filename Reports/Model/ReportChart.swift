@@ -1,33 +1,32 @@
 // Created by Daniel Amoafo on 9/3/2024.
 
+import BudgetSystemService
 import IdentifiedCollections
 import SwiftUI
 
 struct ReportChart: Identifiable, Equatable {
-    let id: String
+    let type: ChartType
     let name: String
     let description: String
-    let type: ChartType
+
+    var id: String { type.id }
 
     static let defaultCharts: IdentifiedArrayOf<Self> = {
         [
             .init(
-                id: "spendingTotal",
+                type: .spendingByTotal,
                 name: Strings.spendingTotalTitle,
-                description: Strings.spendingTotalDescription,
-                type: .spendingByTotal
+                description: Strings.spendingTotalDescription
             ),
             .init(
-                id: "spendingTrend",
+                type: .spendingByTrend,
                 name: Strings.spendingTrendTitle,
-                description: Strings.spendingTrendDescription,
-                type: .spendingByTrend
+                description: Strings.spendingTrendDescription
             ),
             .init(
-                id: "incomeVexpense",
+                type: .incomeExpensesTable,
                 name: Strings.incomeExpenseTitle,
-                description: Strings.incomeExpenseDescription,
-                type: .incomeExpensesTable
+                description: Strings.incomeExpenseDescription
             ),
         ]
     }()
@@ -42,6 +41,15 @@ enum ChartType: Equatable {
     case spendingByTrend
     case incomeExpensesTable
     case line
+
+    var id: String {
+        switch self {
+        case .spendingByTotal: return "spendingTotal"
+        case .spendingByTrend: return "spendingTrend"
+        case .incomeExpensesTable: return "incomeVexpense"
+        case .line: return "line"
+        }
+    }
 
     var image: Image {
         switch self {
@@ -65,20 +73,20 @@ extension ReportChart {
             comment: "The title for a chart displaying spending totals by category"
         )
         static let spendingTotalDescription = String(
-            localized: "A pie chart showing spending totals by category",
+            localized: "A pie chart showing spending totals by category for budget accounts.",
             comment: "description text of the spending total chart"
         )
         static let spendingTrendTitle = String(
             localized: "Spending Trend",
-            comment: "The title for a chart displaying spending by trend"
+            comment: "The title for a chart displaying spending by trend for budget accounts."
         )
         static let spendingTrendDescription = String(
-            localized: "A bar chart showing spending trends",
+            localized: "A bar chart showing spending trends.",
             comment: "description text of the spending trend chart"
         )
         static let incomeExpenseTitle = String(
             localized: "Income v Expense",
-            comment: "The title for a chart displaying income and expenses"
+            comment: "The title for a chart displaying income and expenses."
         )
         static let incomeExpenseDescription = String(
             localized: "A table summarising income & expenses for each category in a month",
@@ -90,7 +98,25 @@ extension ReportChart {
 
 extension ReportChart {
 
-    func selectAccountFilter() {
-        
+    /// Defines what accounts are  available for a given report type
+    func eligibleAccountsFiltered(unfilteredAccounts: IdentifiedArrayOf<Account>) -> IdentifiedArrayOf<Account> {
+        let filtered: [Account]
+        switch self.type {
+        case .spendingByTotal:
+            filtered = Self.onBudgetAccountFilter(unfilteredAccounts.elements)
+        case .spendingByTrend:
+            filtered = Self.onBudgetAccountFilter(unfilteredAccounts.elements)
+        case .incomeExpensesTable:
+            filtered = unfilteredAccounts.elements
+        case .line:
+            filtered = unfilteredAccounts.elements
+        }
+        return .init(uniqueElements: filtered)
+    }
+
+    private static func onBudgetAccountFilter(_ accounts: [Account]) -> [Account] {
+        accounts.filter {
+            $0.onBudget == true
+        }
     }
 }

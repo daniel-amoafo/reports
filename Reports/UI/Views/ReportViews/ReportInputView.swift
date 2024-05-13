@@ -150,8 +150,9 @@ struct ReportInputFeature {
             case .onAppear:
                 if state.accounts == nil {
                     guard budgetClient.accounts.isNotEmpty else { return .none }
-                    // by default show transactions for all eligble accounts
-                    var accounts = budgetClient.accounts
+                    // by default show transactions for all eligble accounts for the chart type
+                    var accounts =  state.chart
+                        .eligibleAccountsFiltered(unfilteredAccounts: budgetClient.accounts)
                     let allAccounts = Account.allAccounts
                     if accounts.insert(allAccounts, at: 0).inserted {
                         state.selectedAccountId = allAccounts.id
