@@ -34,6 +34,9 @@
     "All Categories" : {
       "comment" : "The collective name for top level category groups"
     },
+    "Amount" : {
+
+    },
     "Aug 23 - Dec 23, Main Budget" : {
 
     },
@@ -46,8 +49,14 @@
     "Categories" : {
       "comment" : "title for list of categories for the selected data set"
     },
+    "Category" : {
+
+    },
     "Chart" : {
       "comment" : "the title name for the chart section"
+    },
+    "Date" : {
+
     },
     "Discard" : {
       "comment" : "Confirmation action to not save changes & exit"
@@ -91,6 +100,9 @@
     "Mode" : {
 
     },
+    "Month" : {
+
+    },
     "More Info" : {
       "comment" : "the title to as ection that displays more descriptive text about the chart"
     },
@@ -116,6 +128,9 @@
       "comment" : "Button title for an OK action."
     },
     "Outline" : {
+
+    },
+    "Outline Compact" : {
 
     },
     "Please select an account for the report" : {
@@ -210,6 +225,9 @@
     },
     "View All (%d)" : {
       "comment" : "Move to the Saved Report screen. Displays count of reports saved."
+    },
+    "Year" : {
+
     }
   },
   "version" : "1.0"

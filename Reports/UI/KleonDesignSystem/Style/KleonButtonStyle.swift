@@ -12,17 +12,18 @@ struct KleonButtonStyle: ButtonStyle {
     @Environment(\.colorScheme) private var colorScheme
 
     let theme: Theme
+    var compactWidth: Bool = false
     var typography: Typography = .title3Emphasized
 
     func makeBody(configuration: Configuration) -> some View {
         let isDarkColorScheme = colorScheme == .dark
         return configuration
             .label
-            .frame(maxWidth: .infinity)
+            .frame(maxWidth: compactWidth ? nil : .infinity)
             .font(typography.font)
             .foregroundStyle(theme.color(isPressed: configuration.isPressed, isEnabled: isEnabled))
             .padding(.horizontal, .Spacing.pt12)
-            .padding(.vertical, .Spacing.pt8)
+            .padding(.vertical, theme == .outline ? 2.0 : .Spacing.pt8)
             .background(
                 backgroundShape
                     .fill(
@@ -121,6 +122,9 @@ extension ButtonStyle where Self == KleonButtonStyle {
         KleonButtonStyle(theme: .outline)
     }
 
+    static func kleonOutlinef(compactWidth: Bool) -> Self {
+        KleonButtonStyle(theme: .outline, compactWidth: compactWidth)
+    }
 }
 
 #Preview {
@@ -136,6 +140,9 @@ extension ButtonStyle where Self == KleonButtonStyle {
 
         Button("Outline", action: {})
             .buttonStyle(.kleonOutline)
+
+        Button("Outline Compact", action: {})
+            .buttonStyle(.kleonOutlinef(compactWidth: true))
     }
     .padding(.horizontal)
 }

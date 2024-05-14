@@ -11,12 +11,14 @@ struct ReportInputFeature {
     struct State: Equatable {
         let chart: ReportChart
         var showChartMoreInfo = false
-        var fromDate: Date = .now
-        var toDate: Date = .aWeekFrom(.now)
+        var fromDate: Date = .now.advanceMonths(by: -1, strategy: .firstDay) // first day, last month
+        var toDate: Date = .now.advanceMonths(by: 0, strategy: .lastDay) // last day, current month
         var accounts: IdentifiedArrayOf<Account>?
         var selectedAccountId: String?
         var showAccountList = false
         var fetchStatus: Action.FetchStatus = .ready
+        var popoverFromDate = false
+        var popoverToDate = false
 
         var selectedAccountName: String? {
             guard let selectedAccountId else { return nil }
@@ -88,6 +90,8 @@ struct ReportInputFeature {
         case updateToDateTapped(Date)
         case selectAccountRowTapped(Bool)
         case didSelectAccountId(String?)
+        case setPopoverFromDate(Bool)
+        case setPopoverToDate(Bool)
         case runReportTapped
         case fetchedTransactionsReponse(IdentifiedArrayOf<TransactionEntry>)
         case onAppear
@@ -116,15 +120,29 @@ struct ReportInputFeature {
                 state.showChartMoreInfo = !state.showChartMoreInfo
                 return .none
 
+            case let .setPopoverFromDate(isPresented):
+                state.popoverFromDate = isPresented
+                return .none
+
+            case let .setPopoverToDate(isPresented):
+                state.popoverToDate = isPresented
+                return .none
+
             case .delegate:
-              return .none
+                return .none
 
             case let .updateFromDateTapped(fromDate):
+                // if from date is greater than toDate, update toDate to be last day in that month
+                if fromDate > state.toDate {
+                    state.toDate = fromDate.lastDayInMonth()
+                }
                 state.fromDate = fromDate
                 return .none
 
             case let .updateToDateTapped(toDate):
-                state.toDate = toDate
+                // Ensure date ranges are valid
+                let cleanedToDate = toDate < state.fromDate ? state.fromDate.lastDayInMonth() : toDate
+                state.toDate = cleanedToDate
                 return .none
 
             case .runReportTapped:
@@ -159,6 +177,10 @@ struct ReportInputFeature {
                     }
                     state.accounts = accounts
                 }
+                // Ensure provided date is first day of month in FromDate
+                // and last day of month ToDate
+                state.fromDate = state.fromDate.firstDayInMonth()
+                state.toDate = state.toDate.lastDayInMonth()
                 return .none
             }
         }
@@ -274,27 +296,56 @@ struct ReportInputView: View {
                 })
 
             VStack {
-                DatePicker(
-                    selection: $store.fromDate.sending(\.updateFromDateTapped),
-                    displayedComponents: .date,
-                    label: {
-                        Text(Strings.fromDateTitle)
-                            .typography(.bodyEmphasized)
-                            .alignmentGuide(.iconAndTitleAlignment, computeValue: { dimension in
-                                dimension[VerticalAlignment.center]
-                            })
-                    }
-                )
+                // From Date
+                HStack {
+                    Text(Strings.fromDateTitle)
+                        .typography(.bodyEmphasized)
+                        .alignmentGuide(.iconAndTitleAlignment, computeValue: { dimension in
+                            dimension[VerticalAlignment.center]
+                        })
 
-                DatePicker(
-                    selection: $store.toDate.sending(\.updateToDateTapped),
-                    in: store.fromDate...,
-                    displayedComponents: .date,
-                    label: {
-                        Text(Strings.toDateTitle)
-                            .typography(.bodyEmphasized)
+                    Spacer()
+
+                    Button {
+                        store.send(.setPopoverFromDate(true))
+                    } label: {
+                        Text(store.fromDate.inputFieldFormat)
+                            .typography(.title3Emphasized)
+                            .foregroundStyle(Color.Text.primary)
                     }
-                )
+                    .buttonStyle(.kleonOutlinef(compactWidth: true))
+                    .popover(isPresented: $store.popoverFromDate.sending(\.setPopoverFromDate)) {
+                        MonthYearPickerView(
+                            selection: $store.fromDate.sending(\.updateFromDateTapped), strategy: .firstDay
+                        )
+                        .presentationCompactAdaptation(.popover)
+                    }
+                }
+
+                // To Date
+                HStack {
+                    Text(Strings.toDateTitle)
+                        .typography(.bodyEmphasized)
+
+                    Spacer()
+
+                    Button {
+                        store.send(.setPopoverToDate(true))
+                    } label: {
+                        Text(store.toDate.inputFieldFormat)
+                            .typography(.title3Emphasized)
+                            .foregroundStyle(Color.Text.primary)
+                    }
+                    .buttonStyle(.kleonOutlinef(compactWidth: true))
+                    .popover(isPresented: $store.popoverToDate.sending(\.setPopoverToDate)) {
+                        MonthYearPickerView(
+                            selection: $store.toDate.sending(\.updateToDateTapped),
+                            in: store.fromDate...,
+                            strategy: .lastDay
+                        )
+                        .presentationCompactAdaptation(.popover)
+                    }
+                }
             }
             .foregroundStyle(Color.Text.secondary)
         }

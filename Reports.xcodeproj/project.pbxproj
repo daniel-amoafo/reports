@@ -25,6 +25,7 @@
 		183ECBED2B747460006C45B2 /* Collection+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 183ECBE92B747460006C45B2 /* Collection+Additions.swift */; };
 		183ECBEE2B747460006C45B2 /* Array+Safe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 183ECBEA2B747460006C45B2 /* Array+Safe.swift */; };
 		183ECBF12B748E90006C45B2 /* HorizontalDivider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 183ECBF02B748E90006C45B2 /* HorizontalDivider.swift */; };
+		183F17052BF24186003C1334 /* MonthYearPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 183F17042BF24186003C1334 /* MonthYearPickerView.swift */; };
 		184DF0B72B6E1C3E00BA6F21 /* ReportsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184DF0B62B6E1C3E00BA6F21 /* ReportsApp.swift */; };
 		184DF0BB2B6E1C3E00BA6F21 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 184DF0BA2B6E1C3E00BA6F21 /* Assets.xcassets */; };
 		184DF0BF2B6E1C3E00BA6F21 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 184DF0BE2B6E1C3E00BA6F21 /* Preview Assets.xcassets */; };
@@ -50,6 +51,7 @@
 		186E8A442B9C3AD500E65BDE /* KleonButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186E8A432B9C3AD500E65BDE /* KleonButtonStyle.swift */; };
 		186E8A462B9C4BB500E65BDE /* Color+Adjust.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186E8A452B9C4BB500E65BDE /* Color+Adjust.swift */; };
 		1882CF4E2BDE3D7200EA0B05 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 1882CF4D2BDE3D7200EA0B05 /* Localizable.xcstrings */; };
+		188A8E402BF21D1E00938B81 /* SpendingTrendChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 188A8E3F2BF21D1E00938B81 /* SpendingTrendChartView.swift */; };
 		1894264B2BDFB6D700C06018 /* AppStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1894264A2BDFB6D700C06018 /* AppStrings.swift */; };
 		189641AF2B9C72BE00716258 /* AnimationConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189641AE2B9C72BE00716258 /* AnimationConstants.swift */; };
 		189641BB2B9C8CFE00716258 /* ReportChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189641BA2B9C8CFD00716258 /* ReportChart.swift */; };
@@ -57,6 +59,7 @@
 		189641C12B9D67CE00716258 /* SavedReportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189641C02B9D67CE00716258 /* SavedReportsView.swift */; };
 		18A146B82BEBA69300B4E74F /* ProcessorInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A146B72BEBA69300B4E74F /* ProcessorInfo.swift */; };
 		18A146BA2BECF73B00B4E74F /* ReportFeatureSourceLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A146B92BECF73B00B4E74F /* ReportFeatureSourceLoader.swift */; };
+		18A1AE272BF339E10013EAD3 /* Date+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A1AE262BF339E10013EAD3 /* Date+Additions.swift */; };
 		18A514C92BD5001300B072DE /* SpendingTotalChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A514C82BD5001300B072DE /* SpendingTotalChartView.swift */; };
 		18C3BFB02B81874000E444C8 /* AppIntroLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C3BFAF2B81874000E444C8 /* AppIntroLoginView.swift */; };
 		18C3BFB22B820AEA00E444C8 /* SFSafariView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C3BFB12B820AEA00E444C8 /* SFSafariView.swift */; };
@@ -121,6 +124,7 @@
 		183ECBE92B747460006C45B2 /* Collection+Additions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Collection+Additions.swift"; sourceTree = "<group>"; };
 		183ECBEA2B747460006C45B2 /* Array+Safe.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Array+Safe.swift"; sourceTree = "<group>"; };
 		183ECBF02B748E90006C45B2 /* HorizontalDivider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalDivider.swift; sourceTree = "<group>"; };
+		183F17042BF24186003C1334 /* MonthYearPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthYearPickerView.swift; sourceTree = "<group>"; };
 		184DF0B32B6E1C3E00BA6F21 /* Reports.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Reports.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		184DF0B62B6E1C3E00BA6F21 /* ReportsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportsApp.swift; sourceTree = "<group>"; };
 		184DF0BA2B6E1C3E00BA6F21 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -152,6 +156,7 @@
 		186E8A432B9C3AD500E65BDE /* KleonButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KleonButtonStyle.swift; sourceTree = "<group>"; };
 		186E8A452B9C4BB500E65BDE /* Color+Adjust.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Adjust.swift"; sourceTree = "<group>"; };
 		1882CF4D2BDE3D7200EA0B05 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		188A8E3F2BF21D1E00938B81 /* SpendingTrendChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendingTrendChartView.swift; sourceTree = "<group>"; };
 		1894264A2BDFB6D700C06018 /* AppStrings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStrings.swift; sourceTree = "<group>"; };
 		189641AE2B9C72BE00716258 /* AnimationConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationConstants.swift; sourceTree = "<group>"; };
 		189641BA2B9C8CFD00716258 /* ReportChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportChart.swift; sourceTree = "<group>"; };
@@ -159,6 +164,7 @@
 		189641C02B9D67CE00716258 /* SavedReportsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedReportsView.swift; sourceTree = "<group>"; };
 		18A146B72BEBA69300B4E74F /* ProcessorInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessorInfo.swift; sourceTree = "<group>"; };
 		18A146B92BECF73B00B4E74F /* ReportFeatureSourceLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportFeatureSourceLoader.swift; sourceTree = "<group>"; };
+		18A1AE262BF339E10013EAD3 /* Date+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Additions.swift"; sourceTree = "<group>"; };
 		18A514C22BCFF5FC00B072DE /* MoneyCommon */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = MoneyCommon; path = Packages/MoneyCommon; sourceTree = "<group>"; };
 		18A514C82BD5001300B072DE /* SpendingTotalChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendingTotalChartView.swift; sourceTree = "<group>"; };
 		18C3BFAE2B806A7500E444C8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -282,6 +288,7 @@
 				186A80EA2BCA57F90015FFC7 /* BackgroundShadowViewModifier.swift */,
 				186A80F12BCBF4990015FFC7 /* ViewRectReader.swift */,
 				186A80F42BCC013F0015FFC7 /* BottomShadowViewModifier.swift */,
+				183F17042BF24186003C1334 /* MonthYearPickerView.swift */,
 			);
 			path = KleonDesignSystem;
 			sourceTree = "<group>";
@@ -321,6 +328,7 @@
 				18C3BFB62B820DD000E444C8 /* Binding+Additions.swift */,
 				18C3BFBE2B82370B00E444C8 /* BudgetSystemService+Config.swift */,
 				183ECBE92B747460006C45B2 /* Collection+Additions.swift */,
+				18A1AE262BF339E10013EAD3 /* Date+Additions.swift */,
 				183ECBE82B747460006C45B2 /* String+Additions.swift */,
 				18C3BFC02B83993200E444C8 /* URL+Additions.swift */,
 				18E7BAF82BE1081400C0468E /* EdgeInsets+Additions.swift */,
@@ -412,6 +420,15 @@
 			path = Database;
 			sourceTree = "<group>";
 		};
+		188A8E3E2BF21CF700938B81 /* Graphs */ = {
+			isa = PBXGroup;
+			children = (
+				18A514C82BD5001300B072DE /* SpendingTotalChartView.swift */,
+				188A8E3F2BF21D1E00938B81 /* SpendingTrendChartView.swift */,
+			);
+			path = Graphs;
+			sourceTree = "<group>";
+		};
 		189641B62B9C8CC000716258 /* Model */ = {
 			isa = PBXGroup;
 			children = (
@@ -426,9 +443,9 @@
 		18A514C42BD3652F00B072DE /* ReportViews */ = {
 			isa = PBXGroup;
 			children = (
+				188A8E3E2BF21CF700938B81 /* Graphs */,
 				1800034C2BD6919B003C2804 /* ReportView.swift */,
 				186A80FC2BCCC5DE0015FFC7 /* ReportInputView.swift */,
-				18A514C82BD5001300B072DE /* SpendingTotalChartView.swift */,
 				180003542BD8D40E003C2804 /* TabulatedDataItem.swift */,
 				18E7BAF42BE0CE6D00C0468E /* ReportFetchError.swift */,
 				18E7BAF62BE0E5F300C0468E /* TransactionHistoryView.swift */,
@@ -677,7 +694,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/zsh;
-			shellScript = "export PATH=\"/opt/homebrew/bin:$PATH\"\n\nif which swiftlint >/dev/null; then\n  swiftlint --fix && swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+			shellScript = "export PATH=\"/opt/homebrew/bin:$PATH\"\n\n## fix linting whilst previews run cause Xcode to complain\n## about file changes during previews compliation.\nif [ \"${ENABLE_PREVIEWS}\" = \"YES\" ]; then\n  echo \"Not running Swift Format for Xcode Previews\"\n  exit 0;\nfi\n\nif which swiftlint >/dev/null; then\n  swiftlint --fix && swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -694,6 +711,7 @@
 				18E42B002BEB295500D47109 /* Account+AllAccounts.swift in Sources */,
 				183ECBE12B747085006C45B2 /* Typography.swift in Sources */,
 				1868BACA2BE791B600757E78 /* SavedReportQuery.swift in Sources */,
+				183F17052BF24186003C1334 /* MonthYearPickerView.swift in Sources */,
 				18C3BFBF2B82370B00E444C8 /* BudgetSystemService+Config.swift in Sources */,
 				189641BB2B9C8CFE00716258 /* ReportChart.swift in Sources */,
 				183ECBE02B747085006C45B2 /* SelectListView.swift in Sources */,
@@ -711,6 +729,7 @@
 				184DF0B72B6E1C3E00BA6F21 /* ReportsApp.swift in Sources */,
 				183ECBEE2B747460006C45B2 /* Array+Safe.swift in Sources */,
 				18C3BFB72B820DD000E444C8 /* Binding+Additions.swift in Sources */,
+				188A8E402BF21D1E00938B81 /* SpendingTrendChartView.swift in Sources */,
 				18A514C92BD5001300B072DE /* SpendingTotalChartView.swift in Sources */,
 				189641BE2B9D675900716258 /* SettingsView.swift in Sources */,
 				183ECBC72B70E5DD006C45B2 /* SecureKeyValueStore.swift in Sources */,
@@ -722,6 +741,7 @@
 				1894264B2BDFB6D700C06018 /* AppStrings.swift in Sources */,
 				18E7BAF72BE0E5F300C0468E /* TransactionHistoryView.swift in Sources */,
 				186E8A462B9C4BB500E65BDE /* Color+Adjust.swift in Sources */,
+				18A1AE272BF339E10013EAD3 /* Date+Additions.swift in Sources */,
 				183ECBC32B70E0E3006C45B2 /* InMemoryKeyValueStore.swift in Sources */,
 				1868BAC82BE78C2900757E78 /* Database.swift in Sources */,
 				18C3BFB02B81874000E444C8 /* AppIntroLoginView.swift in Sources */,
