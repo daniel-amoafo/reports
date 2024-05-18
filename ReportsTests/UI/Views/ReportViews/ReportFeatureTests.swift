@@ -63,6 +63,7 @@ final class ReportFeatureTests: XCTestCase {
         await store.send(.confirmationDialog(.presented(.updateExistingReport))) {
             $0.confirmationDialog = nil
             $0.showSavedReportNameAlert = true
+            $0.savedReportName = "My First Report"
         }
 
         let initialLastModified = savedReport.lastModifield
@@ -134,7 +135,7 @@ private extension ReportFeatureTests {
     @MainActor
     func createStoreWithSavedReport(_ savedReport: SavedReport) throws -> TestStoreOf<ReportFeature> {
         @Dependency(\.database) var database
-        let ctx = try database.context()
+        let ctx = database.swiftData
         ctx.insert(savedReport)
         try ctx.save()
 

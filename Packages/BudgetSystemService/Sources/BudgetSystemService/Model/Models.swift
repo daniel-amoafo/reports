@@ -20,7 +20,7 @@ public struct Account: Identifiable, Equatable, CustomStringConvertible {
     }
 }
 
-public struct BudgetSummary: Identifiable, Equatable, CustomStringConvertible {
+public struct BudgetSummary: Identifiable, Equatable, Codable, CustomStringConvertible {
     /// Budget id
     public let id: String
 
@@ -40,6 +40,8 @@ public struct BudgetSummary: Identifiable, Equatable, CustomStringConvertible {
 
     public var description: String { name }
 
+    public var currencyCode: String { currency.code }
+
     public init(
         id: String,
         name: String,
@@ -55,6 +57,28 @@ public struct BudgetSummary: Identifiable, Equatable, CustomStringConvertible {
         self.lastMonth = lastMonth
         self.currency = currency
     }
+
+    public init(
+        id: String,
+        name: String,
+        lastModifiedOn: String,
+        firstMonth: String,
+        lastMonth: String,
+        currencyCode: String
+    ) {
+        guard let currency = Currency.iso4217Currency(for: currencyCode) else {
+            fatalError("Unable to parse currencyCode (\(currencyCode)) in a known Currency")
+        }
+        self.init(
+            id: id,
+            name: name,
+            lastModifiedOn: lastModifiedOn,
+            firstMonth: firstMonth,
+            lastMonth: lastMonth,
+            currency: currency
+        )
+    }
+
 }
 
 public struct CategoryGroup: Identifiable, Equatable, CustomStringConvertible {
@@ -119,13 +143,15 @@ public struct Category: Identifiable, Equatable, CustomStringConvertible {
 }
 
 
-public struct TransactionEntry: Identifiable, Equatable, CustomStringConvertible {
+public struct TransactionEntry: Identifiable, Equatable, Codable, CustomStringConvertible {
 
     public let id: String
 
     public let date: Date
 
-    public let money: Money
+    public let rawAmount: Int
+
+    public let currency: Currency
 
     public let payeeName: String?
 
@@ -153,10 +179,15 @@ public struct TransactionEntry: Identifiable, Equatable, CustomStringConvertible
         "\(id), \(dateFormated), \(categoryName ?? ""), \(amountFormatted)"
     }
 
+    public var money: Money {
+        Money.forYNAB(amount: rawAmount, currency: currency)
+    }
+
     public init(
         id: String,
         date: Date,
-        money: Money,
+        rawAmount: Int,
+        currencyCode: String,
         payeeName: String?,
         accountId: String,
         accountName: String,
@@ -169,7 +200,7 @@ public struct TransactionEntry: Identifiable, Equatable, CustomStringConvertible
     ) {
         self.id = id
         self.date = date
-        self.money = money
+        self.rawAmount = rawAmount
         self.payeeName = payeeName
         self.accountId = accountId
         self.accountName = accountName
@@ -179,6 +210,11 @@ public struct TransactionEntry: Identifiable, Equatable, CustomStringConvertible
         self.categoryGroupName = categoryGroupName
         self.transferAccountId = transferAccountId
         self.deleted = deleted
+
+        guard let currency = Currency.iso4217Currency(for: currencyCode) else {
+            fatalError("unable to parse currencyCode to a Currency value")
+        }
+        self.currency = currency
     }
 
     public var dateFormated: String {

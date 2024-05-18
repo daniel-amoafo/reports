@@ -44,13 +44,8 @@ private extension SavedReportQuery {
     private static var logger: Logger { LogFactory.create(category: "SavedReportQuery") }
 
     private static var modelContext: ModelContext {
-        do {
-            @Dependency(\.database.context) var context
-            let ctx = try context()
-            return ctx
-        } catch {
-            fatalError(error.localizedDescription)
-        }
+        @Dependency(\.database.swiftData) var context
+        return context
     }
 
     private static let live = Self {

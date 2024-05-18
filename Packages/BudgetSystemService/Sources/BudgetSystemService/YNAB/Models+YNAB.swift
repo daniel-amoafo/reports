@@ -58,6 +58,8 @@ extension TransactionEntry {
 
     init(ynabTransactionDetail ynab: SwiftYNAB.TransactionDetail, currency: Currency, categoryGroup: CategoryGroup?) {
         self.id = ynab.id
+        self.rawAmount = ynab.amount
+        self.currency = currency
         self.payeeName = ynab.payeeName
         self.accountId = ynab.accountId
         self.accountName = ynab.accountName
@@ -66,7 +68,6 @@ extension TransactionEntry {
         self.categoryGroupId = categoryGroup?.id
         self.categoryGroupName = categoryGroup?.name
         self.transferAccountId = ynab.transferAccountId
-        self.money = Money.forYNAB(amount: ynab.amount, currency: currency)
         self.deleted = ynab.deleted
 
         guard let date = DateConverter.date(from: ynab.date) else {
@@ -77,6 +78,8 @@ extension TransactionEntry {
 
     init(ynabHybridTransaction ynab: HybridTransaction, currency: Currency, categoryGroup: CategoryGroup?) {
         self.id = ynab.id
+        self.rawAmount = ynab.amount
+        self.currency = currency
         self.payeeName = ynab.payeeName
         self.accountId = ynab.accountId
         self.accountName = ynab.accountName
@@ -85,7 +88,6 @@ extension TransactionEntry {
         self.categoryGroupId = categoryGroup?.id
         self.categoryGroupName = categoryGroup?.name
         self.transferAccountId = ynab.transferAccountId
-        self.money = Money.forYNAB(amount: ynab.amount, currency: currency)
         self.deleted = ynab.deleted
 
         guard let date = DateConverter.date(from: ynab.date) else {

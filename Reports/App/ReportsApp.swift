@@ -27,6 +27,7 @@ struct AppFeature {
         case didUpdateAuthStatus(AuthorizationStatus)
         case checkRetryConnection
         case onAppear
+        case onTask
     }
 
     @Dependency(\.budgetClient) var budgetClient
@@ -76,10 +77,15 @@ struct AppFeature {
             case .onAppear:
                 state.showRetryLoading = false
                 return .run { [connectionCheckTimeout = state.connectionCheckTimeout] send in
-                    await performOnAppear(send: send)
+                    await performOnAppear()
                     // retry connection if authorization status not updated
                     try await self.clock.sleep(for: .seconds(connectionCheckTimeout))
                     await send(.checkRetryConnection, animation: .default)
+                }
+
+            case .onTask:
+                return .run { send in
+                    await startAsyncListeners(send: send)
                 }
             }
         }
@@ -106,24 +112,61 @@ private extension AppFeature {
         }
     }
 
-    func performOnAppear(send: Send<AppFeature.Action>) async {
-        await loadBudgetClientData()
+    func performOnAppear() async {
+         await loadBudgetClientData()
+    }
 
-        // Monitor authorization satus updates
-        for await status in budgetClient.$authorizationStatus.values {
-            await send(.didUpdateAuthStatus(status))
-            logger.debug("did update auth status to: \(status)")
+    /// Spawns unstructured Async Task to mmonitor for budgetClient changes.
+    ///
+    func startAsyncListeners(send: Send<AppFeature.Action>) async {
+        Task {
+            // Monitor authorization satus updates
+            for await status in budgetClient.$authorizationStatus.stream {
+                await send(.didUpdateAuthStatus(status))
+                logger.debug("did update auth status to: \(status)")
+            }
         }
 
-        for await selectedBudgetId in budgetClient.$selectedBudgetId.values {
-            logger.debug("storing selectedBudget \(selectedBudgetId ?? "")")
+        Task {
+            // Monitor when the budgetId changes and update db values
+            for await selectedBudgetId in budgetClient.$selectedBudgetId.stream {
+                logger.debug("selectedBudgetId updated \(selectedBudgetId ?? "")")
+            }
         }
+
+        // await the last task to keep the run effect from completing.
+        // A Reducer run effect cannot complete if send actions can be sent.
+        await Task {
+            for await budgetSummaries in budgetClient.$budgetSummaries.stream {
+                logger.debug("budgetSummaries updated")
+                do {
+                    @Dependency(\.database.grdb) var grdb
+                    try grdb.saveBudgetSummaries(budgetSummaries)
+                } catch {
+                    logger.error("Unable to persist budget summaries in database")
+                    logger.error("\(error.localizedDescription)")
+                    return
+                }
+
+                // fetch transactions to persist once with ?
+            }
+        }.value
 
     }
 
     func loadBudgetClientData() async {
-        logger.debug("\(#function) - fetching budgetClient data")
-        await budgetClient.fetchLoadedData()
+        logger.debug("\(#function)")
+        await budgetClient.fetchData()
+    }
+
+    func syncTransactionHistory() {
+        Task {
+            do {
+                let transactions = try await budgetClient.fetchAllTransactions()
+            } catch {
+                logger.error("\(error.localizedDescription)")
+            }
+        }
     }
 
 }
@@ -136,10 +179,7 @@ struct ReportsApp: App {
 
     var modelContext: ModelContext {
         @Dependency(\.database) var database
-        guard let modelContext = try? database.context() else {
-            fatalError("Could not find modelcontext")
-        }
-        return modelContext
+        return database.swiftData
     }
 
     var body: some Scene {
@@ -152,6 +192,9 @@ struct ReportsApp: App {
                     })
                     .onAppear {
                         store.send(.onAppear)
+                    }
+                    .task {
+                        store.send(.onTask)
                     }
             }
         }
@@ -200,7 +243,7 @@ struct ReportsApp: App {
 
 private enum Strings {
     static let reconnectText = String(
-        localized: "Hmm, something went wrong.\nPlease Try Again",
+        localized: "Hmm, something went wrong.\nPlease try again",
         comment: "text displayed when unable to load screen into a valid state. Ask the user to retry"
     )
     static let reconnectButtonTitle = String(

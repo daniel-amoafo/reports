@@ -149,7 +149,8 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
         .init(
             id: "T1",
             date: Date.iso8601Formatter.date(from: "2024-02-01")!,
-            money: Money(Decimal(-1_00_00), currency: .AUD),
+            rawAmount: -1_00_00,
+            currencyCode: Currency.AUD.code,
             payeeName: "Woolworths",
             accountId: "A1",
             accountName: "Account First",
@@ -163,7 +164,8 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
         .init(
             id: "T2",
             date: Date.iso8601Formatter.date(from: "2024-02-01")!,
-            money: Money(Decimal(-5_00), currency: .AUD),
+            rawAmount: -5_00,
+            currencyCode: Currency.AUD.code,
             payeeName: "Opal",
             accountId: "A1",
             accountName: "Account First",
@@ -177,7 +179,8 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
         .init(
             id: "T3",
             date: Date.iso8601Formatter.date(from: "2024-03-05")!,
-            money: Money(Decimal(-99_99), currency: .AUD),
+            rawAmount: -99_99,
+            currencyCode: Currency.AUD.code,
             payeeName: "Landlord",
             accountId: "A2",
             accountName: "Account Second",
@@ -191,7 +194,8 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
         .init(
             id: "T4",
             date: Date.iso8601Formatter.date(from: "2024-04-24")!,
-            money: Money(Decimal(-37_60), currency: .AUD),
+            rawAmount: -37_60,
+            currencyCode: Currency.AUD.code,
             payeeName: "Uber",
             accountId: "A2",
             accountName: "Account Second",
@@ -205,7 +209,8 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
         .init(
             id: "T5",
             date: Date.iso8601Formatter.date(from: "2024-04-28")!,
-            money: Money(Decimal(-20_00), currency: .AUD),
+            rawAmount: -20_00,
+            currencyCode: Currency.AUD.code,
             payeeName: "IRH Party",
             accountId: "A2",
             accountName: "Account Second",
@@ -219,7 +224,8 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
         .init(
             id: "T6",
             date: Date.iso8601Formatter.date(from: "2024-05-02")!,
-            money: Money(Decimal(-60_00), currency: .AUD),
+            rawAmount: -60_00,
+            currencyCode: Currency.AUD.code,
             payeeName: "The Midnights",
             accountId: "A3",
             accountName: "Account Third",
@@ -233,7 +239,8 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
         .init(
             id: "T7",
             date: Date.iso8601Formatter.date(from: "2024-03-11")!,
-            money: Money(Decimal(-42_00), currency: .AUD),
+            rawAmount: -42_00,
+            currencyCode: Currency.AUD.code,
             payeeName: "Hoyts",
             accountId: "A2",
             accountName: "Account Second",
@@ -250,7 +257,8 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
         .init(
             id: "T1",
             date: Date.iso8601Formatter.date(from: "2024-06-01")!,
-            money: Money(Decimal(-5_00), currency: .AUD),
+            rawAmount: -5_00,
+            currencyCode: Currency.AUD.code,
             payeeName: "Taxi",
             accountId: "A1",
             accountName: "Account First",
@@ -264,7 +272,8 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
         .init(
             id: "T2",
             date: Date.iso8601Formatter.date(from: "2024-07-15")!,
-            money: Money(Decimal(-10_50), currency: .AUD),
+            rawAmount: -10_50,
+            currencyCode: Currency.AUD.code,
             payeeName: "Landlord",
             accountId: "A2",
             accountName: "Account Second",

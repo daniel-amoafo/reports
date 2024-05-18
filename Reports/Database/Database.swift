@@ -5,7 +5,19 @@ import Foundation
 import SwiftData
 
 struct Database {
-    var context: () throws -> ModelContext
+    var swiftData: ModelContext
+    var grdb: GRDBDatabase
+
+    init(swiftData: @escaping () throws -> ModelContext, grdb: @escaping () throws -> GRDBDatabase) {
+        do {
+            self.swiftData = try swiftData()
+            self.grdb = try grdb()
+        } catch {
+            let logger = LogFactory.create(category: "Database init")
+            logger.error("Unable init Database instance...")
+            fatalError("\(error.localizedDescription)")
+        }
+    }
 }
 
 extension Database: DependencyKey {
@@ -13,28 +25,26 @@ extension Database: DependencyKey {
     @MainActor
     static let liveValue = {
         Self(
-            context: {
-                do {
-                    let savedReport = ModelConfiguration("SavedReportModelConfig", schema: Schema([SavedReport.self]))
-
-                    let container = try ModelContainer(for: SavedReport.self, configurations: savedReport)
-                    return ModelContext(container)
-                } catch {
-                    fatalError("Failed to create swift data live container - \(error.localizedDescription)")
-                }
-            }
+            swiftData: { try SwiftDataDatabase.makeLive() },
+            grdb: { try GRDBDatabase.makeLive() }
         )
     }()
 
     @MainActor
-    static let testValue = Self(
-        context: { mockContext }
-    )
+    static let testValue = {
+        Self(
+            swiftData: { try SwiftDataDatabase.makeMock() },
+            grdb: { try GRDBDatabase.makeMock() }
+        )
+    }()
 
     @MainActor
-    static let previewValue = Self(
-        context: { mockContext }
-    )
+    static let previewValue = {
+        Self(
+            swiftData: { try SwiftDataDatabase.makeMock() },
+            grdb: { try GRDBDatabase.makeMock() }
+        )
+    }()
 }
 
 extension DependencyValues {
@@ -43,26 +53,3 @@ extension DependencyValues {
         set { self[Database.self] = newValue }
     }
 }
-
-// MARK: -
-
-@MainActor
-private let mockContext: ModelContext = {
-    do {
-        let savedReport = ModelConfiguration(for: SavedReport.self, isStoredInMemoryOnly: true)
-
-        let container = try ModelContainer(for: SavedReport.self, configurations: savedReport)
-        let context = ModelContext(container)
-        for report in SavedReport.mocks {
-            context.insert(report)
-        }
-        do {
-            try context.save()
-        } catch {
-            debugPrint("\(error.localizedDescription)")
-        }
-        return ModelContext(container)
-    } catch {
-        fatalError("Failed to create swift data test container - \(error.localizedDescription)")
-    }
-}()

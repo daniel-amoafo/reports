@@ -16,7 +16,7 @@ public class BudgetClient {
         didSet {
             if oldValue != selectedBudgetId {
                 Task {
-                    await fetchBudgetSummaryValues()
+                    await fetchAccountAndCategoryValues()
                 }
             }
         }
@@ -60,12 +60,12 @@ public class BudgetClient {
     }
 
     /// Helper function to fetch published data values
-    public func fetchLoadedData() async {
+    public func fetchData() async {
         await fetchBudgetSummaries()
-        await fetchBudgetSummaryValues()
+        await fetchAccountAndCategoryValues()
     }
 
-    func fetchBudgetSummaryValues() async {
+    func fetchAccountAndCategoryValues() async {
         await fetchAccounts()
         await fetchCategoryValues()
     }
@@ -91,7 +91,7 @@ public class BudgetClient {
                 }
             }.value
         } catch {
-            await resolveError(error)
+            resolveError(error)
         }
     }
 
@@ -110,7 +110,7 @@ public class BudgetClient {
             logger.debug("accounts count (\(accounts.count))")
             return accounts
         } catch {
-            await resolveError(error)
+            resolveError(error)
             return []
         }
     }
@@ -132,14 +132,15 @@ public class BudgetClient {
             logger.debug("categoryGroups count (\(categoryGroups.count))")
             logger.debug("categories count (\(categories.count))")
         } catch {
-            await resolveError(error)
+            resolveError(error)
         }
     }
 
-    /// Fetch transactions from the selected Budget with a given start date
+    /// Fetch transactions from the selected Budget with a given start & end date.
+    /// Optional filter parameters can be provided to further constrain the fetched transactions.
     public func fetchTransactions(
-        startDate: Date,
-        finishDate: Date,
+        startDate: Date? = nil,
+        finishDate: Date? = nil,
         filterBy: BudgetProvider.TransactionParameters.FilterByOption? = nil
     ) async throws -> IdentifiedArrayOf<TransactionEntry> {
         logger.debug("fetching transactions ...")
@@ -163,7 +164,9 @@ public class BudgetClient {
                     } else {
                         isOnBudgetAccount = false
                     }
-                    return (startDate...finishDate).contains($0.date) &&
+                    let sDate = startDate ?? Date.distantPast
+                    let fDate = finishDate ?? Date.distantFuture
+                    return (sDate...fDate).contains($0.date) &&
                     $0.categoryGroupName != "Internal Master Category" &&
                     $0.transferAccountId == nil &&
                     $0.deleted == false &&
@@ -171,12 +174,16 @@ public class BudgetClient {
                 }
             return IdentifiedArray(uniqueElements: fetchedTransactions)
         } catch {
-            await resolveError(error)
+            resolveError(error)
             throw error
         }
+
     }
 
-    @MainActor
+    public func fetchAllTransactions() async throws -> IdentifiedArrayOf<TransactionEntry> {
+        return try await fetchTransactions()
+    }
+
     func resolveError(_ error: Error) {
         if let budgetClientError = error as? BudgetClientError,
            budgetClientError.isNotAuthorized {

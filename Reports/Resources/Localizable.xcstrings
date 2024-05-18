@@ -76,7 +76,7 @@
     "Hello World" : {
 
     },
-    "Hmm, something went wrong.\nPlease Try Again" : {
+    "Hmm, something went wrong.\nPlease try again" : {
       "comment" : "text displayed when unable to load screen into a valid state. Ask the user to retry"
     },
     "Hmmm, the saved report appears invalid. It cannot be opened." : {

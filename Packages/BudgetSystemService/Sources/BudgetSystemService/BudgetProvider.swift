@@ -37,8 +37,8 @@ public struct BudgetProvider {
         }
 
         public let budgetId: String
-        public let startDate: Date
-        public let finishDate: Date
+        public let startDate: Date?
+        public let finishDate: Date?
         public let currency: Currency
         public let categoryGroupProvider: CategoryGroupLookupProviding?
         public let filterBy: FilterByOption?
