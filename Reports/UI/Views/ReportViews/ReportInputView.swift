@@ -16,7 +16,6 @@ struct ReportInputFeature {
         var accounts: IdentifiedArrayOf<Account>?
         var selectedAccountId: String?
         var showAccountList = false
-        var fetchStatus: Action.FetchStatus = .ready
         var popoverFromDate = false
         var popoverToDate = false
 
@@ -33,19 +32,6 @@ struct ReportInputFeature {
             !isAccountSelected
         }
 
-        var isReportFetching: Bool {
-            return fetchStatus == .fetching
-        }
-
-        var isReportFetchingLoadingOrErrored: Bool {
-            switch fetchStatus {
-            case .fetching, .error:
-                return true
-            case .ready:
-                return false
-            }
-        }
-
         var fromDateFormatted: String { Date.iso8601utc.string(from: fromDate) }
         var toDateFormatted: String { Date.iso8601utc.string(from: toDate) }
 
@@ -55,32 +41,6 @@ struct ReportInputFeature {
             (savedReport.selectedAccountId == nil || savedReport.selectedAccountId == selectedAccountId)
         }
 
-        /// The fetchTransaction shared code called from elsewhere like the ReportView
-        /// It's defined in the state function to allow the shared reuse in a performant type manner.
-        /// see https://pointfreeco.github.io/swift-composable-architecture/main/documentation/composablearchitecture/performance/#Sharing-logic-with-actions
-        mutating func fetchTransactions() -> Effect<ReportInputFeature.Action> {
-            guard !isReportFetching else { return .none }
-            fetchStatus = .fetching
-            let filterBy: BudgetProvider.TransactionParameters.FilterByOption?
-            if let selectedId = selectedAccountId, selectedId != Account.allAccountsId {
-                filterBy = .account(accountId: selectedId)
-            } else {
-                filterBy = nil
-            }
-            let fromDate = self.fromDate
-            let toDate = self.toDate
-            return .run { send in
-                do {
-                    @Dependency(\.budgetClient) var budgetClient
-                    let transactions = try await budgetClient
-                        .fetchTransactions(startDate: fromDate, finishDate: toDate, filterBy: filterBy)
-                    await send(.fetchedTransactionsReponse(transactions))
-                } catch {
-                    let logger = LogFactory.create(category: "ReportInput.State")
-                    logger.error("fetch transactions error: - \(error.localizedDescription)")
-                }
-            }
-        }
     }
 
     enum Action {
@@ -93,24 +53,18 @@ struct ReportInputFeature {
         case setPopoverFromDate(Bool)
         case setPopoverToDate(Bool)
         case runReportTapped
-        case fetchedTransactionsReponse(IdentifiedArrayOf<TransactionEntry>)
         case onAppear
 
         @CasePathable
         enum Delegate: Equatable {
-            case fetchedTransactions(IdentifiedArrayOf<TransactionEntry>)
-            case didUpdateFetchStatus(FetchStatus)
+            case reportReadyToRun
         }
 
-        @CasePathable
-        enum FetchStatus: Equatable {
-            case ready
-            case fetching
-            case error(ReportFetchError)
-        }
     }
 
     @Dependency(\.budgetClient) var budgetClient
+    @Dependency(\.database.grdb) var grdb
+
     let logger = LogFactory.create(category: "ReportInput")
 
     var body: some ReducerOf<Self> {
@@ -146,16 +100,7 @@ struct ReportInputFeature {
                 return .none
 
             case .runReportTapped:
-                return state.fetchTransactions()
-
-            case let .fetchedTransactionsReponse(transactions):
-                if transactions.isEmpty {
-                    state.fetchStatus = .error(.noResults)
-                    return .none
-                } else {
-                    state.fetchStatus = .ready
-                    return .send(.delegate(.fetchedTransactions(transactions)), animation: .smooth)
-                }
+                return .send(.delegate(.reportReadyToRun), animation: .smooth)
 
             case let .selectAccountRowTapped(isActive):
                 state.showAccountList = isActive
@@ -167,15 +112,18 @@ struct ReportInputFeature {
 
             case .onAppear:
                 if state.accounts == nil {
-                    guard budgetClient.accounts.isNotEmpty else { return .none }
-                    // by default show transactions for all eligble accounts for the chart type
-                    var accounts =  state.chart
-                        .eligibleAccountsFiltered(unfilteredAccounts: budgetClient.accounts)
-                    let allAccounts = Account.allAccounts
-                    if accounts.insert(allAccounts, at: 0).inserted {
-                        state.selectedAccountId = allAccounts.id
+                    do {
+                        let records = try grdb.fetchAccounts(isOnBudget: true)
+                        guard records.isNotEmpty else { return .none }
+                        var accounts = IdentifiedArrayOf(uniqueElements: records)
+                        let allAccounts = Account.allAccounts
+                        if accounts.insert(allAccounts, at: 0).inserted {
+                            state.selectedAccountId = allAccounts.id
+                        }
+                        state.accounts = accounts
+                    } catch {
+                        logger.error("\(String(describing: error))")
                     }
-                    state.accounts = accounts
                 }
                 // Ensure provided date is first day of month in FromDate
                 // and last day of month ToDate
@@ -409,14 +357,8 @@ struct ReportInputView: View {
             Button {
                 store.send(.runReportTapped, animation: .default)
             } label: {
-                ZStack {
-                    Text(Strings.runReportTitle)
-                        .typography(.title3Emphasized)
-                        .opacity(store.isReportFetching ? 0 : 1)
-                    ProgressView()
-                        .tint(Color.Button.primaryTitle)
-                        .opacity(store.isReportFetching ? 1 : 0)
-                }
+                Text(Strings.runReportTitle)
+                    .typography(.title3Emphasized)
             }
             .buttonStyle(.kleonPrimary)
             .disabled(store.isRunReportDisabled)

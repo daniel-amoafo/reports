@@ -80,6 +80,7 @@ struct ReportFeature {
         case destination(PresentationAction<Destination.Action>)
         case showSavedReportNameAlert(isPresented: Bool)
         case savedReportName(shouldSave: Bool)
+        case reportReadyToRun
         case chartDisplayed
         case doneButtonTapped
         case onAppear
@@ -149,11 +150,17 @@ struct ReportFeature {
                     }
                 }
 
-            case let .inputFields(.delegate(.fetchedTransactions(transactions))):
+            case .reportReadyToRun, .inputFields(.delegate(.reportReadyToRun)):
                 let chartTitle = state.inputFields.chart.name
                 switch state.inputFields.chart.type {
                 case .spendingByTotal:
-                    state.chartGraph = .spendingByTotal(.init(title: chartTitle, transactions: transactions))
+                    state.chartGraph = .spendingByTotal(
+                        .init(
+                            title: chartTitle,
+                            startDate: state.inputFields.fromDate,
+                            finishDate: state.inputFields.toDate
+                        )
+                    )
                 case .spendingByTrend:
                     break
                 case .incomeExpensesTable:
@@ -191,7 +198,7 @@ struct ReportFeature {
             case .onAppear:
                 // Run report if we have a Saved Report
                 if state.savedReport != nil {
-                    return state.inputFields.fetchTransactions().map(Action.inputFields)
+                    return .send(.reportReadyToRun)
                 }
                 return .none
 
@@ -318,11 +325,7 @@ private extension ReportView {
                 HorizontalDivider()
                     .opacity(store.chartGraph == nil ? 0 : 1)
 
-                if store.inputFields.isReportFetchingLoadingOrErrored {
-                    searchingView
-                } else {
-                    chartGraphView
-                }
+                chartGraphView
             }
             .scrollTargetLayout()
         }
@@ -341,34 +344,6 @@ private extension ReportView {
         .id(store.chartContainerId)
     }
 
-    var searchingView: some View {
-        VStack {
-            Image(
-                systemName: store.inputFields.isReportFetching ?
-                "text.magnifyingglass" : "exclamationmark.magnifyingglass"
-            )
-            .resizable()
-            .scaledToFit()
-            .containerRelativeFrame(.horizontal) { length, _ in
-                length * 0.5
-            }
-            .foregroundStyle(
-                .linearGradient(colors: [.purple, .orange, .pink], startPoint: .topLeading, endPoint: .bottomTrailing)
-            )
-            // display pulsating image when actively searching
-            .symbolEffect(.pulse.byLayer, options: .repeating, isActive: store.inputFields.isReportFetching)
-            // switch from search with text image to exclaimation when there
-            .contentTransition(store.inputFields.isReportFetching ? .identity : .symbolEffect(.replace.byLayer))
-            .padding(.vertical)
-
-            if case let .error(err) = store.inputFields.fetchStatus {
-                Text(err.localizedDescription)
-                    .typography(.bodyEmphasized)
-                    .foregroundStyle(Color.Text.primary)
-                    .multilineTextAlignment(.center)
-            }
-        }
-    }
 }
 
 // MARK: - Strings
@@ -396,16 +371,6 @@ private enum Strings {
     NavigationStack {
         ReportView(
             store: .init(initialState: ReportFeature.mockInputFields) {
-                ReportFeature()
-            }
-        )
-    }
-}
-
-#Preview("Searching") {
-    NavigationStack {
-        ReportView(
-            store: .init(initialState: ReportFeature.mockSearching) {
                 ReportFeature()
             }
         )
@@ -451,19 +416,6 @@ private extension ReportFeature {
         )
     }
 
-    static var mockSearching: ReportFeature.State {
-        try! .init(
-            sourceData: .new(
-                .init(
-                    chart: .mock,
-                    accounts: .mocks,
-                    selectedAccountId: selectedAccountId,
-                    fetchStatus: .fetching
-                )
-            )
-        )
-    }
-
     static var mockFetchedResults: ReportFeature.State {
         try! .init(
             sourceData: .new(
@@ -473,7 +425,9 @@ private extension ReportFeature {
                     selectedAccountId: selectedAccountId
                 )
             ),
-            chartGraph: .spendingByTotal(.init(title: "Spending By Total", transactions: .mocks))
+            chartGraph: .spendingByTotal(
+                .init(title: "Spending By Total", startDate: Date.distantPast, finishDate: Date.distantFuture)
+            )
         )
     }
 
@@ -483,8 +437,7 @@ private extension ReportFeature {
                 .init(
                     chart: .mock,
                     accounts: .mocks,
-                    selectedAccountId: selectedAccountId,
-                    fetchStatus: .error(.noResults)
+                    selectedAccountId: selectedAccountId
                 )
             )
         )

@@ -14,6 +14,7 @@ struct ServerKnowledgeConfig: Codable, FetchableRecord, PersistableRecord {
     static let budgetSummary = belongsTo(BudgetSummary.self)
 
     let budgetId: String
+
     // Last Known Server Knowledges
     var categories: Int?
     var transactions: Int?
@@ -28,7 +29,7 @@ struct ServerKnowledgeConfig: Codable, FetchableRecord, PersistableRecord {
 
 // MARK: - BudgetService
 
-extension BudgetSummary: FetchableRecord, PersistableRecord {
+extension BudgetSummary: PersistableRecord {
 
     static let transactions = hasMany(TransactionEntry.self)
     static let dbAccounts = hasMany(Account.self)
@@ -48,12 +49,27 @@ extension Account: FetchableRecord, PersistableRecord {
 
     static let budgetSummary = belongsTo(BudgetSummary.self)
 
+    enum DBCodingKey: String, CodingKey {
+        case id, name, onBudget, deleted
+        case budgetId = "budgetSummaryId"
+    }
+
     public func encode(to container: inout PersistenceContainer) throws {
-        container["id"] = id
-        container["name"] = name
-        container["budgetSummaryId"] = budgetId
-        container["onBudget"] = onBudget
-        container["deleted"] = deleted
+        container[DBCodingKey.id.rawValue] = id
+        container[DBCodingKey.budgetId.rawValue] = budgetId
+        container[DBCodingKey.name.rawValue] = name
+        container[DBCodingKey.onBudget.rawValue] = onBudget
+        container[DBCodingKey.deleted.rawValue] = deleted
+    }
+
+    public init(row: Row) throws {
+        self.init(
+            id: row[DBCodingKey.id.rawValue],
+            budgetId: row[DBCodingKey.budgetId.rawValue],
+            name: row[DBCodingKey.name.rawValue],
+            onBudget: row[DBCodingKey.onBudget.rawValue],
+            deleted: row[DBCodingKey.deleted.rawValue]
+        )
     }
 
 }
@@ -113,14 +129,18 @@ extension TransactionEntry: FetchableRecord, PersistableRecord {
 
 // MARK: - Database Records
 
-struct CategoryRecord: Identifiable, Codable, FetchableRecord {
+/// Represents a `Category` or `CategoryGroup` entry with the aggregated total amounts for transactions belonging to the type
+/// Used to make plotting chart graph data
+struct CategoryRecord: Identifiable, Equatable, Codable, FetchableRecord {
 
-    let id: String
+    private let _id: String
     let name: String
     let total: Money
 
+    var id: String { _id }
+
     init(id: String, name: String, total: Money) {
-        self.id = id
+        self._id = id
         self.name = name
         self.total = total
     }
@@ -128,7 +148,7 @@ struct CategoryRecord: Identifiable, Codable, FetchableRecord {
     init(row: Row) throws {
         let currencyCode = row["currencyCode"] as String? ?? ""
         guard let currency = Currency.iso4217Currency(for: currencyCode) else {
-            fatalError("unable to parse currencyCode: \(currencyCode)")
+            fatalError("unable to parse currencyCode: [\(currencyCode)]")
         }
         guard let total = row["total"] as Int? else {
             fatalError("unable to parse total field into Int value")

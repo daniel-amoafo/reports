@@ -144,12 +144,6 @@ private extension AppFeature {
             await budgetClient.fetchCategoryValues()
             await syncTransactionHistory()
 
-            let builder = CategoryRecord.queryTransactionsByCategoryGroupTotals(
-                startDate: .now.advanceMonths(by: -1, strategy: .firstDay),
-                finishDate: .now.advanceMonths(by: -1, strategy: .lastDay)
-            )
-
-
         } catch {
             logger.error("\(String(describing: error))")
         }

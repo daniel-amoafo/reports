@@ -251,12 +251,20 @@ extension GRDBDatabase {
         }
     }
 
-    func fetchRecords<Record: FetchableRecord>(builder: RecordSQLBuilder<Record>)
-    async throws -> [Record] {
-        try await dbWriter.read { db in
+    func fetchRecords<Record: FetchableRecord>(builder: RecordSQLBuilder<Record>) throws -> [Record] {
+        try dbWriter.read { db in
             let sql = builder.sql
             let arguments = StatementArguments(builder.arguments)
             return try builder.record.fetchAll(db, sql: sql, arguments: arguments)
+        }
+    }
+
+    func fetchAccounts(isOnBudget: Bool) throws -> [Account] {
+        try dbWriter.read { db in
+            let onBudgetVal = isOnBudget ? "1" : "0"
+            let request = Account
+                .filter(Column(Account.DBCodingKey.onBudget) == onBudgetVal)
+            return try request.fetchAll(db)
         }
     }
 

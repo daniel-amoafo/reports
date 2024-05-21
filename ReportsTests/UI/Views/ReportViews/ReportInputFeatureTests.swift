@@ -99,40 +99,4 @@ final class ReportInputFeatureTests: XCTestCase {
         XCTAssertEqual(store.state.selectedAccountName, expectedAllAccount.name)
     }
 
-    func xtestFetchTransactions() async throws {
-        XCTAssertFalse(store.state.isReportFetching)
-        XCTAssertEqual(store.state.fetchStatus, .ready)
-        await store.send(.runReportTapped) {
-            $0.fetchStatus = .fetching
-        }
-        XCTAssertTrue(store.state.isReportFetching)
-        XCTAssertTrue(store.state.isReportFetchingLoadingOrErrored)
-
-        await store.receive(\.fetchedTransactionsReponse) {
-            $0.fetchStatus = .ready
-        }
-        await store.receive(\.delegate.fetchedTransactions)
-        XCTAssertFalse(store.state.isReportFetching)
-        XCTAssertFalse(store.state.isReportFetchingLoadingOrErrored)
-    }
-
-    func testFetchTransactionsNoResults() async throws {
-        // change the date range to be outside of the mock transaction entry values
-        // this will filter out all transactions return an empty list return an error - no results
-        let fromDate = Date.dateFormatter.date(from: "2023/01/01")!
-        await store.send(\.updateFromDateTapped, fromDate) {
-            $0.fromDate = fromDate
-        }
-        let toDate = Date.dateFormatter.date(from: "2023/06/06")!
-        await store.send(\.updateToDateTapped, toDate) {
-            $0.toDate = toDate
-        }
-        await store.send(.runReportTapped) {
-            $0.fetchStatus = .fetching
-        }
-        await store.receive(\.fetchedTransactionsReponse) {
-            $0.fetchStatus = .error(.noResults)
-        }
-        XCTAssertTrue(store.state.isReportFetchingLoadingOrErrored)
-    }
 }

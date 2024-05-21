@@ -14,35 +14,34 @@ struct SpendingTotalChartFeature {
     @ObservableState
     struct State: Equatable {
         let title: String
-        let transactions: IdentifiedArrayOf<TransactionEntry>
-        var contentType: SpendingTotalChartFeature.ContentType
+        let startDate: Date
+        let finishDate: Date
+        var contentType: SpendingTotalChartFeature.ContentType = .categoryGroup
 
         var rawSelectedGraphValue: Decimal?
-        var selectedGraphItem: TabulatedDataItem?
+        var selectedGraphItem: CategoryRecord?
 
-        // Populated at initialization
-        fileprivate let categoryGroups: IdentifiedArrayOf<TabulatedDataItem>
-        fileprivate let categories: IdentifiedArrayOf<TabulatedDataItem>
+        fileprivate var categoryGroups: [CategoryRecord] = []
 
         // Categories for a given categoryGroup.
         // Updated when user selects a categoryGroup to inspect
-        fileprivate var catgoriesForCategoryGroup: IdentifiedArrayOf<TabulatedDataItem> = []
+        fileprivate var catgoriesForCategoryGroup: [CategoryRecord] = []
         fileprivate var catgoriesForCategoryGroupName: String?
 
         init(
             title: String,
-            transactions: IdentifiedArrayOf<TransactionEntry>,
-            contentType: SpendingTotalChartFeature.ContentType = .categoryGroup
+            startDate: Date,
+            finishDate: Date
         ) {
             self.title = title
-            self.transactions = transactions
-            self.contentType = contentType
-            let (groups, categories) = TabulatedDataItem.makeCategoryValues(transactions: transactions)
-            self.categoryGroups = groups
-            self.categories = categories
+            self.startDate = startDate
+            self.finishDate = finishDate
+            self.categoryGroups = SpendingTotalQueries.fetchCategoryGroupTotals(
+                    startDate: startDate, finishDate: finishDate
+                )
         }
 
-        var selectedContent: IdentifiedArrayOf<TabulatedDataItem> {
+        var selectedContent: [CategoryRecord] {
             switch contentType {
             case .categoryGroup:
                 return categoryGroups
@@ -60,14 +59,14 @@ struct SpendingTotalChartFeature {
             }
         }
 
-        var totalValue: String {
+        var grandTotalValue: String {
             let selected = selectedContent
-            guard let currency = selected.elements.first?.currency else {
-                debugPrint("The selected entry has zero categories")
+            guard let currency = selected.first?.total.currency else {
                 return ""
             }
-            let total = selected.map(\.value).reduce(.zero) { $0 + $1 }
-            return Money(total, currency: currency).amountFormatted
+            // tally up all the totals for each record to provide a grand total
+            let total = selected.map(\.total).reduce(.zero(currency)) { $0 + $1 }
+            return total.amountFormatted
         }
 
         var listSubTitle: String {
@@ -95,7 +94,9 @@ struct SpendingTotalChartFeature {
         case binding(BindingAction<State>)
         case delegate(Delegate)
         case listRowTapped(id: String)
+        case catgoriesForCategoryGroupFetched([CategoryRecord], String)
         case subTitleTapped
+        case onAppear
 
         @CasePathable
         enum Delegate {
@@ -109,6 +110,9 @@ struct SpendingTotalChartFeature {
     }
 
     @Dependency(\.budgetClient) var budgetClient
+    @Dependency(\.database.grdb) var grdb
+
+    let logger = LogFactory.create(category: String(describing: SpendingTotalChartFeature.self))
 
     var body: some ReducerOf<Self> {
         BindingReducer()
@@ -123,7 +127,7 @@ struct SpendingTotalChartFeature {
                 // This approach is lifted from Apple's interactive pie chart WWDC
                 // see https://developer.apple.com/wwdc23/10037
                 let cumulativeArea = state.selectedContent.map {
-                    let newCumulative = cumulative + abs($0.value)
+                    let newCumulative = cumulative + abs($0.total.amount)
                     let result = (id: $0.id, range: cumulative ..< newCumulative)
                     cumulative = newCumulative
                     return result
@@ -131,32 +135,35 @@ struct SpendingTotalChartFeature {
 
                 guard let foundEntry = cumulativeArea
                     .first(where: { $0.range.contains(rawSelected) }),
-                      let item = state.selectedContent[id: foundEntry.id]
+                      let item = state.selectedContent.first(where: { $0.id == foundEntry.id })
                 else { return .none }
                 state.selectedGraphItem = item
+                return .none
+
+            case let .catgoriesForCategoryGroupFetched(records, categoryGroupName):
+                state.catgoriesForCategoryGroup = records
+                state.catgoriesForCategoryGroupName = categoryGroupName
+                state.contentType = .categoriesByCategoryGroup
+                state.selectedGraphItem = nil
                 return .none
 
             case let .listRowTapped(id):
                 switch state.contentType {
                 case .categoryGroup:
-                    // filter displaying categories for the selected Category Group
-                    guard let group = budgetClient.getCategoryGroup(groupId: id) else {
-                        return .none
-                    }
-                    var items = state.categories.filter { group.categoryIds.contains($0.id) }
-                    // sort entries with the most spent categories taking precedence
-                    items.sort { $0.value < $1.value }
-                    state.catgoriesForCategoryGroup = items
-                    state.catgoriesForCategoryGroupName = group.name
-                    state.contentType = .categoriesByCategoryGroup
-                    state.selectedGraphItem = nil
+                    let (records, groupName) = SpendingTotalQueries.fetchCategoryTotals(
+                        categoryGroupId: id,
+                        startDate: state.startDate,
+                        finishDate: state.finishDate
+                    )
+                    return .send(.catgoriesForCategoryGroupFetched(records, groupName), animation: .smooth)
 
                 case .categoriesByCategoryGroup:
+                    break
                     // find all transactions for the selected category
-                    let categoryTransactions = state.transactions.filter {
-                        $0.categoryId == id
-                    }
-                    return .send(.delegate(.categoryTapped(categoryTransactions)))
+                    //                    let categoryTransactions = state.transactions.filter {
+                    //                        $0.categoryId == id
+                    //                    }
+                    //                    return .send(.delegate(.categoryTapped(categoryTransactions)))
                 }
                 return .none
 
@@ -167,11 +174,62 @@ struct SpendingTotalChartFeature {
                 state.selectedGraphItem = nil
                 return .none
 
+            case .onAppear:
+                return .none
+
             case .binding, .delegate:
                 return .none
             }
         }
     }
+}
+
+private enum SpendingTotalQueries {
+
+    static let logger = LogFactory
+        .create(category: String(describing: SpendingTotalQueries.self))
+
+    static var grdb: GRDBDatabase {
+        @Dependency(\.database.grdb) var grdb
+        return grdb
+    }
+
+    static func fetchCategoryGroupTotals(startDate: Date, finishDate: Date) -> [CategoryRecord] {
+        do {
+            let categoryGroupBuilder = CategoryRecord
+                .queryTransactionsByCategoryGroupTotals(startDate: startDate, finishDate: finishDate)
+
+            return try grdb.fetchRecords(builder: categoryGroupBuilder)
+        } catch {
+            logger.error("\(String(describing: error))")
+            return []
+        }
+    }
+
+    static func fetchCategoryTotals(
+        categoryGroupId: String,
+        startDate: Date,
+        finishDate: Date
+    ) -> ([CategoryRecord], String) {
+        do {
+            let categoryBuilder = CategoryRecord
+                .queryTransactionsByCategoryTotals(
+                    forCategoryGroupId: categoryGroupId,
+                    startDate: startDate,
+                    finishDate: finishDate
+                )
+            let records = try Self.grdb.fetchRecords(builder: categoryBuilder)
+
+            @Dependency(\.budgetClient) var budgetClient
+            let groupName = budgetClient.getCategoryGroup(groupId: categoryGroupId)?.name ?? ""
+
+            return (records, groupName)
+        } catch {
+            Self.logger.error("\(String(describing: error))")
+            return ([], "")
+        }
+    }
+
 }
 
 // MARK: - View
@@ -194,6 +252,9 @@ struct SpendingTotalChartView: View {
             Divider()
 
             listRows
+        }
+        .onAppear {
+            store.send(.onAppear)
         }
     }
 
@@ -224,16 +285,16 @@ struct SpendingTotalChartView: View {
 
     private var chart: some View {
         VStack(spacing: .Spacing.pt16) {
-            Chart(store.selectedContent) { item in
-                let highlight = store.selectedGraphItem == nil || item.id == store.selectedGraphItem?.id
+            Chart(store.selectedContent) { record in
+                let highlight = store.selectedGraphItem == nil || record.id == store.selectedGraphItem?.id
                 SectorMark(
-                    angle: .value(Strings.chartValueKey, abs(item.value)),
+                    angle: .value(Strings.chartValueKey, abs(record.total.amount)),
                     innerRadius: .ratio(0.618),
                     outerRadius: .inset(20),
                     angularInset: 1
                 )
                 .cornerRadius(4)
-                .foregroundStyle(by: .value(Strings.chartNameKey, item.name))
+                .foregroundStyle(by: .value(Strings.chartNameKey, record.name))
                 .opacity(highlight ? 1.0 : 0.4)
             }
             .chartLegend()
@@ -247,7 +308,7 @@ struct SpendingTotalChartView: View {
                             Text(store.selectedGraphItem?.name ?? store.totalName)
                                 .typography(.title3Emphasized)
                                 .foregroundStyle(Color.Text.secondary)
-                            Text(store.selectedGraphItem?.valueFormatted ?? store.totalValue)
+                            Text(store.selectedGraphItem?.total.amountFormatted ?? store.grandTotalValue)
                                 .typography(.title2Emphasized)
                                 .foregroundStyle(Color.Text.primary)
                         }
@@ -301,19 +362,19 @@ struct SpendingTotalChartView: View {
             .listRowTop()
 
             // Category rows
-            ForEach(store.selectedContent) { item in
+            ForEach(store.selectedContent) { record in
                 Button {
-                    store.send(.listRowTapped(id: item.id), animation: .default)
+                    store.send(.listRowTapped(id: record.id), animation: .default)
                 } label: {
                     HStack {
                         BasicChartSymbolShape.circle
-                            .foregroundStyle(colorFor(item))
+                            .foregroundStyle(colorFor(record))
                             .frame(width: 8, height: 8)
-                        Text(item.name)
+                        Text(record.name)
                             .typography(.bodyEmphasized)
                             .foregroundStyle(Color.Text.primary)
                         Spacer()
-                        Text(item.valueFormatted)
+                        Text(record.total.amountFormatted)
                             .typography(.bodyEmphasized)
                             .foregroundStyle(Color.Text.primary)
                     }
@@ -329,8 +390,8 @@ struct SpendingTotalChartView: View {
     }
 
     // Colors are mapped using Apple chart ordering
-    private func colorFor(_ item: TabulatedDataItem) -> Color {
-        let index = store.selectedContent.firstIndex(of: item) ?? 0
+    private func colorFor(_ record: CategoryRecord) -> Color {
+        let index = store.selectedContent.firstIndex(of: record) ?? 0
         return colors[index % colors.count]
     }
 
@@ -367,7 +428,14 @@ private enum Strings {
 #Preview {
     ScrollView {
         SpendingTotalChartView(
-            store: .init(initialState: .init(title: "My Chart Name", transactions: .mocks)) {
+            store: .init(
+                initialState:
+                    .init(
+                        title: "My Chart Name",
+                        startDate: .now.firstDayInMonth(),
+                        finishDate: .now.lastDayInMonth()
+                    )
+            ) {
                  SpendingTotalChartFeature()
             }
         )

@@ -95,28 +95,3 @@ extension ReportChart {
     }
 
 }
-
-extension ReportChart {
-
-    /// Defines what accounts are  available for a given report type
-    func eligibleAccountsFiltered(unfilteredAccounts: IdentifiedArrayOf<Account>) -> IdentifiedArrayOf<Account> {
-        let filtered: [Account]
-        switch self.type {
-        case .spendingByTotal:
-            filtered = Self.onBudgetAccountFilter(unfilteredAccounts.elements)
-        case .spendingByTrend:
-            filtered = Self.onBudgetAccountFilter(unfilteredAccounts.elements)
-        case .incomeExpensesTable:
-            filtered = unfilteredAccounts.elements
-        case .line:
-            filtered = unfilteredAccounts.elements
-        }
-        return .init(uniqueElements: filtered)
-    }
-
-    private static func onBudgetAccountFilter(_ accounts: [Account]) -> [Account] {
-        accounts.filter {
-            $0.onBudget == true
-        }
-    }
-}
