@@ -26,12 +26,12 @@ enum ReportFeatureSourceLoader {
                     "\(String(describing: SavedReport.self)) chart id (\(report.chartId)) not found."
                 )
             }
-            guard let fromDate = Date.iso8601Formatter.date(from: report.fromDate) else {
+            guard let fromDate = Date.iso8601utc.date(from: report.fromDate) else {
                 throw LoadError.invalidDateFormat(
                     "\(String(describing: SavedReport.self)) fromDate could not be parsed (\(report.fromDate))."
                 )
             }
-            guard let toDate = Date.iso8601Formatter.date(from: report.toDate) else {
+            guard let toDate = Date.iso8601utc.date(from: report.toDate) else {
                 throw LoadError.invalidDateFormat(
                     "\(String(describing: SavedReport.self)) toDate could not be parsed (\(report.toDate))."
                 )

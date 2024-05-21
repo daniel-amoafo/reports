@@ -6,7 +6,7 @@ import Foundation
 public extension Date {
 
     static let dateFormatter: ISO8601DateFormatter = {
-        Date.iso8601Formatter
+        Date.iso8601utc
     }()
 
 }

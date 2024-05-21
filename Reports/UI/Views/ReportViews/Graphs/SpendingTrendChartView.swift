@@ -35,7 +35,7 @@ private extension SpendingTrendChartView {
 
 struct TxItem: Identifiable {
 
-    static let date = Date.iso8601Formatter
+    static let date = Date.iso8601utc
     let id: String = UUID().uuidString
     let date: Date
     let category: String

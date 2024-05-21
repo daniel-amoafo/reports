@@ -100,12 +100,12 @@ private struct ContentView: View {
 
     var body: some View {
         VStack {
-            Text(Date.iso8601Formatter.string(from: fromDate))
+            Text(Date.iso8601local.string(from: fromDate))
             MonthYearPickerView(selection: $fromDate, strategy: .firstDay)
 
             Divider()
 
-            Text(Date.iso8601Formatter.string(from: toDate))
+            Text(Date.iso8601local.string(from: toDate))
             MonthYearPickerView(selection: $toDate, in: fromDate..., strategy: .lastDay)
         }
     }

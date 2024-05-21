@@ -10,23 +10,19 @@ public extension BudgetProvider {
         let api = YNAB(accessToken: accessToken)
         return .init {
             do {
-                return try await api.budgets.getBudgets().map(BudgetSummary.init)
+                return try await api.budgets.getBudgets(includeAccounts: true).map(BudgetSummary.init)
             } catch {
                 throw mappedError(error)
             }
 
-        } fetchAccounts: { budgetId in
-            do {
-                return try await api.accounts.getAccounts(budgetId: budgetId).map(Account.init)
-            } catch {
-                throw mappedError(error)
-            }
         } fetchCategoryValues: { params in
             do {
                 let result = try await api.categories.getCategories(budgetId: params.budgetId)
                     .map { categoryGroup -> (CategoryGroup, [Category]) in
                         let group = CategoryGroup(ynabCategoryGroup: categoryGroup)
-                        let categories = categoryGroup.categories.map { Category(ynabCategory: $0, currency: params.currency) }
+                        let categories = categoryGroup.categories.map { 
+                            Category(ynabCategory: $0, currency: params.currency)
+                        }
                         return (group, categories)
                     }
                 let groups = result.map(\.0)
@@ -50,6 +46,24 @@ public extension BudgetProvider {
             } catch {
                 throw mappedError(error)
             }
+        } fetchAllTransactions: { params in
+            let (details, serverKnowledge) = try await api.transactions
+                .getTransactionsWithServerKnowledge(
+                    budgetId: params.budgetId,
+                    sinceDate: nil,
+                    type: nil,
+                    lastKnowledgeOfServer: params.lastServerKnowledge
+                )
+            let transactions = details.map {
+                let categoryGroup = params.categoryGroupProvider?.getCategoryGroupForCategory(categoryId: $0.categoryId)
+                return TransactionEntry(
+                    ynabTransactionDetail: $0,
+                    budgetId: params.budgetId,
+                    currency: params.currency,
+                    categoryGroup: categoryGroup
+                )
+            }
+            return (transactions, serverKnowledge)
         }
     }
 }
@@ -72,7 +86,11 @@ private extension BudgetProvider {
         let transactionDetails: [TransactionDetail]
         if let accountId {
             transactionDetails = try await api.transactions
-                .getTransactions(budgetId: params.budgetId, accountId: accountId, sinceDate: params.startDate)
+                .getTransactions(
+                    budgetId: params.budgetId,
+                    accountId: accountId,
+                    sinceDate: params.startDate
+                )
         } else {
             transactionDetails = try await api.transactions
                 .getTransactions(budgetId: params.budgetId, sinceDate: params.startDate)
@@ -81,7 +99,12 @@ private extension BudgetProvider {
         return transactionDetails
             .map {
                 let categoryGroup = params.categoryGroupProvider?.getCategoryGroupForCategory(categoryId: $0.categoryId)
-                return TransactionEntry(ynabTransactionDetail: $0, currency: params.currency, categoryGroup: categoryGroup)
+                return TransactionEntry(
+                    ynabTransactionDetail: $0,
+                    budgetId: params.budgetId,
+                    currency: params.currency,
+                    categoryGroup: categoryGroup
+                )
             }
     }
 
@@ -97,7 +120,12 @@ private extension BudgetProvider {
         return hybridTransactions
             .map {
                 let categoryGroup = params.categoryGroupProvider?.getCategoryGroupForCategory(categoryId: $0.categoryId)
-                return TransactionEntry(ynabHybridTransaction: $0, currency: params.currency, categoryGroup: categoryGroup)
+                return TransactionEntry(
+                    ynabHybridTransaction: $0,
+                    budgetId: params.budgetId,
+                    currency: params.currency,
+                    categoryGroup: categoryGroup
+                )
             }
     }
 }

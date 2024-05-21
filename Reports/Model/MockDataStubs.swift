@@ -20,9 +20,9 @@ extension ReportChart {
 extension IdentifiedArray where ID == Account.ID, Element == Account {
 
     static let mocks: Self = [
-        .init(id: "01", name: "Everyday Account", onBudget: true, deleted: false),
-        .init(id: "02", name: "Acme Account", onBudget: true, deleted: false),
-        .init(id: "03", name: "Appleseed Account", onBudget: true, deleted: false),
+        .init(id: "01", budgetId: "Budget1", name: "Everyday Account", onBudget: true, deleted: false),
+        .init(id: "02", budgetId: "Budget1", name: "Acme Account", onBudget: true, deleted: false),
+        .init(id: "03", budgetId: "Budget1", name: "Appleseed Account", onBudget: true, deleted: false),
     ]
 }
 
@@ -37,7 +37,8 @@ extension IdentifiedArray where Element == BudgetSummary, ID == BudgetSummary.ID
             lastModifiedOn: "Yesterday",
             firstMonth: "March",
             lastMonth: "May",
-            currency: .AUD
+            currency: .AUD,
+            accounts: []
         ),
         .init(
             id: "Budget2",
@@ -45,7 +46,8 @@ extension IdentifiedArray where Element == BudgetSummary, ID == BudgetSummary.ID
             lastModifiedOn: "Days ago",
             firstMonth: "April",
             lastMonth: "Jun",
-            currency: .AUD
+            currency: .AUD,
+            accounts: []
         ),
     ]
 }
@@ -148,7 +150,8 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
     static let mocks: Self = [
         .init(
             id: "T1",
-            date: Date.iso8601Formatter.date(from: "2024-02-01")!,
+            budgetId: IdentifiedArrayOf<BudgetSummary>.mocks[0].id,
+            date: Date.iso8601utc.date(from: "2024-02-01")!,
             rawAmount: -1_00_00,
             currencyCode: Currency.AUD.code,
             payeeName: "Woolworths",
@@ -163,7 +166,8 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
         ),
         .init(
             id: "T2",
-            date: Date.iso8601Formatter.date(from: "2024-02-01")!,
+            budgetId: IdentifiedArrayOf<BudgetSummary>.mocks[0].id,
+            date: Date.iso8601utc.date(from: "2024-02-01")!,
             rawAmount: -5_00,
             currencyCode: Currency.AUD.code,
             payeeName: "Opal",
@@ -178,7 +182,8 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
         ),
         .init(
             id: "T3",
-            date: Date.iso8601Formatter.date(from: "2024-03-05")!,
+            budgetId: IdentifiedArrayOf<BudgetSummary>.mocks[0].id,
+            date: Date.iso8601utc.date(from: "2024-03-05")!,
             rawAmount: -99_99,
             currencyCode: Currency.AUD.code,
             payeeName: "Landlord",
@@ -193,7 +198,8 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
         ),
         .init(
             id: "T4",
-            date: Date.iso8601Formatter.date(from: "2024-04-24")!,
+            budgetId: IdentifiedArrayOf<BudgetSummary>.mocks[0].id,
+            date: Date.iso8601utc.date(from: "2024-04-24")!,
             rawAmount: -37_60,
             currencyCode: Currency.AUD.code,
             payeeName: "Uber",
@@ -208,7 +214,8 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
         ),
         .init(
             id: "T5",
-            date: Date.iso8601Formatter.date(from: "2024-04-28")!,
+            budgetId: IdentifiedArrayOf<BudgetSummary>.mocks[0].id,
+            date: Date.iso8601utc.date(from: "2024-04-28")!,
             rawAmount: -20_00,
             currencyCode: Currency.AUD.code,
             payeeName: "IRH Party",
@@ -223,7 +230,8 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
         ),
         .init(
             id: "T6",
-            date: Date.iso8601Formatter.date(from: "2024-05-02")!,
+            budgetId: IdentifiedArrayOf<BudgetSummary>.mocks[0].id,
+            date: Date.iso8601utc.date(from: "2024-05-02")!,
             rawAmount: -60_00,
             currencyCode: Currency.AUD.code,
             payeeName: "The Midnights",
@@ -238,7 +246,8 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
         ),
         .init(
             id: "T7",
-            date: Date.iso8601Formatter.date(from: "2024-03-11")!,
+            budgetId: IdentifiedArrayOf<BudgetSummary>.mocks[0].id,
+            date: Date.iso8601utc.date(from: "2024-03-11")!,
             rawAmount: -42_00,
             currencyCode: Currency.AUD.code,
             payeeName: "Hoyts",
@@ -256,7 +265,8 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
     static let mocksTwo: Self = [
         .init(
             id: "T1",
-            date: Date.iso8601Formatter.date(from: "2024-06-01")!,
+            budgetId: IdentifiedArrayOf<BudgetSummary>.mocks[0].id,
+            date: Date.iso8601utc.date(from: "2024-06-01")!,
             rawAmount: -5_00,
             currencyCode: Currency.AUD.code,
             payeeName: "Taxi",
@@ -271,7 +281,8 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
         ),
         .init(
             id: "T2",
-            date: Date.iso8601Formatter.date(from: "2024-07-15")!,
+            budgetId: IdentifiedArrayOf<BudgetSummary>.mocks[0].id,
+            date: Date.iso8601utc.date(from: "2024-07-15")!,
             rawAmount: -10_50,
             currencyCode: Currency.AUD.code,
             payeeName: "Landlord",
@@ -317,7 +328,7 @@ extension SavedReport {
                 fromDate: "2024-01-01",
                 toDate: "2024-02-28",
                 chartId: ReportChart.firstChart.id,
-                lastModified: Date.iso8601Formatter.date(from: "2024-03-30T14:30")!
+                lastModified: Date.iso8601utc.date(from: "2024-03-30T14:30")!
             ),
             .init(
                 id: UUID(uuidString: "00000000-0000-0000-0000-000000000012")!,
@@ -325,7 +336,7 @@ extension SavedReport {
                 fromDate: "2024-03-05",
                 toDate: "2024-04-04",
                 chartId: ReportChart.firstChart.id,
-                lastModified: Date.iso8601Formatter.date(from: "2024-05-12T16:45")!
+                lastModified: Date.iso8601utc.date(from: "2024-05-12T16:45")!
             ),
             .init(
                 id: UUID(uuidString: "00000000-0000-0000-0000-000000000013")!,
@@ -334,7 +345,7 @@ extension SavedReport {
                 toDate: "2024-02-09",
                 chartId: ReportChart.firstChart.id,
                 selectedAccountId: Account.allAccountsId,
-                lastModified: Date.iso8601Formatter.date(from: "2024-02-12T08:45")!
+                lastModified: Date.iso8601utc.date(from: "2024-02-12T08:45")!
             ),
             .init(
                 id: UUID(uuidString: "00000000-0000-0000-0000-000000000014")!,
@@ -343,7 +354,7 @@ extension SavedReport {
                 toDate: "2024-05-09",
                 chartId: ReportChart.firstChart.id,
                 selectedAccountId: Account.allAccountsId,
-                lastModified: Date.iso8601Formatter.date(from: "2024-05-08T17:12")!
+                lastModified: Date.iso8601utc.date(from: "2024-05-08T17:12")!
             ),
         ]
     }()

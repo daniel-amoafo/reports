@@ -4,16 +4,18 @@
 import Foundation
 import MoneyCommon
 
-public struct Account: Identifiable, Equatable, CustomStringConvertible {
+public struct Account: Identifiable, Equatable, Codable, CustomStringConvertible {
 
     public var id: String
+    public var budgetId: String
     public var name: String
     public var onBudget: Bool
     public var deleted: Bool
     public var description: String { name }
 
-    public init(id: String, name: String, onBudget: Bool, deleted: Bool) {
+    public init(id: String, budgetId: String, name: String, onBudget: Bool, deleted: Bool) {
         self.id = id
+        self.budgetId = budgetId
         self.name = name
         self.onBudget = onBudget
         self.deleted = deleted
@@ -38,6 +40,8 @@ public struct BudgetSummary: Identifiable, Equatable, Codable, CustomStringConve
 
     public let currency: Currency
 
+    public let accounts: [Account]
+
     public var description: String { name }
 
     public var currencyCode: String { currency.code }
@@ -48,7 +52,8 @@ public struct BudgetSummary: Identifiable, Equatable, Codable, CustomStringConve
         lastModifiedOn: String,
         firstMonth: String,
         lastMonth: String,
-        currency: Currency
+        currency: Currency,
+        accounts: [Account]
     ) {
         self.id = id
         self.name = name
@@ -56,6 +61,7 @@ public struct BudgetSummary: Identifiable, Equatable, Codable, CustomStringConve
         self.firstMonth = firstMonth
         self.lastMonth = lastMonth
         self.currency = currency
+        self.accounts = accounts
     }
 
     public init(
@@ -75,13 +81,14 @@ public struct BudgetSummary: Identifiable, Equatable, Codable, CustomStringConve
             lastModifiedOn: lastModifiedOn,
             firstMonth: firstMonth,
             lastMonth: lastMonth,
-            currency: currency
+            currency: currency,
+            accounts: []
         )
     }
 
 }
 
-public struct CategoryGroup: Identifiable, Equatable, CustomStringConvertible {
+public struct CategoryGroup: Identifiable, Equatable, Codable, CustomStringConvertible {
     /// Category group id
     public let id: String
 
@@ -107,7 +114,7 @@ public struct CategoryGroup: Identifiable, Equatable, CustomStringConvertible {
     }
 }
 
-public struct Category: Identifiable, Equatable, CustomStringConvertible {
+public struct Category: Identifiable, Equatable, Codable, CustomStringConvertible {
     /// Category id
     public let id: String
 
@@ -147,6 +154,8 @@ public struct TransactionEntry: Identifiable, Equatable, Codable, CustomStringCo
 
     public let id: String
 
+    public let budgetId: String
+
     public let date: Date
 
     public let rawAmount: Int
@@ -185,6 +194,7 @@ public struct TransactionEntry: Identifiable, Equatable, Codable, CustomStringCo
 
     public init(
         id: String,
+        budgetId: String,
         date: Date,
         rawAmount: Int,
         currencyCode: String,
@@ -199,6 +209,7 @@ public struct TransactionEntry: Identifiable, Equatable, Codable, CustomStringCo
         deleted: Bool
     ) {
         self.id = id
+        self.budgetId = budgetId
         self.date = date
         self.rawAmount = rawAmount
         self.payeeName = payeeName
@@ -218,7 +229,7 @@ public struct TransactionEntry: Identifiable, Equatable, Codable, CustomStringCo
     }
 
     public var dateFormated: String {
-        Date.iso8601Formatter.string(from: date)
+        Date.iso8601utc.string(from: date)
     }
 
     public var dateFormatedLong: String {

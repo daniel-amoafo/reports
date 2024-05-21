@@ -46,9 +46,6 @@ public class BudgetClient {
 
     public func updateProvider(_ provider: BudgetProvider) {
         self.provider = provider
-        Task {
-            await fetchBudgetSummaries()
-        }
     }
 
     public func updateSelectedBudgetId(_ selectedId: String) throws {
@@ -59,61 +56,33 @@ public class BudgetClient {
         logger.debug("BudgetClient selectedBudgetId updated to: \(selectedId)")
     }
 
-    /// Helper function to fetch published data values
-    public func fetchData() async {
-        await fetchBudgetSummaries()
-        await fetchAccountAndCategoryValues()
-    }
 
     func fetchAccountAndCategoryValues() async {
-        await fetchAccounts()
         await fetchCategoryValues()
     }
 
-    public func fetchBudgetSummaries() async {
+    public func fetchBudgetSummaries() async throws -> [BudgetSummary] {
         do {
             logger.debug("fetching budget summaries ...")
-            let fetchedBudgetSummaries = try await provider.fetchBudgetSummaries()
-            await Task {
-                await MainActor.run {
-                    // updating published events on main run loop
-                    self.budgetSummaries = IdentifiedArray(uniqueElements: fetchedBudgetSummaries)
-                    // must be logged in to successfully fetch budget summaries without error
-                    self.authorizationStatus = .loggedIn
-
-                    logger.debug("budgetSummaries count(\(self.budgetSummaries.count))")
-                    // If set, ensure the selected budget id is in the updated budget summaries
-                    if let selectedBudgetId = self.selectedBudgetId,
-                        !fetchedBudgetSummaries.map(\.id).contains(selectedBudgetId) {
-                        self.selectedBudgetId = nil
-                        logger.debug("selectedBudgetId set to nil")
-                    }
+            let budgetSummaries = try await provider.fetchBudgetSummaries()
+            logger.debug("budgetSummaries count(\(budgetSummaries.count))")
+            await Task { @MainActor in
+                self.budgetSummaries = IdentifiedArray(uniqueElements: budgetSummaries)
+                self.authorizationStatus = .loggedIn
+                // If set, ensure the selected budget id is in the updated budget summaries
+                if let selectedBudgetId = self.selectedBudgetId,
+                   !budgetSummaries.map(\.id).contains(selectedBudgetId) {
+                    self.selectedBudgetId = nil
+                    logger.debug("selectedBudgetId set to nil")
                 }
             }.value
+            return budgetSummaries
         } catch {
-            resolveError(error)
+            logoutIfNeeded(error)
+            throw error
         }
     }
 
-    /// Fetches account list from budget provider and publishes accounts
-    @discardableResult
-    public func fetchAccounts() async -> IdentifiedArrayOf<Account> {
-        logger.debug("fetching category accounts...")
-        guard let selectedBudgetId, isAuthenticated else { return [] }
-        do {
-            let fetchedAccounts = try await provider.fetchAccounts(selectedBudgetId)
-            let accounts = IdentifiedArray(uniqueElements: fetchedAccounts)
-                .filter { $0.deleted == false }
-            Task { @MainActor in
-                self.accounts = accounts
-            }
-            logger.debug("accounts count (\(accounts.count))")
-            return accounts
-        } catch {
-            resolveError(error)
-            return []
-        }
-    }
 
     public func fetchCategoryValues() async {
         logger.debug("fetching category values ...")
@@ -125,14 +94,14 @@ public class BudgetClient {
             )
             let categoryGroups = IdentifiedArray(uniqueElements: fetchedCategoryValues.groups)
             let categories = IdentifiedArray(uniqueElements: fetchedCategoryValues.categories)
-            Task { @MainActor in
-                self.categoryGroups = categoryGroups
-                self.categories = categories
-            }
             logger.debug("categoryGroups count (\(categoryGroups.count))")
             logger.debug("categories count (\(categories.count))")
+            await Task { @MainActor in
+                self.categoryGroups = categoryGroups
+                self.categories = categories
+            }.value
         } catch {
-            resolveError(error)
+            logoutIfNeeded(error)
         }
     }
 
@@ -153,7 +122,8 @@ public class BudgetClient {
                     finishDate: finishDate,
                     currency: currency,
                     categoryGroupProvider: self,
-                    filterBy: filterBy
+                    filterBy: filterBy,
+                    lastServerKnowledge: nil
                 )
             )
                 .filter {
@@ -174,17 +144,31 @@ public class BudgetClient {
                 }
             return IdentifiedArray(uniqueElements: fetchedTransactions)
         } catch {
-            resolveError(error)
+            logoutIfNeeded(error)
             throw error
         }
 
     }
 
-    public func fetchAllTransactions() async throws -> IdentifiedArrayOf<TransactionEntry> {
-        return try await fetchTransactions()
+    public func fetchAllTransactions(lastServerKnowledge: Int?)
+    async throws -> ([TransactionEntry], serverKnowledge: Int) {
+        guard let selectedBudgetId, let currency = budgetSummaries[id: selectedBudgetId]?.currency
+        else { return ([], 0) }
+        logger.debug("fetching all transaction entries...")
+        return try await provider.fetchAllTransactions(
+            .init(
+                budgetId: selectedBudgetId,
+                startDate: nil,
+                finishDate: nil,
+                currency: currency,
+                categoryGroupProvider: self,
+                filterBy: nil,
+                lastServerKnowledge: lastServerKnowledge
+            )
+        )
     }
 
-    func resolveError(_ error: Error) {
+    func logoutIfNeeded(_ error: Error) {
         if let budgetClientError = error as? BudgetClientError,
            budgetClientError.isNotAuthorized {
             self.authorizationStatus = .loggedOut
@@ -212,12 +196,12 @@ extension BudgetClient {
     ) {
         let provider = BudgetProvider {
             budgetSummaries.elements
-        } fetchAccounts: { budgetId in
-            accounts.elements
         } fetchCategoryValues: { _ in
             (categoryGroups.elements, categories.elements)
         } fetchTransactions: { _ in
             transactions.elements
+        } fetchAllTransactions: { _ in
+            (transactions.elements, 0)
         }
         self.init(provider: provider)
 

@@ -31,6 +31,7 @@ struct AppFeature {
     }
 
     @Dependency(\.budgetClient) var budgetClient
+    @Dependency(\.database.grdb) var grdb
     @Dependency(\.configProvider) var configProvider
     @Dependency(\.continuousClock) var clock
 
@@ -63,12 +64,11 @@ struct AppFeature {
                 return .run { _ in
                     if newStatus == .loggedIn, oldStatus == .loggedOut {
                         // make sure we have fresh data if previously loggedOut state
-                        await loadBudgetClientData()
+                        await syncBudgetData()
                     }
                 }
 
             case .checkRetryConnection:
-                logger.debug("checkRetryConnection called")
                 if state.authStatus == .unknown {
                     state.showRetryLoading = true
                 }
@@ -106,6 +106,9 @@ private extension AppFeature {
                 budgetClient.updateYnabProvider(accessToken)
                 state.appIntroLogin.showSafariBrowser = nil
                 logger.info("oauth url path handled, updated budget client with new access token.")
+                Task {
+                    await syncBudgetData()
+                }
             }
         default:
             break
@@ -113,59 +116,63 @@ private extension AppFeature {
     }
 
     func performOnAppear() async {
-         await loadBudgetClientData()
+          await syncBudgetData()
     }
 
     /// Spawns unstructured Async Task to mmonitor for budgetClient changes.
-    ///
     func startAsyncListeners(send: Send<AppFeature.Action>) async {
-        Task {
+        // await the last task to keep the run effect from completing.
+        // A Reducer run effect cannot complete if send actions will be emitted.
+        await Task {
             // Monitor authorization satus updates
             for await status in budgetClient.$authorizationStatus.stream {
                 await send(.didUpdateAuthStatus(status))
                 logger.debug("did update auth status to: \(status)")
             }
-        }
-
-        Task {
-            // Monitor when the budgetId changes and update db values
-            for await selectedBudgetId in budgetClient.$selectedBudgetId.stream {
-                logger.debug("selectedBudgetId updated \(selectedBudgetId ?? "")")
-            }
-        }
-
-        // await the last task to keep the run effect from completing.
-        // A Reducer run effect cannot complete if send actions can be sent.
-        await Task {
-            for await budgetSummaries in budgetClient.$budgetSummaries.stream {
-                logger.debug("budgetSummaries updated")
-                do {
-                    @Dependency(\.database.grdb) var grdb
-                    try grdb.saveBudgetSummaries(budgetSummaries)
-                } catch {
-                    logger.error("Unable to persist budget summaries in database")
-                    logger.error("\(error.localizedDescription)")
-                    return
-                }
-
-                // fetch transactions to persist once with ?
-            }
         }.value
-
     }
 
-    func loadBudgetClientData() async {
-        logger.debug("\(#function)")
-        await budgetClient.fetchData()
-    }
-
-    func syncTransactionHistory() {
-        Task {
-            do {
-                let transactions = try await budgetClient.fetchAllTransactions()
-            } catch {
-                logger.error("\(error.localizedDescription)")
+    func syncBudgetData() async {
+        do {
+            let summaries = try await budgetClient.fetchBudgetSummaries()
+            guard summaries.isNotEmpty else {
+                logger.warning("No budget summaries fetched! Halting db sync.")
+                return
             }
+            logger.debug("Syncing summaries and accounts to db...")
+            try await grdb.saveBudgetSummaries(summaries)
+            await budgetClient.fetchCategoryValues()
+            await syncTransactionHistory()
+
+            let builder = CategoryRecord.queryTransactionsByCategoryGroupTotals(
+                startDate: .now.advanceMonths(by: -1, strategy: .firstDay),
+                finishDate: .now.advanceMonths(by: -1, strategy: .lastDay)
+            )
+
+
+        } catch {
+            logger.error("\(String(describing: error))")
+        }
+    }
+
+    func syncTransactionHistory() async {
+        do {
+            guard let selectedId = budgetClient.selectedBudgetId else { return }
+
+            let lastServerKnowledge = try grdb.fetchServerKnowledgeConfig(budgetId: selectedId)?.transactions
+            let (transactions, serverKnowledge) = try await budgetClient
+                .fetchAllTransactions(lastServerKnowledge: lastServerKnowledge)
+
+            guard transactions.isNotEmpty else {
+                logger.debug("No new / updated transactions since last sync.")
+                return
+            }
+
+            logger.debug("Syncing transaction history to db...")
+            try grdb.saveTransactions(transactions, serverKnowledge: serverKnowledge)
+
+        } catch {
+            logger.error("\(String(describing: error))")
         }
     }
 

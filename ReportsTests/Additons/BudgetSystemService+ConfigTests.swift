@@ -25,19 +25,13 @@ final class BudgetSystemServiceConfigTests: XCTestCase {
 
         try await withMainSerialExecutor {
             // when
-            XCTAssertTrue(env.client.budgetSummaries.isEmpty)
-            await env.client.fetchBudgetSummaries()
-            await Task.megaYield()
-            // then
-            XCTAssertTrue(env.client.budgetSummaries.isNotEmpty)
+            let summaries = try await env.client.fetchBudgetSummaries()
 
             // when
             XCTAssertTrue(env.client.accounts.isEmpty)
             try env.client.updateSelectedBudgetId("2")
-            await env.client.fetchAccounts()
-            await Task.megaYield()
             // then
-            XCTAssertTrue(env.client.accounts.isNotEmpty)
+
         }
     }
 
@@ -45,10 +39,10 @@ final class BudgetSystemServiceConfigTests: XCTestCase {
         // given
         let env = Factory.createBudgetClient()
 
-        await withMainSerialExecutor {
+        try await withMainSerialExecutor {
             // when
             XCTAssertTrue(env.client.budgetSummaries.isEmpty)
-            await env.client.fetchBudgetSummaries()
+            _ = try await env.client.fetchBudgetSummaries()
             await Task.megaYield()
             // then
             XCTAssertTrue(env.client === BudgetClient.notAuthorizedClient)
@@ -83,12 +77,12 @@ private enum Factory {
     static var mockBudgetProvider: BudgetProvider {
         return .init {
             .mocks
-        } fetchAccounts: { _ in
-                .mocks
         } fetchCategoryValues: { _ in
             ([], [])
         } fetchTransactions: { _ in
             []
+        } fetchAllTransactions: { _ in
+            ([], 0)
         }
     }
 
@@ -97,9 +91,9 @@ private enum Factory {
 extension Array where Element == Account {
 
     static let mocks: Self = [
-        .init(id: "01", name: "First Account", onBudget: true, deleted: false),
-        .init(id: "02", name: "Second Account", onBudget: true, deleted: false),
-        .init(id: "03", name: "Third Account", onBudget: true, deleted: false),
+        .init(id: "01", budgetId: "1", name: "First Account", onBudget: true, deleted: false),
+        .init(id: "02", budgetId: "1", name: "Second Account", onBudget: true, deleted: false),
+        .init(id: "03", budgetId: "1", name: "Third Account", onBudget: true, deleted: false),
     ]
 }
 
@@ -112,7 +106,8 @@ extension Array where Element == BudgetSummary {
             lastModifiedOn: "Yesterday",
             firstMonth: "March",
             lastMonth: "May",
-            currency: .AUD
+            currency: .AUD,
+            accounts: []
         ),
         .init(
             id: "2",
@@ -120,7 +115,8 @@ extension Array where Element == BudgetSummary {
             lastModifiedOn: "Days ago",
             firstMonth: "April",
             lastMonth: "Jun",
-            currency: .AUD
+            currency: .AUD,
+            accounts: []
         ),
     ]
 

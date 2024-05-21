@@ -3,8 +3,10 @@
 import Combine
 import Foundation
 
-// AsyncPublisher vends a .value property however not reliable
+/// AsyncPublisher vends a .value property however does not reliably vend values
+/// when used in a for await syntax. Using a `AsyncStream` reliably delivers values
 extension Publisher where Failure == Never {
+
     public var stream: AsyncStream<Output> {
         AsyncStream { continuation in
             let cancellable = self.sink { _ in
@@ -17,4 +19,5 @@ extension Publisher where Failure == Never {
             }
         }
     }
+
 }

@@ -10,11 +10,25 @@ struct GRDBDatabase {
     /// Provides access to the database.
     private let dbWriter: any DatabaseWriter
 
-    /// Creates an `AppDatabase`, and makes sure the database schema
+    /// Creates an `GRDBDatabase`, and makes sure the database schema
     /// is ready.
     init(_ dbWriter: any DatabaseWriter) throws {
         self.dbWriter = dbWriter
         try migrator.migrate(dbWriter)
+    }
+}
+
+extension GRDBDatabase {
+
+    enum ValidationError: LocalizedError {
+        case missingBudgetId
+
+        var errorDescription: String? {
+            switch self {
+            case .missingBudgetId:
+                return "A valid budget id is required"
+            }
+        }
     }
 }
 
@@ -123,6 +137,7 @@ private extension GRDBDatabase {
         migrator.eraseDatabaseOnSchemaChange = true
 #endif
 // swiftlint:disable identifier_name
+
         migrator.registerMigration("create initial tables") { db in
             // Create a tables
             // See <https://swiftpackageindex.com/groue/grdb.swift/documentation/grdb/databaseschema>
@@ -135,10 +150,19 @@ private extension GRDBDatabase {
                 t.column("currencyCode", .text).notNull()
             }
 
+            try db.create(table: "account") { t in
+                t.primaryKey("id", .text).notNull()
+                t.column("name", .text).notNull()
+                t.column("onBudget", .boolean).notNull()
+                t.column("deleted", .boolean).notNull()
+                t.belongsTo("budgetSummary", onDelete: .cascade).notNull()
+            }
+
             try db.create(table: "transactionEntry") { t in
                 t.primaryKey("id", .text).notNull()
                 t.column("date", .date).notNull()
                 t.column("amount", .integer).notNull()
+                t.column("currencyCode", .text).notNull()
                 t.column("payeeName", .text)
                 t.column("accountId", .text).notNull()
                 t.column("accountName", .text).notNull()
@@ -148,7 +172,18 @@ private extension GRDBDatabase {
                 t.column("categoryGroupName", .text)
                 t.column("transferAccountId", .text)
                 t.column("deleted", .boolean)
+                t.belongsTo("budgetSummary", onDelete: .cascade).notNull()
+            }
+
+            try db.create(table: "serverKnowledgeConfig") { t in
+
                 t.belongsTo("budgetSummary", onDelete: .cascade)
+                    .unique()
+                    .notNull()
+
+                // The last known server knowledge values per api
+                t.column("categories", .integer)
+                t.column("transactions", .integer)
             }
         }
 
@@ -166,45 +201,86 @@ private extension GRDBDatabase {
 
 extension GRDBDatabase {
 
-    func saveBudgetSummaries(_ summaries: IdentifiedArrayOf<BudgetSummary>) throws {
-        try dbWriter.write { db in
-            for summary in summaries.elements {
+    func saveBudgetSummaries(_ summaries: [BudgetSummary]) async throws {
+        try await dbWriter.write { db in
+            for summary in summaries {
                 try summary.save(db)
+                try saveAccounts(summary.accounts, db: db)
             }
+        }
+    }
+
+    func saveTransactions(_ transactions: [TransactionEntry], serverKnowledge: Int) throws {
+        guard let budgetId = transactions.first?.budgetId else { return }
+        try dbWriter.write { db in
+            for transaction in transactions {
+                try transaction.save(db)
+            }
+
+            // Update or Create server knowledge config
+            var serverKnowledgeConfig = try fetchServerKnowledgeConfig(budgetId: budgetId, db: db)
+            ?? .init(budgetId: budgetId)
+            serverKnowledgeConfig.transactions = serverKnowledge
+            try serverKnowledgeConfig.upsert(db)
+
+            Self.logger.debug("saved transactions (\(transactions.count)), server knowledge (\(serverKnowledge))")
+        }
+    }
+
+    func saveServerKnowledge(_ serverKnowledge: ServerKnowledgeConfig) throws {
+        try dbWriter.write { db in
+            try serverKnowledge.save(db)
+        }
+    }
+
+    private func saveAccounts(_ accounts: [Account], db: GRDB.Database) throws {
+        for account in accounts {
+            try account.save(db)
         }
     }
 
 }
 
-extension BudgetSummary: FetchableRecord, PersistableRecord {
+// MARK: - Database Access: Read
 
-    public func encode(to container: inout PersistenceContainer) throws {
-        container["id"] = id
-        container["name"] = name
-        container["lastModifiedOn"] = lastModifiedOn
-        container["firstMonth"] = firstMonth
-        container["lastMonth"] = lastMonth
-        container["currencyCode"] = currencyCode
+extension GRDBDatabase {
+
+    func fetchServerKnowledgeConfig(budgetId: String) throws -> ServerKnowledgeConfig? {
+        try dbWriter.read { db in
+            try fetchServerKnowledgeConfig(budgetId: budgetId, db: db)
+        }
     }
 
+    func fetchRecords<Record: FetchableRecord>(builder: RecordSQLBuilder<Record>)
+    async throws -> [Record] {
+        try await dbWriter.read { db in
+            let sql = builder.sql
+            let arguments = StatementArguments(builder.arguments)
+            return try builder.record.fetchAll(db, sql: sql, arguments: arguments)
+        }
+    }
+
+    func fetchTransactions() throws -> [TransactionEntry] {
+        return []
+    }
+
+    private func fetchServerKnowledgeConfig(budgetId: String, db: GRDB.Database) throws -> ServerKnowledgeConfig? {
+        guard budgetId.isNotEmpty else {
+            throw ValidationError.missingBudgetId
+        }
+        let budgetIdColumn = ServerKnowledgeConfig.CodingKeys.budgetId.rawValue
+        let request = ServerKnowledgeConfig.filter(Column(budgetIdColumn) == budgetId)
+        return try request.fetchOne(db)
+    }
 }
 
-extension TransactionEntry: FetchableRecord, PersistableRecord {
+extension GRDBDatabase {
 
-    public func encode(to container: inout GRDB.PersistenceContainer) throws {
-        container["id"] = id
-        container["date"] = date
-        container["amount"] = rawAmount
-        container["currencyCode"] = currency.code
-        container["payeeName"] = payeeName
-        container["accountId"] = accountId
-        container["accountName"] = accountName
-        container["categoryId"] = categoryId
-        container["categoryName"] = categoryName
-        container["categoryGroupId"] = categoryGroupId
-        container["categoryGroupName"] = categoryGroupName
-        container["transferAccountId"] = transferAccountId
-        container["deleted"] = deleted
+    /// A struct used to create a SQL to return a record type
+    struct RecordSQLBuilder<Record: FetchableRecord> {
+        let record: Record.Type
+        let sql: String
+        let arguments: [(any DatabaseValueConvertible)?]
     }
 
 }

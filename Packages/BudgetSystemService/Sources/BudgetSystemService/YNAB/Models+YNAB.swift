@@ -6,8 +6,9 @@ import SwiftYNAB
 
 extension Account {
     
-    init(ynabAccount: SwiftYNAB.Account) {
+    init(ynabAccount: SwiftYNAB.Account, budgetId: String) {
         self.id = ynabAccount.id
+        self.budgetId = budgetId
         self.name = ynabAccount.name
         self.onBudget = ynabAccount.onBudget
         self.deleted = ynabAccount.deleted
@@ -22,7 +23,10 @@ extension BudgetSummary {
         self.lastModifiedOn = ynabBudgetSummary.lastModifiedOn
         self.firstMonth = ynabBudgetSummary.firstMonth
         self.lastMonth = ynabBudgetSummary.lastMonth
-        
+        self.accounts = ynabBudgetSummary.accounts.map({ ynabAccount in
+            Account.init(ynabAccount: ynabAccount, budgetId: ynabBudgetSummary.id)
+        })
+
         guard let currency = Currency.iso4217Currency(for: ynabBudgetSummary.currencyFormat.isoCode) else {
             fatalError("Expected Currency not found using isoCode - \(ynabBudgetSummary.currencyFormat.isoCode)")
         }
@@ -56,8 +60,14 @@ extension Category {
 
 extension TransactionEntry {
 
-    init(ynabTransactionDetail ynab: SwiftYNAB.TransactionDetail, currency: Currency, categoryGroup: CategoryGroup?) {
+    init(
+        ynabTransactionDetail ynab: SwiftYNAB.TransactionDetail,
+        budgetId: String,
+        currency: Currency,
+        categoryGroup: CategoryGroup?
+    ) {
         self.id = ynab.id
+        self.budgetId = budgetId
         self.rawAmount = ynab.amount
         self.currency = currency
         self.payeeName = ynab.payeeName
@@ -70,14 +80,20 @@ extension TransactionEntry {
         self.transferAccountId = ynab.transferAccountId
         self.deleted = ynab.deleted
 
-        guard let date = DateConverter.date(from: ynab.date) else {
+        guard let date = Date.iso8601utc.date(from: ynab.date) else {
             fatalError("Unable to convert ynab transaction date string into a Date instance - \(ynab.date)")
         }
         self.date = date
     }
 
-    init(ynabHybridTransaction ynab: HybridTransaction, currency: Currency, categoryGroup: CategoryGroup?) {
+    init(
+        ynabHybridTransaction ynab: HybridTransaction,
+        budgetId: String,
+        currency: Currency,
+        categoryGroup: CategoryGroup?
+    ) {
         self.id = ynab.id
+        self.budgetId = budgetId
         self.rawAmount = ynab.amount
         self.currency = currency
         self.payeeName = ynab.payeeName
@@ -99,7 +115,7 @@ extension TransactionEntry {
 
 extension Money {
 
-    static func forYNAB(amount: Int, currency: Currency) -> Self {
+    public static func forYNAB(amount: Int, currency: Currency) -> Self {
         // YNAB amounts store values in milli units (to the thousandths). see https://api.ynab.com/#formats
         let ynabMilliUnits: Double = 1_000
         let amountConverted = Decimal(Double(amount) / ynabMilliUnits)

@@ -11,25 +11,11 @@ final class BudgetClientTests: XCTestCase {
         let budgetProvider = Factory.createBudgetProvider()
         sut = BudgetClient(provider: budgetProvider)
 
-        XCTAssertTrue(sut.budgetSummaries.isEmpty)
-        await sut.fetchBudgetSummaries()
-        // yield a few times to allow publisher to be updated with new account values
-        await Task.megaYield()
+        let budgetSummaries = try await sut.fetchBudgetSummaries()
 
         // then
-        XCTAssertEqual(sut.budgetSummaries.elements, Factory.budgetSummaries)
-    }
-
-    func testFetchAccounts() async throws {
-        let budgetProvider = Factory.createBudgetProvider()
-        sut = BudgetClient(provider: budgetProvider, selectedBudgetId: "Budget2")
-        sut.authorizationStatus = .loggedIn
-
-        XCTAssertTrue(sut.accounts.isEmpty)
-        await sut.fetchAccounts()
-        // yield a few times to allow publisher to be updated with new account values
-        await Task.megaYield()
-        XCTAssertEqual(sut.accounts.elements, Factory.accounts)
+        XCTAssertEqual(budgetSummaries, Factory.budgetSummaries)
+        XCTAssertEqual(budgetSummaries[0].accounts, Factory.accounts)
     }
 
     func testFetchCategoryValues() async throws {
@@ -40,9 +26,8 @@ final class BudgetClientTests: XCTestCase {
         XCTAssertTrue(sut.categoryGroups.isEmpty)
         XCTAssertTrue(sut.categories.isEmpty)
 
-        await sut.fetchBudgetSummaries()
-        await Task.megaYield()
-        
+        _ = try await sut.fetchBudgetSummaries()
+
         // when
         await sut.fetchCategoryValues()
         await Task.megaYield()
@@ -55,7 +40,7 @@ final class BudgetClientTests: XCTestCase {
         let budgetProvider = Factory.createBudgetProvider()
         sut = BudgetClient(provider: budgetProvider)
 
-        await sut.fetchBudgetSummaries()
+        _ = try await sut.fetchBudgetSummaries()
         await Task.megaYield()
         XCTAssertNil(sut.selectedBudgetId)
 
@@ -71,7 +56,7 @@ final class BudgetClientTests: XCTestCase {
         let budgetProvider = Factory.createBudgetProvider()
         sut = BudgetClient(provider: budgetProvider)
 
-        await sut.fetchBudgetSummaries()
+        _ = try await sut.fetchBudgetSummaries()
         await Task.megaYield()
         XCTAssertNil(sut.selectedBudgetId)
 
@@ -89,8 +74,8 @@ final class BudgetClientTests: XCTestCase {
     func testFetchTransactions() async throws {
         // given
         sut = try await Factory.createBudgetClientWithSelectBudgetId("Budget1")
-        let startDate = Date.iso8601Formatter.date(from: "2024-02-01")!
-        let finishDate = Date.iso8601Formatter.date(from: "2024-03-30")!
+        let startDate = Date.iso8601utc.date(from: "2024-02-01")!
+        let finishDate = Date.iso8601utc.date(from: "2024-03-30")!
 
         // when
         let transactions = try await sut.fetchTransactions(startDate: startDate, finishDate: finishDate)
@@ -106,7 +91,7 @@ private enum Factory {
         let provider = createBudgetProvider()
         let client = BudgetClient(provider: provider)
 
-        await client.fetchBudgetSummaries()
+        _ = try await client.fetchBudgetSummaries()
         await Task.megaYield()
         XCTAssertNil(client.selectedBudgetId)
         try client.updateSelectedBudgetId(budgetId)
@@ -122,27 +107,27 @@ private enum Factory {
     ) -> BudgetProvider {
         .init {
             budgetSummaries ?? Self.budgetSummaries
-        } fetchAccounts: { budgetId in
-            accounts ?? Self.accounts
         } fetchCategoryValues: { params in
             categoryValues ?? (categoryGroup, categories)
         } fetchTransactions: { params in
             transactions ?? Self.transactions
+        } fetchAllTransactions: { _ in
+            (transactions ?? Self.transactions, 0)
         }
     }
 
     static var budgetSummaries: [BudgetSummary] {
         [
-            .init(id: "Budget1", name: "Summary One", lastModifiedOn: "Yesterday", firstMonth: "March", lastMonth: "May", currency: .AUD),
-            .init(id: "Budget2", name: "Summary Two", lastModifiedOn: "Days ago", firstMonth: "April", lastMonth: "Jun", currency: .AUD)
+            .init(id: "Budget1", name: "Summary One", lastModifiedOn: "Yesterday", firstMonth: "March", lastMonth: "May", currency: .AUD, accounts: []),
+            .init(id: "Budget2", name: "Summary Two", lastModifiedOn: "Days ago", firstMonth: "April", lastMonth: "Jun", currency: .AUD, accounts: [])
         ]
     }
 
     static var accounts: [Account] {
         [
-            .init(id: "01", name: "First", onBudget: true, deleted: false),
-            .init(id: "02", name: "Second", onBudget: true, deleted: false),
-            .init(id: "03", name: "Third", onBudget: true, deleted: false),
+            .init(id: "01", budgetId: "Budget1", name: "First", onBudget: true, deleted: false),
+            .init(id: "02", budgetId: "Budget1", name: "Second", onBudget: true, deleted: false),
+            .init(id: "03", budgetId: "Budget1", name: "Third", onBudget: true, deleted: false),
         ]
     }
 
@@ -189,8 +174,10 @@ private enum Factory {
         [
             .init(
                 id: "T1",
-                date: Date.iso8601Formatter.date(from: "2024-02-01")!,
-                money: Money(Decimal(-100), currency: .AUD), 
+                budgetId: "Budget1",
+                date: Date.iso8601utc.date(from: "2024-02-01")!,
+                rawAmount: -100,
+                currencyCode: Currency.AUD.code,
                 payeeName: "Coles",
                 accountId: "A1",
                 accountName: "Account First",
@@ -203,8 +190,10 @@ private enum Factory {
             ),
             .init(
                 id: "T2",
-                date: Date.iso8601Formatter.date(from: "2024-03-04")!,
-                money: Money(Decimal(-123.45), currency: .AUD), 
+                budgetId: "Budget1",
+                date: Date.iso8601utc.date(from: "2024-03-04")!,
+                rawAmount: -12345,
+                currencyCode: Currency.AUD.code,
                 payeeName: "Engerix",
                 accountId: "A1",
                 accountName: "Account First",
@@ -217,8 +206,10 @@ private enum Factory {
             ),
             .init(
                 id: "T3",
-                date: Date.iso8601Formatter.date(from: "2024-04-05")!,
-                money: Money(Decimal(-299.99), currency: .AUD), 
+                budgetId: "Budget1",
+                date: Date.iso8601utc.date(from: "2024-04-05")!,
+                rawAmount: -29999,
+                currencyCode: Currency.AUD.code,
                 payeeName: "Landlord",
                 accountId: "A2",
                 accountName: "Account Second",

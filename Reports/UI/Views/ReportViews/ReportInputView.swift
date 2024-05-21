@@ -46,8 +46,8 @@ struct ReportInputFeature {
             }
         }
 
-        var fromDateFormatted: String { Date.iso8601Formatter.string(from: fromDate) }
-        var toDateFormatted: String { Date.iso8601Formatter.string(from: toDate) }
+        var fromDateFormatted: String { Date.iso8601utc.string(from: fromDate) }
+        var toDateFormatted: String { Date.iso8601utc.string(from: toDate) }
 
         func isEqual(to savedReport: SavedReport) -> Bool {
             savedReport.fromDate == fromDateFormatted &&

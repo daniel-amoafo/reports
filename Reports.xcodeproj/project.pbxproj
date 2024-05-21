@@ -56,6 +56,8 @@
 		188AA9042BF5EB8A0032F170 /* GRDBDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 188AA9032BF5EB8A0032F170 /* GRDBDatabase.swift */; };
 		188AA9062BF73F3C0032F170 /* SwiftDataDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 188AA9052BF73F3C0032F170 /* SwiftDataDatabase.swift */; };
 		188AA9082BF763A70032F170 /* Publisher+Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = 188AA9072BF763A70032F170 /* Publisher+Async.swift */; };
+		188AA90A2BF8807D0032F170 /* Models+GRDB.swift in Sources */ = {isa = PBXBuildFile; fileRef = 188AA9092BF8807D0032F170 /* Models+GRDB.swift */; };
+		188AA90C2BFC3E7E0032F170 /* GRDBQueries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 188AA90B2BFC3E7E0032F170 /* GRDBQueries.swift */; };
 		1894264B2BDFB6D700C06018 /* AppStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1894264A2BDFB6D700C06018 /* AppStrings.swift */; };
 		189641AF2B9C72BE00716258 /* AnimationConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189641AE2B9C72BE00716258 /* AnimationConstants.swift */; };
 		189641BB2B9C8CFE00716258 /* ReportChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189641BA2B9C8CFD00716258 /* ReportChart.swift */; };
@@ -164,6 +166,8 @@
 		188AA9032BF5EB8A0032F170 /* GRDBDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GRDBDatabase.swift; sourceTree = "<group>"; };
 		188AA9052BF73F3C0032F170 /* SwiftDataDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataDatabase.swift; sourceTree = "<group>"; };
 		188AA9072BF763A70032F170 /* Publisher+Async.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Publisher+Async.swift"; sourceTree = "<group>"; };
+		188AA9092BF8807D0032F170 /* Models+GRDB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models+GRDB.swift"; sourceTree = "<group>"; };
+		188AA90B2BFC3E7E0032F170 /* GRDBQueries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GRDBQueries.swift; sourceTree = "<group>"; };
 		1894264A2BDFB6D700C06018 /* AppStrings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStrings.swift; sourceTree = "<group>"; };
 		189641AE2B9C72BE00716258 /* AnimationConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationConstants.swift; sourceTree = "<group>"; };
 		189641BA2B9C8CFD00716258 /* ReportChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportChart.swift; sourceTree = "<group>"; };
@@ -444,6 +448,8 @@
 			isa = PBXGroup;
 			children = (
 				188AA9032BF5EB8A0032F170 /* GRDBDatabase.swift */,
+				188AA9092BF8807D0032F170 /* Models+GRDB.swift */,
+				188AA90B2BFC3E7E0032F170 /* GRDBQueries.swift */,
 			);
 			path = GRDB;
 			sourceTree = "<group>";
@@ -751,9 +757,11 @@
 				186A80FD2BCCC5DE0015FFC7 /* ReportInputView.swift in Sources */,
 				184DF0B72B6E1C3E00BA6F21 /* ReportsApp.swift in Sources */,
 				183ECBEE2B747460006C45B2 /* Array+Safe.swift in Sources */,
+				188AA90C2BFC3E7E0032F170 /* GRDBQueries.swift in Sources */,
 				18C3BFB72B820DD000E444C8 /* Binding+Additions.swift in Sources */,
 				188A8E402BF21D1E00938B81 /* SpendingTrendChartView.swift in Sources */,
 				18A514C92BD5001300B072DE /* SpendingTotalChartView.swift in Sources */,
+				188AA90A2BF8807D0032F170 /* Models+GRDB.swift in Sources */,
 				189641BE2B9D675900716258 /* SettingsView.swift in Sources */,
 				183ECBC72B70E5DD006C45B2 /* SecureKeyValueStore.swift in Sources */,
 				186A80F52BCC013F0015FFC7 /* BottomShadowViewModifier.swift in Sources */,
@@ -955,6 +963,10 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Reports/Info.plist;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
