@@ -126,7 +126,7 @@ struct SpendingTotalChartFeature {
                     return .none
                 }
                 var cumulative = Decimal.zero
-                // This approach is lifted from Apple's interactive pie chart WWDC
+                // This approach is lifted from Apple's interactive pie chart WWDC talk
                 // see https://developer.apple.com/wwdc23/10037
                 let cumulativeArea = state.selectedContent.map {
                     let newCumulative = cumulative + abs($0.total.amount)
@@ -160,14 +160,13 @@ struct SpendingTotalChartFeature {
                     return .send(.catgoriesForCategoryGroupFetched(records, groupName), animation: .smooth)
 
                 case .categoriesByCategoryGroup:
-                    break
-                    // find all transactions for the selected category
-                    //                    let categoryTransactions = state.transactions.filter {
-                    //                        $0.categoryId == id
-                    //                    }
-                    //                    return .send(.delegate(.categoryTapped(categoryTransactions)))
+                    let transactions = SpendingTotalQueries.fetchTransactionEntries(
+                        for: id,
+                        startDate: state.startDate,
+                        finishDate: state.finishDate
+                    )
+                    return .send(.delegate(.categoryTapped(transactions)), animation: .smooth)
                 }
-                return .none
 
             case .subTitleTapped:
                 state.contentType = .categoryGroup
@@ -179,17 +178,18 @@ struct SpendingTotalChartFeature {
             case .onAppear:
                 return .none
 
-            case .binding, .delegate:
+            case .binding,
+                    .delegate:
                 return .none
             }
         }
     }
 }
 
+/// Manages calls to Database queries
 private enum SpendingTotalQueries {
 
-    static let logger = LogFactory
-        .create(category: String(describing: SpendingTotalQueries.self))
+    static let logger = LogFactory.create(category: String(describing: SpendingTotalQueries.self))
 
     static var grdb: GRDBDatabase {
         @Dependency(\.database.grdb) var grdb
@@ -232,6 +232,23 @@ private enum SpendingTotalQueries {
         } catch {
             Self.logger.error("\(error.toString())")
             return ([], "")
+        }
+    }
+
+    static func fetchTransactionEntries(for categoryId: String, startDate: Date, finishDate: Date)
+    -> IdentifiedArrayOf<TransactionEntry> {
+        do {
+            let transactionsBuilder = TransactionEntry.queryTransactionsByCategoryId(
+                categoryId,
+                startDate: startDate,
+                finishDate: finishDate
+            )
+            let transactions = try Self.grdb.fetchRecords(builder: transactionsBuilder)
+
+            return .init(uniqueElements: transactions)
+        } catch {
+            Self.logger.error("\(error.toString())")
+            return .init(uniqueElements: [])
         }
     }
 

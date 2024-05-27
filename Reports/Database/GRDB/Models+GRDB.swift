@@ -105,7 +105,7 @@ extension CategoryGroup: FetchableRecord, PersistableRecord {
             id: row[DBCodingKey.id.rawValue],
             name: row[DBCodingKey.name.rawValue],
             hidden: row[DBCodingKey.hidden.rawValue],
-            deleted: row[DBCodingKey.deleted.rawValue],
+            deleted: row[DBCodingKey.deleted.rawValue] as Bool? ?? false,
             budgetId: row[DBCodingKey.budgetId.rawValue]
         )
     }
@@ -136,7 +136,7 @@ extension BudgetSystemService.Category: FetchableRecord, PersistableRecord {
             categoryGroupId: row[DBCodingKey.categoryGroupId.rawValue],
             name: row[DBCodingKey.name.rawValue],
             hidden: row[DBCodingKey.hidden.rawValue],
-            deleted: row[DBCodingKey.deleted.rawValue],
+            deleted: row[DBCodingKey.deleted.rawValue] as Bool? ?? false,
             budgetId: row[DBCodingKey.budgetId.rawValue]
         )
     }
@@ -185,7 +185,7 @@ extension TransactionEntry: FetchableRecord, PersistableRecord {
             categoryId: row[DBCodingKey.categoryId.rawValue],
             categoryName: row[DBCodingKey.categoryName.rawValue],
             transferAccountId: row[DBCodingKey.transferAccountId.rawValue],
-            deleted: row[DBCodingKey.deleted.rawValue]
+            deleted: row[DBCodingKey.deleted.rawValue] as Bool? ?? false
         )
     }
 

@@ -4,6 +4,8 @@ import BudgetSystemService
 import Dependencies
 import Foundation
 
+// swiftlint:disable line_length
+
 // Helper fixture to access the grdb instance
 private enum Shared {
 
@@ -27,7 +29,33 @@ extension CategoryGroup {
     }
 }
 
-// swiftlint:disable line_length
+extension TransactionEntry {
+
+    static func queryTransactionsByCategoryId(_ categoryId: String, startDate: Date, finishDate: Date)
+    -> GRDBDatabase.RecordSQLBuilder<TransactionEntry> {
+        .init(
+            record: TransactionEntry.self,
+            sql: """
+            SELECT * FROM transactionEntry
+            INNER JOIN account on account.id = transactionEntry.accountId
+            INNER JOIN budgetSummary on budgetSummary.id = transactionEntry.budgetSummaryId
+            INNER JOIN category on category.id = transactionEntry.categoryId
+            INNER JOIN  categoryGroup on categoryGroup.id = category.categoryGroupId
+            WHERE date BETWEEN ? AND ?
+            AND account.onBudget = 1
+            AND transactionEntry.categoryId = ?
+            AND ( categoryGroup.name <> 'Internal Master Category' OR (categoryGroup.name = 'Internal Master Category' AND category.name = 'Uncategorized' ))
+            ORDER BY date DESC
+            """,
+            arguments: [
+                Date.iso8601local.string(from: startDate),
+                Date.iso8601local.string(from: finishDate),
+                categoryId,
+            ]
+        )
+    }
+}
+
 extension CategoryRecord {
 
     // MARK: CategoryRecord Queries
