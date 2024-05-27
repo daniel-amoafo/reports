@@ -55,21 +55,21 @@ private extension SavedReportQuery {
             )
             return try modelContext.fetch(descriptor)
         } catch {
-            logger.error("\(error.localizedDescription)")
+            logger.error("\(error.toString())")
             return []
         }
     } fetch: { descriptor in
         do {
             return try modelContext.fetch(descriptor)
         } catch {
-            logger.error("\(error.localizedDescription)")
+            logger.error("\(error.toString())")
             return []
         }
     } fetchCount: { descriptor in
         do {
             return try modelContext.fetchCount(descriptor)
         } catch {
-            logger.error("\(error.localizedDescription)")
+            logger.error("\(error.toString())")
             return 0
         }
     } add: { savedReport in
@@ -77,16 +77,16 @@ private extension SavedReportQuery {
             modelContext.insert(savedReport)
             try modelContext.save()
         } catch {
-            logger.error("\(error.localizedDescription)")
-            throw SavedReportQueryError.add(error.localizedDescription)
+            logger.error("\(error.toString())")
+            throw SavedReportQueryError.add(error.toString())
         }
     } delete: { savedReport in
         do {
             modelContext.delete(savedReport)
             try modelContext.save()
         } catch {
-            logger.error("\(error.localizedDescription)")
-            throw SavedReportQueryError.delete(error.localizedDescription)
+            logger.error("\(error.toString())")
+            throw SavedReportQueryError.delete(error.toString())
         }
     } didUpdateNotification: {
         AsyncStream(

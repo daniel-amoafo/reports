@@ -268,7 +268,7 @@ private extension ReportFeature {
             try savedReportQuery.add(savedReport)
 
         } catch {
-            logger.error("\(error.localizedDescription)")
+            logger.error("\(error.toString())")
         }
     }
 

@@ -15,7 +15,7 @@ struct Database {
         } catch {
             let logger = LogFactory.create(category: "Database init")
             logger.error("Unable init Database instance...")
-            fatalError("\(error.localizedDescription)")
+            fatalError("\(error.toString())")
         }
     }
 }

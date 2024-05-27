@@ -230,7 +230,7 @@ private enum SpendingTotalQueries {
 
             return (records, groupName)
         } catch {
-            Self.logger.error("\(String(describing: error))")
+            Self.logger.error("\(error.toString())")
             return ([], "")
         }
     }

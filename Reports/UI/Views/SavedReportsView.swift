@@ -78,7 +78,7 @@ fileprivate extension SavedReportsFeature {
             state.savedReports = try savedReportQuery.fetchAll()
             return .none
         } catch {
-            logger.error("\(error.localizedDescription)")
+            logger.error("\(error.toString())")
             return .none
         }
     }
@@ -88,7 +88,7 @@ fileprivate extension SavedReportsFeature {
             do {
                 try savedReportQuery.delete(report)
             } catch {
-                logger.error("\(error.localizedDescription)")
+                logger.error("\(error.toString())")
             }
         }
     }

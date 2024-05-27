@@ -23,7 +23,7 @@ enum ModelContextFactory {
         do {
             try context.save()
         } catch {
-            debugPrint("\(error.localizedDescription)")
+            debugPrint("\(error.toString())")
         }
         return ModelContext(container)
     }

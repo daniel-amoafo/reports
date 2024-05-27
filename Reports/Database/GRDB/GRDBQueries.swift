@@ -72,15 +72,19 @@ extension CategoryRecord {
         .init(
             record: CategoryRecord.self,
             sql: """
-                SELECT categoryName as name, SUM(amount) as total, categoryId as id, budgetSummary.currencyCode FROM transactionEntry
-                INNER JOIN account on account.id = transactionEntry.accountId
-                INNER JOIN budgetSummary on budgetSummary.id = transactionEntry.budgetSummaryId
-                WHERE date BETWEEN ? AND ?
-                AND account.onBudget = 1
-                AND transactionEntry.categoryGroupId = ?
-                GROUP BY categoryName
-                HAVING total <> 0
-                ORDER BY total ASC
+            SELECT category.name as name, SUM(amount) as total, category.id as id,
+            budgetSummary.currencyCode FROM transactionEntry
+            INNER JOIN account on account.id = transactionEntry.accountId
+            INNER JOIN budgetSummary on budgetSummary.id = transactionEntry.budgetSummaryId
+            INNER JOIN category on category.id = transactionEntry.categoryId
+            INNER JOIN  categoryGroup on categoryGroup.id = category.categoryGroupId
+            WHERE date BETWEEN ? AND ?
+            AND account.onBudget = 1
+            AND categoryGroup.id = ?
+            AND ( categoryGroup.name <> 'Internal Master Category' OR (categoryGroup.name = 'Internal Master Category' AND category.name = 'Uncategorized' ))
+            GROUP BY category.name
+            HAVING total <> 0
+            ORDER BY total ASC
             """,
             arguments: [
                 Date.iso8601local.string(from: startDate),

@@ -48,7 +48,7 @@ struct MainTab {
                 do {
                     state.report = try ReportFeature.State(sourceData: source)
                 } catch {
-                    logger.error("\(error.localizedDescription)")
+                    logger.error("\(error.toString())")
                     state.alert = .unableToOpenSavedReport
                 }
                 return .none
@@ -57,7 +57,7 @@ struct MainTab {
                 do {
                     state.report = try .init(sourceData: .existing(savedReport))
                 } catch {
-                    logger.error("\(error.localizedDescription)")
+                    logger.error("\(error.toString())")
                     state.alert = .unableToOpenSavedReport
                 }
                 return .none

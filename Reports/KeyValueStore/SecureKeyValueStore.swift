@@ -74,7 +74,7 @@ extension SecureKeyValueStore: KeyValueStore {
         do {
             return try JSONDecoder().decode(T.self, from: data)
         } catch {
-            debugPrint("Error \(error.localizedDescription)")
+            debugPrint("Error \(error.toString())")
             return nil
         }
     }
@@ -86,7 +86,7 @@ extension SecureKeyValueStore: KeyValueStore {
         do {
             return try JSONDecoder().decode([T].self, from: data)
         } catch {
-            debugPrint("Error \(error.localizedDescription)")
+            debugPrint("Error \(error.toString())")
             return nil
         }
     }
@@ -98,7 +98,7 @@ extension SecureKeyValueStore: KeyValueStore {
         do {
             return try JSONDecoder().decode([String: T].self, from: data)
         } catch {
-            debugPrint("Error \(error.localizedDescription)")
+            debugPrint("Error \(error.toString())")
             return nil
         }
     }
@@ -171,7 +171,7 @@ extension SecureKeyValueStore: KeyValueStore {
             let data = try JSONEncoder().encode(value)
             set(data, forKey: key)
         } catch {
-            debugPrint("Error: \(error.localizedDescription)")
+            debugPrint("Error: \(error.toString())")
         }
     }
 
@@ -184,7 +184,7 @@ extension SecureKeyValueStore: KeyValueStore {
             let data = try JSONEncoder().encode(array)
             set(data, forKey: key)
         } catch {
-            debugPrint("Error: \(error.localizedDescription)")
+            debugPrint("Error: \(error.toString())")
         }
     }
 
@@ -197,7 +197,7 @@ extension SecureKeyValueStore: KeyValueStore {
             let data = try JSONEncoder().encode(dictionary)
             set(data, forKey: key)
         } catch {
-            debugPrint("Error: \(error.localizedDescription)")
+            debugPrint("Error: \(error.toString())")
         }
     }
 
@@ -232,7 +232,7 @@ extension SecureKeyValueStore: KeyValueStore {
             let data = try NSKeyedArchiver.archivedData(withRootObject: value, requiringSecureCoding: false)
             return keychain.set(data, forKey: key)
         } catch {
-            fatalError("Error storing value: \(error.localizedDescription)")
+            fatalError("Error storing value: \(error.toString())")
         }
     }
 
