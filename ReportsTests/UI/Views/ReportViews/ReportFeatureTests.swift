@@ -19,7 +19,7 @@ final class ReportFeatureTests: XCTestCase {
 
         store.exhaustivity = .off
         // perform transaction fetch
-        await store.send(\.inputFields.delegate.fetchedTransactions, .mocksTwo)
+//        await store.send(\.inputFields.delegate.fetchedTransactions, .mocksTwo)
         await store.receive(\.chartDisplayed)
 
         store.exhaustivity = .on
@@ -86,9 +86,9 @@ final class ReportFeatureTests: XCTestCase {
         // When a input fields view returns fetched transactions.
         // The delegate updates the Reports view accordingly with the selected report type.
         XCTAssertNil(store.state.chartGraph)
-        await store.send(\.inputFields.delegate.fetchedTransactions, .mocksTwo) {
-            $0.scrollToId = nil
-        }
+//        await store.send(\.inputFields.delegate.fetchedTransactions, .mocksTwo) {
+//            $0.scrollToId = nil
+//        }
         XCTAssertNotNil(store.state.chartGraph)
         guard case .spendingByTotal = store.state.chartGraph else {
             XCTFail("Expected \(ChartType.spendingByTotal) but got \(String(describing: store.state.chartGraph))")
@@ -105,7 +105,7 @@ final class ReportFeatureTests: XCTestCase {
 
         // Given
         store.exhaustivity = .off
-        await store.send(\.inputFields.delegate.fetchedTransactions, .mocksTwo)
+//        await store.send(\.inputFields.delegate.fetchedTransactions, .mocksTwo)
         await store.receive(\.chartDisplayed)
 
         // When

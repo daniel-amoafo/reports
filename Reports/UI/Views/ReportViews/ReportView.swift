@@ -113,8 +113,9 @@ struct ReportFeature {
     @Dependency(\.isPresented) var isPresented
     @Dependency(\.dismiss) var dismiss
     @Dependency(\.savedReportQuery) var savedReportQuery
+    @Dependency(\.continuousClock) var clock
 
-    let logger = LogFactory.create(category: "Report")
+    let logger = LogFactory.create(category: String(describing: ReportFeature.self))
 
     var body: some ReducerOf<Self> {
         BindingReducer()
@@ -178,6 +179,7 @@ struct ReportFeature {
                 guard state.chartGraph != nil else { return .none }
                 state.scrollToId = nil
                 return .run { send in
+                    try await self.clock.sleep(for: .seconds(0.5))
                     await send(.chartDisplayed, animation: .easeInOut)
                 }
 

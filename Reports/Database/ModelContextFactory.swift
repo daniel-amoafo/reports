@@ -3,7 +3,7 @@
 import Foundation
 import SwiftData
 
-enum SwiftDataDatabase {
+enum ModelContextFactory {
 
     static func makeLive() throws -> ModelContext {
         let savedReport = ModelConfiguration("SavedReportModelConfig", schema: Schema([SavedReport.self]))

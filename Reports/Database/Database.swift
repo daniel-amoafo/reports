@@ -22,29 +22,21 @@ struct Database {
 
 extension Database: DependencyKey {
 
-    @MainActor
-    static let liveValue = {
-        Self(
-            swiftData: { try SwiftDataDatabase.makeLive() },
-            grdb: { try GRDBDatabase.makeLive() }
-        )
-    }()
+    static let liveValue = Self(
+        swiftData: { try ModelContextFactory.makeLive() },
+        grdb: { try GRDBDatabase.makeLive() }
+    )
 
-    @MainActor
-    static let testValue = {
-        Self(
-            swiftData: { try SwiftDataDatabase.makeMock() },
-            grdb: { try GRDBDatabase.makeMock() }
-        )
-    }()
+    static let testValue = Self(
+        swiftData: { try ModelContextFactory.makeMock() },
+        grdb: { try GRDBDatabase.makeMock() }
+    )
 
-    @MainActor
-    static let previewValue = {
-        Self(
-            swiftData: { try SwiftDataDatabase.makeMock() },
-            grdb: { try GRDBDatabase.makeMock() }
-        )
-    }()
+    static let previewValue = Self(
+        swiftData: { try ModelContextFactory.makeMock() },
+        grdb: { try GRDBDatabase.makeMock() }
+    )
+
 }
 
 extension DependencyValues {

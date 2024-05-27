@@ -67,7 +67,7 @@ struct SpendingTotalChartFeature {
                 return ""
             }
             // tally up all the totals for each record to provide a grand total
-            let total = selected.map(\.total).reduce(.zero(currency)) { $0 + $1 }
+            let total = selected.map(\.total).reduce(.zero(currency), +)
             return total.amountFormatted
         }
 

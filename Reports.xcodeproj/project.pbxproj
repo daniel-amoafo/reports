@@ -54,7 +54,7 @@
 		188A8E402BF21D1E00938B81 /* SpendingTrendChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 188A8E3F2BF21D1E00938B81 /* SpendingTrendChartView.swift */; };
 		188AA8FF2BF3A4390032F170 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = 188AA8FE2BF3A4390032F170 /* GRDB */; };
 		188AA9042BF5EB8A0032F170 /* GRDBDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 188AA9032BF5EB8A0032F170 /* GRDBDatabase.swift */; };
-		188AA9062BF73F3C0032F170 /* SwiftDataDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 188AA9052BF73F3C0032F170 /* SwiftDataDatabase.swift */; };
+		188AA9062BF73F3C0032F170 /* ModelContextFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 188AA9052BF73F3C0032F170 /* ModelContextFactory.swift */; };
 		188AA9082BF763A70032F170 /* Publisher+Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = 188AA9072BF763A70032F170 /* Publisher+Async.swift */; };
 		188AA90A2BF8807D0032F170 /* Models+GRDB.swift in Sources */ = {isa = PBXBuildFile; fileRef = 188AA9092BF8807D0032F170 /* Models+GRDB.swift */; };
 		188AA90C2BFC3E7E0032F170 /* GRDBQueries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 188AA90B2BFC3E7E0032F170 /* GRDBQueries.swift */; };
@@ -164,7 +164,7 @@
 		1882CF4D2BDE3D7200EA0B05 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		188A8E3F2BF21D1E00938B81 /* SpendingTrendChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendingTrendChartView.swift; sourceTree = "<group>"; };
 		188AA9032BF5EB8A0032F170 /* GRDBDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GRDBDatabase.swift; sourceTree = "<group>"; };
-		188AA9052BF73F3C0032F170 /* SwiftDataDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataDatabase.swift; sourceTree = "<group>"; };
+		188AA9052BF73F3C0032F170 /* ModelContextFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelContextFactory.swift; sourceTree = "<group>"; };
 		188AA9072BF763A70032F170 /* Publisher+Async.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Publisher+Async.swift"; sourceTree = "<group>"; };
 		188AA9092BF8807D0032F170 /* Models+GRDB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models+GRDB.swift"; sourceTree = "<group>"; };
 		188AA90B2BFC3E7E0032F170 /* GRDBQueries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GRDBQueries.swift; sourceTree = "<group>"; };
@@ -431,7 +431,7 @@
 				188AA9022BF5EB0B0032F170 /* GRDB */,
 				1868BAC72BE78C2900757E78 /* Database.swift */,
 				1868BAC92BE791B600757E78 /* SavedReportQuery.swift */,
-				188AA9052BF73F3C0032F170 /* SwiftDataDatabase.swift */,
+				188AA9052BF73F3C0032F170 /* ModelContextFactory.swift */,
 			);
 			path = Database;
 			sourceTree = "<group>";
@@ -746,7 +746,7 @@
 				183ECBC12B70E0B6006C45B2 /* KeyValueStore.swift in Sources */,
 				18A146BA2BECF73B00B4E74F /* ReportFeatureSourceLoader.swift in Sources */,
 				183ECBF12B748E90006C45B2 /* HorizontalDivider.swift in Sources */,
-				188AA9062BF73F3C0032F170 /* SwiftDataDatabase.swift in Sources */,
+				188AA9062BF73F3C0032F170 /* ModelContextFactory.swift in Sources */,
 				186E8A222B9AEDB100E65BDE /* MainTabView.swift in Sources */,
 				186A80E72BC9F8450015FFC7 /* ChartButtonView.swift in Sources */,
 				18EF05572BEB005300976055 /* MainTab+Additions.swift in Sources */,

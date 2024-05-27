@@ -25,7 +25,7 @@ final class BudgetSystemServiceConfigTests: XCTestCase {
 
         try await withMainSerialExecutor {
             // when
-            let summaries = try await env.client.fetchBudgetSummaries()
+            _ = try await env.client.fetchBudgetSummaries()
 
             // when
             XCTAssertTrue(env.client.accounts.isEmpty)
@@ -78,7 +78,7 @@ private enum Factory {
         return .init {
             .mocks
         } fetchCategoryValues: { _ in
-            ([], [])
+            ([], [], 0)
         } fetchTransactions: { _ in
             []
         } fetchAllTransactions: { _ in

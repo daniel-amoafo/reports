@@ -66,7 +66,7 @@ struct ReportInputFeature {
     @Dependency(\.configProvider) var configProvider
     @Dependency(\.database.grdb) var grdb
 
-    let logger = LogFactory.create(category: "ReportInput")
+    let logger = LogFactory.create(category: String(describing: ReportInputFeature.self))
 
     var body: some ReducerOf<Self> {
         Reduce { state, action in
