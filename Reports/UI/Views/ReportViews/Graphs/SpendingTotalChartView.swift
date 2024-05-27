@@ -30,15 +30,17 @@ struct SpendingTotalChartFeature {
 
         init(
             title: String,
+            budgetId: String,
             startDate: Date,
             finishDate: Date
         ) {
             self.title = title
             self.startDate = startDate
             self.finishDate = finishDate
+
             self.categoryGroups = SpendingTotalQueries.fetchCategoryGroupTotals(
-                    startDate: startDate, finishDate: finishDate
-                )
+                budgetId: budgetId, startDate: startDate, finishDate: finishDate
+            )
         }
 
         var selectedContent: [CategoryRecord] {
@@ -194,10 +196,14 @@ private enum SpendingTotalQueries {
         return grdb
     }
 
-    static func fetchCategoryGroupTotals(startDate: Date, finishDate: Date) -> [CategoryRecord] {
+    static func fetchCategoryGroupTotals(budgetId: String, startDate: Date, finishDate: Date) -> [CategoryRecord] {
         do {
             let categoryGroupBuilder = CategoryRecord
-                .queryTransactionsByCategoryGroupTotals(startDate: startDate, finishDate: finishDate)
+                .queryTransactionsByCategoryGroupTotals(
+                    budgetId: budgetId,
+                    startDate: startDate,
+                    finishDate: finishDate
+                )
 
             return try grdb.fetchRecords(builder: categoryGroupBuilder)
         } catch {
@@ -220,8 +226,7 @@ private enum SpendingTotalQueries {
                 )
             let records = try Self.grdb.fetchRecords(builder: categoryBuilder)
 
-            @Dependency(\.budgetClient) var budgetClient
-            let groupName = budgetClient.getCategoryGroup(groupId: categoryGroupId)?.name ?? ""
+            let groupName = try CategoryGroup.fetch(id: categoryGroupId)?.name ?? ""
 
             return (records, groupName)
         } catch {
@@ -432,6 +437,7 @@ private enum Strings {
                 initialState:
                     .init(
                         title: "My Chart Name",
+                        budgetId: "Budget1",
                         startDate: .now.firstDayInMonth(),
                         finishDate: .now.lastDayInMonth()
                     )

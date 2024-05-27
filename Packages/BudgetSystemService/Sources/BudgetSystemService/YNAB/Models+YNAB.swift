@@ -23,8 +23,8 @@ extension BudgetSummary {
         self.lastModifiedOn = ynabBudgetSummary.lastModifiedOn
         self.firstMonth = ynabBudgetSummary.firstMonth
         self.lastMonth = ynabBudgetSummary.lastMonth
-        self.accounts = ynabBudgetSummary.accounts.map({ ynabAccount in
-            Account.init(ynabAccount: ynabAccount, budgetId: ynabBudgetSummary.id)
+        self.accounts = ynabBudgetSummary.accounts.map({
+            Account(ynabAccount: $0, budgetId: ynabBudgetSummary.id)
         })
 
         guard let currency = Currency.iso4217Currency(for: ynabBudgetSummary.currencyFormat.isoCode) else {
@@ -36,25 +36,24 @@ extension BudgetSummary {
 
 extension CategoryGroup {
 
-    init(ynabCategoryGroup: SwiftYNAB.CategoryGroupWithCategories) {
+    init(ynabCategoryGroup: SwiftYNAB.CategoryGroupWithCategories, budgetId: String) {
         self.id = ynabCategoryGroup.id
         self.name = ynabCategoryGroup.name
         self.hidden = ynabCategoryGroup.hidden
         self.deleted = ynabCategoryGroup.deleted
-        self.categoryIds = ynabCategoryGroup.categories.map(\.id)
+        self.budgetId = budgetId
     }
 }
 
 extension Category {
 
-    init(ynabCategory: SwiftYNAB.Category, currency: Currency) {
+    init(ynabCategory: SwiftYNAB.Category, budgetId: String) {
         self.id = ynabCategory.id
         self.name = ynabCategory.name
         self.categoryGroupId = ynabCategory.categoryGroupId
         self.hidden = ynabCategory.hidden
-        self.note = ynabCategory.note
         self.deleted = ynabCategory.deleted
-        self.balance = Money.forYNAB(amount: ynabCategory.balance, currency: currency)
+        self.budgetId = budgetId
     }
 }
 
@@ -63,8 +62,7 @@ extension TransactionEntry {
     init(
         ynabTransactionDetail ynab: SwiftYNAB.TransactionDetail,
         budgetId: String,
-        currency: Currency,
-        categoryGroup: CategoryGroup?
+        currency: Currency
     ) {
         self.id = ynab.id
         self.budgetId = budgetId
@@ -75,8 +73,6 @@ extension TransactionEntry {
         self.accountName = ynab.accountName
         self.categoryId = ynab.categoryId
         self.categoryName = ynab.categoryName
-        self.categoryGroupId = categoryGroup?.id
-        self.categoryGroupName = categoryGroup?.name
         self.transferAccountId = ynab.transferAccountId
         self.deleted = ynab.deleted
 
@@ -89,8 +85,7 @@ extension TransactionEntry {
     init(
         ynabHybridTransaction ynab: HybridTransaction,
         budgetId: String,
-        currency: Currency,
-        categoryGroup: CategoryGroup?
+        currency: Currency
     ) {
         self.id = ynab.id
         self.budgetId = budgetId
@@ -101,8 +96,6 @@ extension TransactionEntry {
         self.accountName = ynab.accountName
         self.categoryId = ynab.categoryId
         self.categoryName = ynab.categoryName
-        self.categoryGroupId = categoryGroup?.id
-        self.categoryGroupName = categoryGroup?.name
         self.transferAccountId = ynab.transferAccountId
         self.deleted = ynab.deleted
 

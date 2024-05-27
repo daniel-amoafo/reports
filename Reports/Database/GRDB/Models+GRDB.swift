@@ -9,7 +9,7 @@ import MoneyCommon
 /// This improves fetch requests & speeds data transfer from YNAB server endpoints
 /// by only getting changed values since the last fetch
 /// see: https://api.ynab.com/#deltas
-struct ServerKnowledgeConfig: Codable, FetchableRecord, PersistableRecord {
+struct ServerKnowledgeConfig: Codable, FetchableRecord, PersistableRecord, CustomDebugStringConvertible {
 
     static let budgetSummary = belongsTo(BudgetSummary.self)
 
@@ -19,12 +19,20 @@ struct ServerKnowledgeConfig: Codable, FetchableRecord, PersistableRecord {
     var categories: Int?
     var transactions: Int?
 
+    var debugDescription: String {
+        "budgetId: \(budgetId), categories(\(String(describing: categories)), " +
+        "transactions\(String(describing: transactions)))"
+    }
+
     enum CodingKeys: String, CodingKey {
         case budgetId = "budgetSummaryId"
         case categories
         case transactions
     }
 
+    enum Value {
+        case categories(Int), transactions(Int)
+    }
 }
 
 // MARK: - BudgetService
@@ -33,6 +41,7 @@ extension BudgetSummary: PersistableRecord {
 
     static let transactions = hasMany(TransactionEntry.self)
     static let dbAccounts = hasMany(Account.self)
+    static let categoryGroup = hasMany(CategoryGroup.self)
 
     public func encode(to container: inout PersistenceContainer) throws {
         container["id"] = id
@@ -71,7 +80,66 @@ extension Account: FetchableRecord, PersistableRecord {
             deleted: row[DBCodingKey.deleted.rawValue]
         )
     }
+}
 
+extension CategoryGroup: FetchableRecord, PersistableRecord {
+
+    static let budgetSummary = belongsTo(BudgetSummary.self)
+    static let category = hasMany(Category.self)
+
+    enum DBCodingKey: String, CodingKey {
+        case id, name, hidden, deleted
+        case budgetId = "budgetSummaryId"
+    }
+
+    public func encode(to container: inout PersistenceContainer) throws {
+        container[DBCodingKey.id.rawValue] = id
+        container[DBCodingKey.name.rawValue] = name
+        container[DBCodingKey.hidden.rawValue] = hidden
+        container[DBCodingKey.deleted.rawValue] = deleted
+        container[DBCodingKey.budgetId.rawValue] = budgetId
+    }
+
+    public init(row: Row) throws {
+        self.init(
+            id: row[DBCodingKey.id.rawValue],
+            name: row[DBCodingKey.name.rawValue],
+            hidden: row[DBCodingKey.hidden.rawValue],
+            deleted: row[DBCodingKey.deleted.rawValue],
+            budgetId: row[DBCodingKey.budgetId.rawValue]
+        )
+    }
+}
+
+extension BudgetSystemService.Category: FetchableRecord, PersistableRecord {
+
+    static let budgetSummary = belongsTo(BudgetSummary.self)
+    static let categoryGroup = belongsTo(CategoryGroup.self)
+
+    enum DBCodingKey: String, CodingKey {
+        case id, name, hidden, deleted, categoryGroupId
+        case budgetId = "budgetSummaryId"
+    }
+
+    public func encode(to container: inout GRDB.PersistenceContainer) throws {
+        container[DBCodingKey.id.rawValue] = id
+        container[DBCodingKey.name.rawValue] = name
+        container[DBCodingKey.hidden.rawValue] = hidden
+        container[DBCodingKey.deleted.rawValue] = deleted
+        container[DBCodingKey.categoryGroupId.rawValue] = categoryGroupId
+        container[DBCodingKey.budgetId.rawValue] = budgetId
+    }
+
+    public init(row: Row) throws {
+        self.init(
+            id: row[DBCodingKey.id.rawValue],
+            categoryGroupId: row[DBCodingKey.categoryGroupId.rawValue],
+            name: row[DBCodingKey.name.rawValue],
+            hidden: row[DBCodingKey.hidden.rawValue],
+            deleted: row[DBCodingKey.deleted.rawValue],
+            budgetId: row[DBCodingKey.budgetId.rawValue]
+        )
+    }
 }
 
 extension TransactionEntry: FetchableRecord, PersistableRecord {
@@ -84,7 +152,7 @@ extension TransactionEntry: FetchableRecord, PersistableRecord {
 
     enum DBCodingKey: String, CodingKey {
         case id, date, payeeName, accountId, accountName, categoryId, categoryName
-        case categoryGroupId, categoryGroupName, transferAccountId, deleted, currencyCode
+        case categoryGroupId, transferAccountId, deleted, currencyCode
         case budgetId = "budgetSummaryId"
         case rawAmount = "amount"
     }
@@ -100,8 +168,6 @@ extension TransactionEntry: FetchableRecord, PersistableRecord {
         container[DBCodingKey.accountName.rawValue] = accountName
         container[DBCodingKey.categoryId.rawValue] = categoryId
         container[DBCodingKey.categoryName.rawValue] = categoryName
-        container[DBCodingKey.categoryGroupId.rawValue] = categoryGroupId
-        container[DBCodingKey.categoryGroupName.rawValue] = categoryGroupName
         container[DBCodingKey.transferAccountId.rawValue] = transferAccountId
         container[DBCodingKey.transferAccountId.rawValue] = deleted
     }
@@ -118,8 +184,6 @@ extension TransactionEntry: FetchableRecord, PersistableRecord {
             accountName: row[DBCodingKey.accountName.rawValue],
             categoryId: row[DBCodingKey.categoryId.rawValue],
             categoryName: row[DBCodingKey.categoryName.rawValue],
-            categoryGroupId: row[DBCodingKey.categoryGroupId.rawValue],
-            categoryGroupName: row[DBCodingKey.categoryGroupName.rawValue],
             transferAccountId: row[DBCodingKey.transferAccountId.rawValue],
             deleted: row[DBCodingKey.deleted.rawValue]
         )

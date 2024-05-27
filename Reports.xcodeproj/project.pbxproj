@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		1800034D2BD6919B003C2804 /* ReportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1800034C2BD6919B003C2804 /* ReportView.swift */; };
 		180003512BD796D0003C2804 /* MockDataStubs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180003502BD796D0003C2804 /* MockDataStubs.swift */; };
-		180003552BD8D40F003C2804 /* TabulatedDataItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180003542BD8D40E003C2804 /* TabulatedDataItem.swift */; };
 		183ECBB92B6F092B006C45B2 /* BudgetSystemService in Frameworks */ = {isa = PBXBuildFile; productRef = 183ECBB82B6F092B006C45B2 /* BudgetSystemService */; };
 		183ECBC12B70E0B6006C45B2 /* KeyValueStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 183ECBC02B70E0B6006C45B2 /* KeyValueStore.swift */; };
 		183ECBC32B70E0E3006C45B2 /* InMemoryKeyValueStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 183ECBC22B70E0E3006C45B2 /* InMemoryKeyValueStore.swift */; };
@@ -50,6 +49,7 @@
 		186E8A402B9BE5E800E65BDE /* ListStyleViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186E8A3F2B9BE5E800E65BDE /* ListStyleViewModifier.swift */; };
 		186E8A442B9C3AD500E65BDE /* KleonButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186E8A432B9C3AD500E65BDE /* KleonButtonStyle.swift */; };
 		186E8A462B9C4BB500E65BDE /* Color+Adjust.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186E8A452B9C4BB500E65BDE /* Color+Adjust.swift */; };
+		1870E1762BFDFEA300045F58 /* Error+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1870E1752BFDFEA300045F58 /* Error+Additions.swift */; };
 		1882CF4E2BDE3D7200EA0B05 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 1882CF4D2BDE3D7200EA0B05 /* Localizable.xcstrings */; };
 		188A8E402BF21D1E00938B81 /* SpendingTrendChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 188A8E3F2BF21D1E00938B81 /* SpendingTrendChartView.swift */; };
 		188AA8FF2BF3A4390032F170 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = 188AA8FE2BF3A4390032F170 /* GRDB */; };
@@ -116,7 +116,6 @@
 /* Begin PBXFileReference section */
 		1800034C2BD6919B003C2804 /* ReportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportView.swift; sourceTree = "<group>"; };
 		180003502BD796D0003C2804 /* MockDataStubs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockDataStubs.swift; sourceTree = "<group>"; };
-		180003542BD8D40E003C2804 /* TabulatedDataItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabulatedDataItem.swift; sourceTree = "<group>"; };
 		183ECBC02B70E0B6006C45B2 /* KeyValueStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyValueStore.swift; sourceTree = "<group>"; };
 		183ECBC22B70E0E3006C45B2 /* InMemoryKeyValueStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InMemoryKeyValueStore.swift; sourceTree = "<group>"; };
 		183ECBC42B70E10C006C45B2 /* Atomic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Atomic.swift; sourceTree = "<group>"; };
@@ -161,6 +160,7 @@
 		186E8A3F2B9BE5E800E65BDE /* ListStyleViewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListStyleViewModifier.swift; sourceTree = "<group>"; };
 		186E8A432B9C3AD500E65BDE /* KleonButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KleonButtonStyle.swift; sourceTree = "<group>"; };
 		186E8A452B9C4BB500E65BDE /* Color+Adjust.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Adjust.swift"; sourceTree = "<group>"; };
+		1870E1752BFDFEA300045F58 /* Error+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Error+Additions.swift"; sourceTree = "<group>"; };
 		1882CF4D2BDE3D7200EA0B05 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		188A8E3F2BF21D1E00938B81 /* SpendingTrendChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendingTrendChartView.swift; sourceTree = "<group>"; };
 		188AA9032BF5EB8A0032F170 /* GRDBDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GRDBDatabase.swift; sourceTree = "<group>"; };
@@ -347,6 +347,7 @@
 				18EF05562BEB005300976055 /* MainTab+Additions.swift */,
 				18A146B72BEBA69300B4E74F /* ProcessorInfo.swift */,
 				188AA9072BF763A70032F170 /* Publisher+Async.swift */,
+				1870E1752BFDFEA300045F58 /* Error+Additions.swift */,
 			);
 			path = Additions;
 			sourceTree = "<group>";
@@ -471,7 +472,6 @@
 				188A8E3E2BF21CF700938B81 /* Graphs */,
 				1800034C2BD6919B003C2804 /* ReportView.swift */,
 				186A80FC2BCCC5DE0015FFC7 /* ReportInputView.swift */,
-				180003542BD8D40E003C2804 /* TabulatedDataItem.swift */,
 				18E7BAF42BE0CE6D00C0468E /* ReportFetchError.swift */,
 				18E7BAF62BE0E5F300C0468E /* TransactionHistoryView.swift */,
 				18A146B92BECF73B00B4E74F /* ReportFeatureSourceLoader.swift */,
@@ -756,6 +756,7 @@
 				186E8A402B9BE5E800E65BDE /* ListStyleViewModifier.swift in Sources */,
 				186A80FD2BCCC5DE0015FFC7 /* ReportInputView.swift in Sources */,
 				184DF0B72B6E1C3E00BA6F21 /* ReportsApp.swift in Sources */,
+				1870E1762BFDFEA300045F58 /* Error+Additions.swift in Sources */,
 				183ECBEE2B747460006C45B2 /* Array+Safe.swift in Sources */,
 				188AA90C2BFC3E7E0032F170 /* GRDBQueries.swift in Sources */,
 				18C3BFB72B820DD000E444C8 /* Binding+Additions.swift in Sources */,
@@ -784,7 +785,6 @@
 				183ECBEC2B747460006C45B2 /* String+Additions.swift in Sources */,
 				186A80EB2BCA57F90015FFC7 /* BackgroundShadowViewModifier.swift in Sources */,
 				18E7BAF52BE0CE6D00C0468E /* ReportFetchError.swift in Sources */,
-				180003552BD8D40F003C2804 /* TabulatedDataItem.swift in Sources */,
 				186E8A242B9AF45200E65BDE /* HomeView.swift in Sources */,
 				189641C12B9D67CE00716258 /* SavedReportsView.swift in Sources */,
 				18C3BFC12B83993200E444C8 /* URL+Additions.swift in Sources */,

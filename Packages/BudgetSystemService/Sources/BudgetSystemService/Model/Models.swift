@@ -85,14 +85,13 @@ public struct BudgetSummary: Identifiable, Equatable, Codable, CustomStringConve
             accounts: []
         )
     }
-
 }
 
 public struct CategoryGroup: Identifiable, Equatable, Codable, CustomStringConvertible {
     /// Category group id
     public let id: String
 
-    /// Category name
+    /// Category  Group name
     public let name: String
 
     /// Whether or not the category is hidden
@@ -101,16 +100,22 @@ public struct CategoryGroup: Identifiable, Equatable, Codable, CustomStringConve
     /// Whether or not the category is deleted
     public let deleted: Bool
 
+    public let budgetId: String
+
     public var description: String { name }
 
-    public var categoryIds: [String]
-
-    public init(id: String, name: String, hidden: Bool, deleted: Bool, categoryIds: [String]) {
+    public init(
+        id: String,
+        name: String,
+        hidden: Bool,
+        deleted: Bool,
+        budgetId: String
+    ) {
         self.id = id
         self.name = name
         self.hidden = hidden
         self.deleted = deleted
-        self.categoryIds = categoryIds
+        self.budgetId = budgetId
     }
 }
 
@@ -127,25 +132,20 @@ public struct Category: Identifiable, Equatable, Codable, CustomStringConvertibl
     /// Whether or not the category is hidden
     public let hidden: Bool
 
-    /// Category note
-    public let note: String?
-
-    /// Current balance on this category
-    public let balance: Money
-
     /// Whether or not the category is deleted
     public let deleted: Bool
 
+    public let budgetId: String
+
     public var description: String { name }
 
-    public init(id: String, categoryGroupId: String, name: String, hidden: Bool, note: String?, balance: Money, deleted: Bool) {
+    public init(id: String, categoryGroupId: String, name: String, hidden: Bool, deleted: Bool, budgetId: String) {
         self.id = id
         self.categoryGroupId = categoryGroupId
         self.name = name
         self.hidden = hidden
-        self.note = note
-        self.balance = balance
         self.deleted = deleted
+        self.budgetId = budgetId
     }
 }
 
@@ -173,10 +173,6 @@ public struct TransactionEntry: Identifiable, Equatable, Codable, CustomStringCo
     /// Category id
     public let categoryId: String?
 
-    public let categoryGroupId: String?
-
-    public let categoryGroupName: String?
-
     /// Category name
     public let categoryName: String?
 
@@ -185,7 +181,7 @@ public struct TransactionEntry: Identifiable, Equatable, Codable, CustomStringCo
     public let deleted: Bool
 
     public var description: String { 
-        "\(id), \(dateFormated), \(categoryName ?? ""), \(amountFormatted)"
+        "\(id), \(dateFormated), \(amountFormatted)"
     }
 
     public var money: Money {
@@ -203,8 +199,6 @@ public struct TransactionEntry: Identifiable, Equatable, Codable, CustomStringCo
         accountName: String,
         categoryId: String?,
         categoryName: String?,
-        categoryGroupId: String?,
-        categoryGroupName: String?,
         transferAccountId: String?,
         deleted: Bool
     ) {
@@ -217,8 +211,6 @@ public struct TransactionEntry: Identifiable, Equatable, Codable, CustomStringCo
         self.accountName = accountName
         self.categoryId = categoryId
         self.categoryName = categoryName
-        self.categoryGroupId = categoryGroupId
-        self.categoryGroupName = categoryGroupName
         self.transferAccountId = transferAccountId
         self.deleted = deleted
 

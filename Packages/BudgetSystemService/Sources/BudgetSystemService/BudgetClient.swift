@@ -9,18 +9,8 @@ public class BudgetClient {
 
     @Published public private(set) var budgetSummaries: IdentifiedArrayOf<BudgetSummary> = []
     @Published public private(set) var accounts: IdentifiedArrayOf<Account> = []
-    @Published public private(set) var categoryGroups: IdentifiedArrayOf<CategoryGroup> = []
-    @Published public private(set) var categories: IdentifiedArrayOf<Category> = []
     @Published public var authorizationStatus: AuthorizationStatus
-    @Published public private(set) var selectedBudgetId: String? {
-        didSet {
-            if oldValue != selectedBudgetId {
-                Task {
-                    await fetchAccountAndCategoryValues()
-                }
-            }
-        }
-    }
+    @Published public private(set) var selectedBudgetId: String?
 
     private let logger = Logger(subsystem: "BudgetSystemService", category: "BudgetClient")
 
@@ -32,7 +22,6 @@ public class BudgetClient {
         self.provider = provider
         self.selectedBudgetId = selectedBudgetId
         self.authorizationStatus = authorizationStatus
-
     }
 
     public var isAuthenticated: Bool {
@@ -52,14 +41,14 @@ public class BudgetClient {
         guard budgetSummaries.map(\.id).contains(selectedId) else {
             throw BudgetClientError.selectedBudgetIdInvalid
         }
+        guard selectedId != selectedBudgetId else {
+            logger.debug("Selected budgetId is already set to: \(selectedId). No action taken.")
+            return
+        }
         selectedBudgetId = selectedId
         logger.debug("BudgetClient selectedBudgetId updated to: \(selectedId)")
     }
 
-
-    func fetchAccountAndCategoryValues() async {
-        await fetchCategoryValues()
-    }
 
     public func fetchBudgetSummaries() async throws -> [BudgetSummary] {
         do {
@@ -83,85 +72,32 @@ public class BudgetClient {
         }
     }
 
-
-    public func fetchCategoryValues() async {
+    @discardableResult
+    public func fetchCategoryValues(budgetId: String, lastServerKnowledge: Int?) async -> ([CategoryGroup], [Category], Int) {
         logger.debug("fetching category values ...")
-        guard let selectedBudgetId, isAuthenticated,
-              let currency = budgetSummaries[id: selectedBudgetId]?.currency else { return }
+        guard isAuthenticated else { return ([], [], 0) }
         do {
-            let fetchedCategoryValues = try await provider.fetchCategoryValues(
-                .init(budgetId: selectedBudgetId, currency: currency)
+            let result = try await provider.fetchCategoryValues(
+                .init(budgetId: budgetId, lastServerKnowledge: lastServerKnowledge)
             )
-            let categoryGroups = IdentifiedArray(uniqueElements: fetchedCategoryValues.groups)
-            let categories = IdentifiedArray(uniqueElements: fetchedCategoryValues.categories)
-            logger.debug("categoryGroups count (\(categoryGroups.count))")
-            logger.debug("categories count (\(categories.count))")
-            await Task { @MainActor in
-                self.categoryGroups = categoryGroups
-                self.categories = categories
-            }.value
+            return (result.0, result.1, result.2)
         } catch {
             logoutIfNeeded(error)
+            return ([], [], 0)
         }
     }
 
-    /// Fetch transactions from the selected Budget with a given start & end date.
-    /// Optional filter parameters can be provided to further constrain the fetched transactions.
-    public func fetchTransactions(
-        startDate: Date? = nil,
-        finishDate: Date? = nil,
-        filterBy: BudgetProvider.TransactionParameters.FilterByOption? = nil
-    ) async throws -> IdentifiedArrayOf<TransactionEntry> {
-        logger.debug("fetching transactions ...")
-        guard let selectedBudgetId, let currency = budgetSummaries[id: selectedBudgetId]?.currency else { return [] }
-        do {
-            let fetchedTransactions = try await provider.fetchTransactions(
-                .init(
-                    budgetId: selectedBudgetId,
-                    startDate: startDate,
-                    finishDate: finishDate,
-                    currency: currency,
-                    categoryGroupProvider: self,
-                    filterBy: filterBy,
-                    lastServerKnowledge: nil
-                )
-            )
-                .filter {
-                    // Move filter criteria. Should be provided as an argument
-                    let isOnBudgetAccount: Bool
-                    if let account = accounts[id: $0.accountId] {
-                        isOnBudgetAccount = account.onBudget
-                    } else {
-                        isOnBudgetAccount = false
-                    }
-                    let sDate = startDate ?? Date.distantPast
-                    let fDate = finishDate ?? Date.distantFuture
-                    return (sDate...fDate).contains($0.date) &&
-                    $0.categoryGroupName != "Internal Master Category" &&
-                    $0.transferAccountId == nil &&
-                    $0.deleted == false &&
-                    isOnBudgetAccount
-                }
-            return IdentifiedArray(uniqueElements: fetchedTransactions)
-        } catch {
-            logoutIfNeeded(error)
-            throw error
-        }
-
-    }
-
-    public func fetchAllTransactions(lastServerKnowledge: Int?)
+    public func fetchAllTransactions(budgetId: String, lastServerKnowledge: Int?)
     async throws -> ([TransactionEntry], serverKnowledge: Int) {
-        guard let selectedBudgetId, let currency = budgetSummaries[id: selectedBudgetId]?.currency
+        guard let currency = budgetSummaries[id: budgetId]?.currency
         else { return ([], 0) }
         logger.debug("fetching all transaction entries...")
         return try await provider.fetchAllTransactions(
             .init(
-                budgetId: selectedBudgetId,
+                budgetId: budgetId,
                 startDate: nil,
                 finishDate: nil,
                 currency: currency,
-                categoryGroupProvider: self,
                 filterBy: nil,
                 lastServerKnowledge: lastServerKnowledge
             )
@@ -197,7 +133,7 @@ extension BudgetClient {
         let provider = BudgetProvider {
             budgetSummaries.elements
         } fetchCategoryValues: { _ in
-            (categoryGroups.elements, categories.elements)
+            (categoryGroups.elements, categories.elements, 0)
         } fetchTransactions: { _ in
             transactions.elements
         } fetchAllTransactions: { _ in
@@ -208,8 +144,6 @@ extension BudgetClient {
         // set the published values so previews work and not dependent on async routines
         self.budgetSummaries = budgetSummaries
         self.accounts = accounts
-        self.categoryGroups = categoryGroups
-        self.categories = categories
         self.authorizationStatus = authorizationStatus
         self.selectedBudgetId = selectedBudgetId
     }
@@ -221,32 +155,3 @@ extension BudgetClient {
     
     public static let notAuthorizedClient = BudgetClient(provider: .notAuthorized, authorizationStatus: .loggedOut)
 }
-
-// MARK: - CategoryGroupLookupProviding
-
-public protocol CategoryGroupLookupProviding {
-    
-    func getCategoryGroupForCategory(categoryId: String?) -> CategoryGroup?
-    func getCategoryGroup(groupId: String?) -> CategoryGroup?
-
-}
-
-extension BudgetClient: CategoryGroupLookupProviding {
-
-    public func getCategoryGroupForCategory(categoryId: String?) -> CategoryGroup? {
-        guard let categoryId, !categories.isEmpty,
-              let category = categories[id: categoryId] else {
-            return nil
-        }
-        return categoryGroups[id: category.categoryGroupId]
-    }
-
-    public func getCategoryGroup(groupId: String?) -> CategoryGroup? {
-        guard let groupId, !categoryGroups.isEmpty,
-              let group = categoryGroups[id: groupId] else {
-            return nil
-        }
-        return group
-    }
-}
-

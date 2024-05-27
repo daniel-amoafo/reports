@@ -71,18 +71,6 @@ final class BudgetClientTests: XCTestCase {
         }
     }
 
-    func testFetchTransactions() async throws {
-        // given
-        sut = try await Factory.createBudgetClientWithSelectBudgetId("Budget1")
-        let startDate = Date.iso8601utc.date(from: "2024-02-01")!
-        let finishDate = Date.iso8601utc.date(from: "2024-03-30")!
-
-        // when
-        let transactions = try await sut.fetchTransactions(startDate: startDate, finishDate: finishDate)
-
-        // then
-        XCTAssertEqual(transactions.count, 2)
-    }
 }
 
 private enum Factory {

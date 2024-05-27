@@ -123,7 +123,7 @@ private extension HomeFeature {
             configProvider.selectedBudgetId = selectedBudgetId
 
         } catch {
-            logger.error("Error attempting to update selectedBudgetId: \(error.localizedDescription)")
+            logger.error("Error attempting to update selectedBudgetId: \(error.toString())")
         }
     }
 
@@ -139,7 +139,7 @@ private extension HomeFeature {
             let total = try savedReportQuery.fetchCount(FetchDescriptor<SavedReport>())
             return (savedReports, total)
         } catch {
-            logger.error("\(error.localizedDescription)")
+            logger.error("\(error.toString())")
             return ([], 0)
         }
     }

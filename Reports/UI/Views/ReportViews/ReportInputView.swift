@@ -63,6 +63,7 @@ struct ReportInputFeature {
     }
 
     @Dependency(\.budgetClient) var budgetClient
+    @Dependency(\.configProvider) var configProvider
     @Dependency(\.database.grdb) var grdb
 
     let logger = LogFactory.create(category: "ReportInput")
@@ -111,9 +112,9 @@ struct ReportInputFeature {
                 return .none
 
             case .onAppear:
-                if state.accounts == nil {
+                if state.accounts == nil, let budgetId = configProvider.selectedBudgetId {
                     do {
-                        let records = try grdb.fetchAccounts(isOnBudget: true)
+                        let records = try grdb.fetchAccounts(isOnBudget: true, budgetId: budgetId)
                         guard records.isNotEmpty else { return .none }
                         var accounts = IdentifiedArrayOf(uniqueElements: records)
                         let allAccounts = Account.allAccounts

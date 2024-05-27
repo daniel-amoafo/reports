@@ -27,7 +27,7 @@ class CurrencyFormatter: NumberFormatter {
     // This maintains shared instances for Currency Formatter as they canbe used
     private static var formatters: [Currency: CurrencyFormatter] = [:]
 
-    static func forCurrency(currency: Currency) -> CurrencyFormatter {
+    static func formatter(for currency: Currency) -> CurrencyFormatter {
         if let formatter = formatters[currency] {
             return formatter
         }

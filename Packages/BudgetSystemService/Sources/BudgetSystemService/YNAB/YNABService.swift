@@ -17,17 +17,23 @@ public extension BudgetProvider {
 
         } fetchCategoryValues: { params in
             do {
-                let result = try await api.categories.getCategories(budgetId: params.budgetId)
+                let (categoryGroupsWithCategories, serverKnowledge) = try await api.categories.getCategories(
+                    budgetId: params.budgetId, lastKnowledgeOfServer: params.lastServerKnowledge
+                )
+                let result = categoryGroupsWithCategories
                     .map { categoryGroup -> (CategoryGroup, [Category]) in
-                        let group = CategoryGroup(ynabCategoryGroup: categoryGroup)
-                        let categories = categoryGroup.categories.map { 
-                            Category(ynabCategory: $0, currency: params.currency)
+                        let group = CategoryGroup(
+                            ynabCategoryGroup: categoryGroup,
+                            budgetId: params.budgetId
+                        )
+                        let categories = categoryGroup.categories.map {
+                            Category(ynabCategory: $0, budgetId: params.budgetId)
                         }
                         return (group, categories)
                     }
                 let groups = result.map(\.0)
                 let categories = result.flatMap(\.1)
-                return (groups, categories)
+                return (groups, categories, serverKnowledge)
             } catch {
                 throw mappedError(error)
             }
@@ -37,7 +43,7 @@ public extension BudgetProvider {
                     switch filterBy {
                     case let .account(accountId):
                         return try await fetchTransactionDetails(params: params, api: api, accountId: accountId)
-                    case let .category(categoryId) :
+                    case let .category(categoryId):
                         return try await fetchTransactionHybrids(params: params, api: api, type: .category(id: categoryId))
                     }
                 }  else {
@@ -55,12 +61,10 @@ public extension BudgetProvider {
                     lastKnowledgeOfServer: params.lastServerKnowledge
                 )
             let transactions = details.map {
-                let categoryGroup = params.categoryGroupProvider?.getCategoryGroupForCategory(categoryId: $0.categoryId)
                 return TransactionEntry(
                     ynabTransactionDetail: $0,
                     budgetId: params.budgetId,
-                    currency: params.currency,
-                    categoryGroup: categoryGroup
+                    currency: params.currency
                 )
             }
             return (transactions, serverKnowledge)
@@ -98,12 +102,10 @@ private extension BudgetProvider {
 
         return transactionDetails
             .map {
-                let categoryGroup = params.categoryGroupProvider?.getCategoryGroupForCategory(categoryId: $0.categoryId)
-                return TransactionEntry(
+                TransactionEntry(
                     ynabTransactionDetail: $0,
                     budgetId: params.budgetId,
-                    currency: params.currency,
-                    categoryGroup: categoryGroup
+                    currency: params.currency
                 )
             }
     }
@@ -119,12 +121,10 @@ private extension BudgetProvider {
 
         return hybridTransactions
             .map {
-                let categoryGroup = params.categoryGroupProvider?.getCategoryGroupForCategory(categoryId: $0.categoryId)
-                return TransactionEntry(
+                TransactionEntry(
                     ynabHybridTransaction: $0,
                     budgetId: params.budgetId,
-                    currency: params.currency,
-                    categoryGroup: categoryGroup
+                    currency: params.currency
                 )
             }
     }

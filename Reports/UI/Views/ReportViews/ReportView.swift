@@ -36,6 +36,12 @@ struct ReportFeature {
             "\(inputFields.toDate.formatted(date: .abbreviated, time: .omitted))"
         }
 
+        var budgetId: String {
+            // todo add budgetId into SavedReport an retrieve from here if running a savedReport
+            @Dependency(\.configProvider) var configProvider
+            return configProvider.selectedBudgetId ?? ""
+        }
+
         var hasUnsavedChanges: Bool {
             if let savedReport {
                 // compare if saved report input fields are equal to current input field values.
@@ -157,6 +163,7 @@ struct ReportFeature {
                     state.chartGraph = .spendingByTotal(
                         .init(
                             title: chartTitle,
+                            budgetId: state.budgetId,
                             startDate: state.inputFields.fromDate,
                             finishDate: state.inputFields.toDate
                         )
@@ -426,7 +433,12 @@ private extension ReportFeature {
                 )
             ),
             chartGraph: .spendingByTotal(
-                .init(title: "Spending By Total", startDate: Date.distantPast, finishDate: Date.distantFuture)
+                .init(
+                    title: "Spending By Total",
+                    budgetId: "Budget1",
+                    startDate: Date.distantPast,
+                    finishDate: Date.distantFuture
+                )
             )
         )
     }

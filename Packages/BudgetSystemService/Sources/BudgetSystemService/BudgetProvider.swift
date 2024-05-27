@@ -8,13 +8,13 @@ import MoneyCommon
 public struct BudgetProvider {
 
     let fetchBudgetSummaries: () async throws -> [BudgetSummary]
-    let fetchCategoryValues: (_ params: CategoryGroupParameters) async throws -> (groups: [CategoryGroup], categories: [Category])
+    let fetchCategoryValues: (_ params: CategoryGroupParameters) async throws -> ([CategoryGroup], [Category], Int)
     let fetchTransactions: (_ params: TransactionParameters) async throws -> [TransactionEntry]
     let fetchAllTransactions: (_ params: TransactionParameters) async throws -> ([TransactionEntry], Int)
 
     public init(
         fetchBudgetSummaries: @Sendable @escaping () async throws -> [BudgetSummary],
-        fetchCategoryValues: @Sendable @escaping (_ params: CategoryGroupParameters) async throws -> (groups: [CategoryGroup], categories: [Category]),
+        fetchCategoryValues: @Sendable @escaping (_ params: CategoryGroupParameters) async throws -> (groups: [CategoryGroup], categories: [Category], serverKnowledge: Int),
         fetchTransactions: @Sendable @escaping (_ params: TransactionParameters) async throws -> [TransactionEntry],
         fetchAllTransactions: @Sendable @escaping (_ params: TransactionParameters) async throws -> (transactions: [TransactionEntry], serverKnowledge: Int)
     ) {
@@ -26,21 +26,19 @@ public struct BudgetProvider {
 
     public struct CategoryGroupParameters {
         public let budgetId: String
-        public let currency: Currency
+        public let lastServerKnowledge: Int?
     }
 
     public struct TransactionParameters {
         public enum FilterByOption {
             case account(accountId: String)
             case category(categoryId: String)
-            // support payee fitler type
         }
 
         public let budgetId: String
         public let startDate: Date?
         public let finishDate: Date?
         public let currency: Currency
-        public let categoryGroupProvider: CategoryGroupLookupProviding?
         public let filterBy: FilterByOption?
         public let lastServerKnowledge: Int?
     }
@@ -53,7 +51,7 @@ public extension BudgetProvider {
     /// Static BudgetProvider that does nothing
     static let noop = BudgetProvider(
         fetchBudgetSummaries: { return [] },
-        fetchCategoryValues: { _ in return ([],[]) },
+        fetchCategoryValues: { _ in return ([], [], 0) },
         fetchTransactions: { _ in return [] },
         fetchAllTransactions: { _ in return ([], 0) }
     )

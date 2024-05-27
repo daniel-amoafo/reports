@@ -25,6 +25,9 @@
     "A pie chart showing spending totals by category for budget accounts." : {
       "comment" : "description text of the spending total chart"
     },
+    "A Saved Report date was not valid (%@)." : {
+      "comment" : "Saved Report date could not be parsed back to a date."
+    },
     "A table summarising income & expenses for each category in a month" : {
       "comment" : "description text of the income expense chart"
     },
@@ -127,6 +130,9 @@
     "OK" : {
       "comment" : "Button title for an OK action."
     },
+    "Opps, there was an unexpected error loading the saved report." : {
+      "comment" : "A generic error message displauyed when unable to load a saved report for an unknown reason"
+    },
     "Outline" : {
 
     },
@@ -199,6 +205,9 @@
     "Spending Trend" : {
       "comment" : "The title for a chart displaying spending by trend for budget accounts."
     },
+    "The Saved Report Account could not be found." : {
+      "comment" : "Error displayed when the account id wasn't found in database"
+    },
     "This is a bottom row" : {
 
     },
@@ -213,9 +222,6 @@
     },
     "Total Spending" : {
 
-    },
-    "Uncategorized" : {
-      "comment" : "Category title for transactions without a formal category"
     },
     "Update Saved Report?" : {
       "comment" : "Confirmation message when updating an existing saved report."

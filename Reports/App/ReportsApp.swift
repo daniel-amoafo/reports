@@ -119,20 +119,30 @@ private extension AppFeature {
           await syncBudgetData()
     }
 
-    /// Spawns unstructured Async Task to mmonitor for budgetClient changes.
+    /// Spawns unstructured Async Task to monitor for budgetClient changes.
     func startAsyncListeners(send: Send<AppFeature.Action>) async {
+
+        Task {
+            // Monitor when the budgetId changes and sync db values for the new selectedBudgetId
+            for await _ in budgetClient.$selectedBudgetId.stream {
+//                await syncBudgetData()
+            }
+        }
+
         // await the last task to keep the run effect from completing.
         // A Reducer run effect cannot complete if send actions will be emitted.
         await Task {
             // Monitor authorization satus updates
             for await status in budgetClient.$authorizationStatus.stream {
                 await send(.didUpdateAuthStatus(status))
-                logger.debug("did update auth status to: \(status)")
             }
         }.value
     }
 
     func syncBudgetData() async {
+        defer {
+
+        }
         do {
             let summaries = try await budgetClient.fetchBudgetSummaries()
             guard summaries.isNotEmpty else {
@@ -141,33 +151,51 @@ private extension AppFeature {
             }
             logger.debug("Syncing summaries and accounts to db...")
             try await grdb.saveBudgetSummaries(summaries)
-            await budgetClient.fetchCategoryValues()
-            await syncTransactionHistory()
+
+            try await syncCategoryValues()
+            try await syncTransactionHistory()
 
         } catch {
             logger.error("\(String(describing: error))")
         }
     }
 
-    func syncTransactionHistory() async {
-        do {
-            guard let selectedId = budgetClient.selectedBudgetId else { return }
+    func syncCategoryValues() async throws {
+        guard let selectedId = configProvider.selectedBudgetId else { return }
 
-            let lastServerKnowledge = try grdb.fetchServerKnowledgeConfig(budgetId: selectedId)?.transactions
-            let (transactions, serverKnowledge) = try await budgetClient
-                .fetchAllTransactions(lastServerKnowledge: lastServerKnowledge)
+        let lastServerKnowledge = try grdb.fetchServerKnowledgeConfig(budgetId: selectedId)?.categories
+        let (groups, categories, newServerKnowledge) = await budgetClient.fetchCategoryValues(
+            budgetId: selectedId,
+            lastServerKnowledge: lastServerKnowledge
+        )
 
-            guard transactions.isNotEmpty else {
-                logger.debug("No new / updated transactions since last sync.")
-                return
-            }
-
-            logger.debug("Syncing transaction history to db...")
-            try grdb.saveTransactions(transactions, serverKnowledge: serverKnowledge)
-
-        } catch {
-            logger.error("\(String(describing: error))")
+        if groups.isEmpty && categories.isEmpty {
+            logger.debug("No new / updated category values since last sync.")
+            return
         }
+
+        logger.debug("Syncing category values to db...")
+        try await grdb.saveCategoryValues(
+            categoryGroups: groups,
+            categories: categories,
+            serverKnowledge: newServerKnowledge
+        )
+    }
+
+    func syncTransactionHistory() async throws {
+        guard let selectedId = configProvider.selectedBudgetId else { return }
+
+        let lastServerKnowledge = try grdb.fetchServerKnowledgeConfig(budgetId: selectedId)?.transactions
+        let (transactions, newServerKnowledge) = try await budgetClient
+            .fetchAllTransactions(budgetId: selectedId, lastServerKnowledge: lastServerKnowledge)
+
+        guard transactions.isNotEmpty else {
+            logger.debug("No new / updated transactions since last sync.")
+            return
+        }
+
+        logger.debug("Syncing transaction history to db...")
+        try await grdb.saveTransactions(transactions, serverKnowledge: newServerKnowledge)
     }
 
 }

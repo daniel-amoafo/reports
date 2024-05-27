@@ -43,7 +43,7 @@ public extension Money {
 public extension Money {
     
     var amountFormatted: String {
-        let formatter = CurrencyFormatter.forCurrency(currency: currency)
+        let formatter = CurrencyFormatter.formatter(for: currency)
         return formatter.string(for: toMajorUnitAmount) ?? ""
     }
 }

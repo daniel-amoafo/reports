@@ -62,21 +62,21 @@ extension IdentifiedArray where Element == CategoryGroup, ID == CategoryGroup.ID
             name: "Fixed Expenses",
             hidden: false,
             deleted: false,
-            categoryIds: ["CAT-RENT", "CAT-GROC"]
+            budgetId: "Budget1"
         ),
         .init(
             id: "CG-TRANS",
             name: "Transportation",
             hidden: false,
             deleted: false,
-            categoryIds: ["CAT-TRAIN", "CAT-TAXI"]
+            budgetId: "Budget1"
         ),
         .init(
             id: "CG-ENTERTAINMENT",
             name: "Entertainment",
             hidden: false,
             deleted: false,
-            categoryIds: ["CAT-MOVIES", "CAT-CONCERT"]
+            budgetId: "Budget1"
         ),
     ]
 }
@@ -91,54 +91,48 @@ extension IdentifiedArray where Element == BudgetSystemService.Category, ID == B
             categoryGroupId: "CG-FIX-EXP",
             name: "Rent",
             hidden: false,
-            note: nil,
-            balance: Money(123.45, currency: .AUD),
-            deleted: false
+            deleted: false,
+            budgetId: "Budget1"
         ),
         .init(
             id: "CAT-TRAIN",
             categoryGroupId: "CG-TRANS",
             name: "Train Ticket",
             hidden: false,
-            note: nil,
-            balance: Money(40.50, currency: .AUD),
-            deleted: false
+            deleted: false,
+            budgetId: "Budget1"
         ),
         .init(
             id: "CAT-TAXI",
             categoryGroupId: "CG-TRANS",
             name: "Taxi / Uber",
             hidden: false,
-            note: nil,
-            balance: Money(20.00, currency: .AUD),
-            deleted: false
+            deleted: false,
+            budgetId: "Budget1"
         ),
         .init(
             id: "CAT-GROCERIES",
             categoryGroupId: "CG-FIX-EXP",
             name: "Groceries",
             hidden: false,
-            note: nil,
-            balance: Money(89.50, currency: .AUD),
-            deleted: false
+            deleted: false,
+            budgetId: "Budget1"
         ),
         .init(
             id: "CAT-MOVIES",
             categoryGroupId: "CG-ENTERTAINMENT",
             name: "Movies",
             hidden: false,
-            note: nil,
-            balance: Money(42, currency: .AUD),
-            deleted: false
+            deleted: false,
+            budgetId: "Budget1"
         ),
         .init(
             id: "CAT-CONCERT",
             categoryGroupId: "CG-ENTERTAINMENT",
             name: "Concert",
             hidden: false,
-            note: nil,
-            balance: Money(80, currency: .AUD),
-            deleted: false
+            deleted: false,
+            budgetId: "Budget1"
         ),
     ]
 }
@@ -159,8 +153,6 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
             accountName: "Account First",
             categoryId: "CAT-GROC",
             categoryName: "Groceries",
-            categoryGroupId: "CG-FIX-EXP",
-            categoryGroupName: "Fixed Expenses",
             transferAccountId: nil,
             deleted: false
         ),
@@ -175,8 +167,6 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
             accountName: "Account First",
             categoryId: "CAT-TRAIN",
             categoryName: "Train Ticket",
-            categoryGroupId: "CG-TRANS",
-            categoryGroupName: "Transport",
             transferAccountId: nil,
             deleted: false
         ),
@@ -191,8 +181,6 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
             accountName: "Account Second",
             categoryId: "CAT-RENT",
             categoryName: "Rent",
-            categoryGroupId: "CG-FIX-EXP",
-            categoryGroupName: "Fixed Expenses",
             transferAccountId: nil,
             deleted: false
         ),
@@ -207,8 +195,6 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
             accountName: "Account Second",
             categoryId: "CAT-TAXI",
             categoryName: "Taxi / Uber",
-            categoryGroupId: "CG-TRANS",
-            categoryGroupName: "Transport",
             transferAccountId: nil,
             deleted: false
         ),
@@ -223,8 +209,6 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
             accountName: "Account Second",
             categoryId: "CAT-CONCERT",
             categoryName: "Concert",
-            categoryGroupId: "CG-ENTERTAINMENT",
-            categoryGroupName: "Entertainment",
             transferAccountId: nil,
             deleted: false
         ),
@@ -239,8 +223,6 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
             accountName: "Account Third",
             categoryId: "CAT-CONCERT",
             categoryName: "Concert",
-            categoryGroupId: "CG-ENTERTAINMENT",
-            categoryGroupName: "Entertainment",
             transferAccountId: nil,
             deleted: false
         ),
@@ -255,8 +237,6 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
             accountName: "Account Second",
             categoryId: "CAT-Movies",
             categoryName: "Movies",
-            categoryGroupId: "CG-ENTERTAINMENT",
-            categoryGroupName: "Entertainment",
             transferAccountId: nil,
             deleted: false
         ),
@@ -274,8 +254,6 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
             accountName: "Account First",
             categoryId: "CAT-TAXI",
             categoryName: "Taxi / Uber",
-            categoryGroupId: "CG-TRANS",
-            categoryGroupName: "Transport",
             transferAccountId: nil,
             deleted: false
         ),
@@ -290,8 +268,6 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
             accountName: "Account Second",
             categoryId: "CAT-RENT",
             categoryName: "Rent",
-            categoryGroupId: "CG-FIX-EXP",
-            categoryGroupName: "Fixed Expenses",
             transferAccountId: nil,
             deleted: false
         ),

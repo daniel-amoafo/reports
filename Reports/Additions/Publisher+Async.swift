@@ -3,8 +3,8 @@
 import Combine
 import Foundation
 
-/// AsyncPublisher vends a .value property however does not reliably vend values
-/// when used in a for await syntax. Using a `AsyncStream` reliably delivers values
+/// AsyncPublisher vends a .value property however does not reliably emit values
+/// when used in a for await syntax. Using a `AsyncStream` reliably delivers the values.
 extension Publisher where Failure == Never {
 
     public var stream: AsyncStream<Output> {

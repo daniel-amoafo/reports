@@ -77,11 +77,11 @@ extension GRDBDatabase {
     }
 }
 
-// MARK: - GRDBDatabase Instance
+// MARK: - GRDBDatabase Instance Creation
 
 extension GRDBDatabase {
 
-    /// Used by a simulator and device builds. The normal operational mode for the app.
+    /// Used by a simulator and device builds. The normal operating mode in the app.
     static func makeLive() throws -> Self {
         // Create the "Application Support/Database" directory if needed
         let fileManager = FileManager.default
@@ -106,7 +106,7 @@ extension GRDBDatabase {
         logger.debug("Database stored at \(databaseURL.path)")
         let dbPool = try DatabasePool(
             path: databaseURL.path,
-            // Use default AppDatabase configuration
+            // Use default GRDBDatabase configuration
             configuration: Self.makeConfiguration()
         )
 
@@ -158,6 +158,23 @@ private extension GRDBDatabase {
                 t.belongsTo("budgetSummary", onDelete: .cascade).notNull()
             }
 
+            try db.create(table: "categoryGroup") { t in
+                t.primaryKey("id", .text).notNull()
+                t.column("name", .text).notNull()
+                t.column("hidden", .boolean).notNull()
+                t.column("deleted", .boolean).notNull()
+                t.belongsTo("budgetSummary", onDelete: .cascade).notNull()
+            }
+
+            try db.create(table: "category") { t in
+                t.primaryKey("id", .text).notNull()
+                t.column("name", .text).notNull()
+                t.column("hidden", .boolean).notNull()
+                t.column("deleted", .boolean).notNull()
+                t.belongsTo("categoryGroup", onDelete: .cascade).notNull()
+                t.belongsTo("budgetSummary", onDelete: .cascade).notNull()
+            }
+
             try db.create(table: "transactionEntry") { t in
                 t.primaryKey("id", .text).notNull()
                 t.column("date", .date).notNull()
@@ -168,8 +185,6 @@ private extension GRDBDatabase {
                 t.column("accountName", .text).notNull()
                 t.column("categoryId", .text)
                 t.column("categoryName", .text)
-                t.column("categoryGroupId", .text)
-                t.column("categoryGroupName", .text)
                 t.column("transferAccountId", .text)
                 t.column("deleted", .boolean)
                 t.belongsTo("budgetSummary", onDelete: .cascade).notNull()
@@ -210,32 +225,49 @@ extension GRDBDatabase {
         }
     }
 
-    func saveTransactions(_ transactions: [TransactionEntry], serverKnowledge: Int) throws {
+    func saveCategoryValues(
+        categoryGroups: [CategoryGroup],
+        categories: [BudgetSystemService.Category],
+        serverKnowledge: Int
+    ) async throws {
+
+        guard let budgetId = categoryGroups.first?.budgetId else { return }
+
+        try await dbWriter.write { db in
+            for categoryGroup in categoryGroups {
+                try categoryGroup.save(db)
+            }
+
+            for category in categories {
+                try category.save(db)
+            }
+
+            try updateServerKnowledge(
+                in: db,
+                budgetId: budgetId,
+                updatedValue: .categories(serverKnowledge)
+            )
+        }
+    }
+
+    func saveTransactions(_ transactions: [TransactionEntry], serverKnowledge: Int) async throws {
         guard let budgetId = transactions.first?.budgetId else { return }
-        try dbWriter.write { db in
+        try await dbWriter.write { db in
             for transaction in transactions {
                 try transaction.save(db)
             }
 
-            // Update or Create server knowledge config
-            var serverKnowledgeConfig = try fetchServerKnowledgeConfig(budgetId: budgetId, db: db)
-            ?? .init(budgetId: budgetId)
-            serverKnowledgeConfig.transactions = serverKnowledge
-            try serverKnowledgeConfig.upsert(db)
-
-            Self.logger.debug("saved transactions (\(transactions.count)), server knowledge (\(serverKnowledge))")
+            try updateServerKnowledge(
+                in: db,
+                budgetId: budgetId,
+                updatedValue: .transactions(serverKnowledge)
+            )
         }
     }
 
     func saveServerKnowledge(_ serverKnowledge: ServerKnowledgeConfig) throws {
         try dbWriter.write { db in
             try serverKnowledge.save(db)
-        }
-    }
-
-    private func saveAccounts(_ accounts: [Account], db: GRDB.Database) throws {
-        for account in accounts {
-            try account.save(db)
         }
     }
 
@@ -251,6 +283,12 @@ extension GRDBDatabase {
         }
     }
 
+    func fetchRecord<Record: FetchableRecord>(_ record: Record.Type, request: any FetchRequest) throws -> Record? {
+        try dbWriter.read { db in
+            try record.fetchOne(db, request)
+        }
+    }
+
     func fetchRecords<Record: FetchableRecord>(builder: RecordSQLBuilder<Record>) throws -> [Record] {
         try dbWriter.read { db in
             let sql = builder.sql
@@ -259,11 +297,12 @@ extension GRDBDatabase {
         }
     }
 
-    func fetchAccounts(isOnBudget: Bool) throws -> [Account] {
+    func fetchAccounts(isOnBudget: Bool, budgetId: String) throws -> [Account] {
         try dbWriter.read { db in
             let onBudgetVal = isOnBudget ? "1" : "0"
             let request = Account
                 .filter(Column(Account.DBCodingKey.onBudget) == onBudgetVal)
+                .filter(Column(Account.DBCodingKey.budgetId) == budgetId)
             return try request.fetchAll(db)
         }
     }
@@ -271,14 +310,43 @@ extension GRDBDatabase {
     func fetchTransactions() throws -> [TransactionEntry] {
         return []
     }
+}
 
-    private func fetchServerKnowledgeConfig(budgetId: String, db: GRDB.Database) throws -> ServerKnowledgeConfig? {
+private extension GRDBDatabase {
+
+    private func saveAccounts(_ accounts: [Account], db: GRDB.Database) throws {
+        for account in accounts {
+            try account.save(db)
+        }
+    }
+
+    func fetchServerKnowledgeConfig(budgetId: String, db: GRDB.Database) throws -> ServerKnowledgeConfig? {
         guard budgetId.isNotEmpty else {
             throw ValidationError.missingBudgetId
         }
         let budgetIdColumn = ServerKnowledgeConfig.CodingKeys.budgetId.rawValue
         let request = ServerKnowledgeConfig.filter(Column(budgetIdColumn) == budgetId)
         return try request.fetchOne(db)
+    }
+
+    func updateServerKnowledge(
+        in db: GRDB.Database,
+        budgetId: String,
+        updatedValue: ServerKnowledgeConfig.Value
+    ) throws {
+        // Update or Create server knowledge config
+        var serverKnowledgeConfig = try fetchServerKnowledgeConfig(budgetId: budgetId, db: db)
+        ?? .init(budgetId: budgetId)
+
+        switch updatedValue {
+        case let .categories(serverKnowledge):
+            serverKnowledgeConfig.categories = serverKnowledge
+        case let .transactions(serverKnowledge):
+            serverKnowledgeConfig.transactions = serverKnowledge
+        }
+        try serverKnowledgeConfig.upsert(db)
+
+        Self.logger.debug("server knowledge entry updated - \(String(reflecting: serverKnowledgeConfig))")
     }
 }
 

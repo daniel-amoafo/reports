@@ -16,6 +16,7 @@ extension BudgetClient {
     func logout(store: KeyValueStore = SecureKeyValueStore()) {
         Self.storeAccessToken(accessToken: nil, store: store)
         updateProvider(.notAuthorized)
+        authorizationStatus = .loggedOut
     }
 
     static func makeClient(
