@@ -356,7 +356,7 @@ extension GRDBDatabase {
     struct RecordSQLBuilder<Record: FetchableRecord> {
         let record: Record.Type
         let sql: String
-        let arguments: [(any DatabaseValueConvertible)?]
+        let arguments: [String: (any DatabaseValueConvertible)?]
     }
 
 }

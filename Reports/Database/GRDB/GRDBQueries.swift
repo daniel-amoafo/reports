@@ -41,16 +41,16 @@ extension TransactionEntry {
             INNER JOIN budgetSummary on budgetSummary.id = transactionEntry.budgetSummaryId
             INNER JOIN category on category.id = transactionEntry.categoryId
             INNER JOIN  categoryGroup on categoryGroup.id = category.categoryGroupId
-            WHERE date BETWEEN ? AND ?
+            WHERE date BETWEEN :startDate AND :finishDate
             AND account.onBudget = 1
-            AND transactionEntry.categoryId = ?
+            AND transactionEntry.categoryId = :categoryId
             AND ( categoryGroup.name <> 'Internal Master Category' OR (categoryGroup.name = 'Internal Master Category' AND category.name = 'Uncategorized' ))
             ORDER BY date DESC
             """,
             arguments: [
-                Date.iso8601local.string(from: startDate),
-                Date.iso8601local.string(from: finishDate),
-                categoryId,
+                "startDate": Date.iso8601local.string(from: startDate),
+                "finishDate": Date.iso8601local.string(from: finishDate),
+                "categoryId": categoryId,
             ]
         )
     }
@@ -73,18 +73,18 @@ extension CategoryRecord {
             INNER JOIN budgetSummary on budgetSummary.id = transactionEntry.budgetSummaryId
             INNER JOIN category on category.id = transactionEntry.categoryId
             INNER JOIN  categoryGroup on categoryGroup.id = category.categoryGroupId
-            WHERE date BETWEEN ? AND ?
+            WHERE date BETWEEN :startDate AND :finishDate
             AND account.onBudget = 1
-            AND transactionEntry.budgetSummaryId = ?
+            AND transactionEntry.budgetSummaryId = :budgetId
             AND ( categoryGroup.name <> 'Internal Master Category' OR (categoryGroup.name = 'Internal Master Category' AND category.name = 'Uncategorized' ))
             GROUP BY categoryGroup.name
             HAVING total <> 0
             ORDER BY total ASC
             """,
             arguments: [
-                Date.iso8601local.string(from: startDate),
-                Date.iso8601local.string(from: finishDate),
-                budgetId,
+                "startDate": Date.iso8601local.string(from: startDate),
+                "finishDate": Date.iso8601local.string(from: finishDate),
+                "budgetId": budgetId,
             ]
         )
     }
@@ -106,18 +106,18 @@ extension CategoryRecord {
             INNER JOIN budgetSummary on budgetSummary.id = transactionEntry.budgetSummaryId
             INNER JOIN category on category.id = transactionEntry.categoryId
             INNER JOIN  categoryGroup on categoryGroup.id = category.categoryGroupId
-            WHERE date BETWEEN ? AND ?
+            WHERE date BETWEEN :startDate AND :finishDate
             AND account.onBudget = 1
-            AND categoryGroup.id = ?
+            AND categoryGroup.id = :categoryGroupId
             AND ( categoryGroup.name <> 'Internal Master Category' OR (categoryGroup.name = 'Internal Master Category' AND category.name = 'Uncategorized' ))
             GROUP BY category.name
             HAVING total <> 0
             ORDER BY total ASC
             """,
             arguments: [
-                Date.iso8601local.string(from: startDate),
-                Date.iso8601local.string(from: finishDate),
-                categoryGroupId,
+                "startDate": Date.iso8601local.string(from: startDate),
+                "finishDate": Date.iso8601local.string(from: finishDate),
+                "categoryGroupId": categoryGroupId,
             ]
         )
     }
