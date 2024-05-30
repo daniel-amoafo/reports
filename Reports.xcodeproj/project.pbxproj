@@ -50,6 +50,11 @@
 		186E8A442B9C3AD500E65BDE /* KleonButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186E8A432B9C3AD500E65BDE /* KleonButtonStyle.swift */; };
 		186E8A462B9C4BB500E65BDE /* Color+Adjust.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186E8A452B9C4BB500E65BDE /* Color+Adjust.swift */; };
 		1873E1932C070840003C49CD /* ForEach+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1873E1922C070840003C49CD /* ForEach+Additions.swift */; };
+		1873E1952C08AA9C003C49CD /* ReportInputFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1873E1942C08AA9C003C49CD /* ReportInputFeature.swift */; };
+		1873E1972C08AB47003C49CD /* ReportFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1873E1962C08AB47003C49CD /* ReportFeature.swift */; };
+		1873E1992C08AB81003C49CD /* TransactionHistoryFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1873E1982C08AB81003C49CD /* TransactionHistoryFeature.swift */; };
+		1873E19B2C08AD6C003C49CD /* SavedReportsFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1873E19A2C08AD6C003C49CD /* SavedReportsFeature.swift */; };
+		1873E19D2C08ADC9003C49CD /* HomeFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1873E19C2C08ADC9003C49CD /* HomeFeature.swift */; };
 		1882CF4E2BDE3D7200EA0B05 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 1882CF4D2BDE3D7200EA0B05 /* Localizable.xcstrings */; };
 		188A8E402BF21D1E00938B81 /* SpendingTrendChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 188A8E3F2BF21D1E00938B81 /* SpendingTrendChartView.swift */; };
 		188AA8FF2BF3A4390032F170 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = 188AA8FE2BF3A4390032F170 /* GRDB */; };
@@ -162,6 +167,11 @@
 		186E8A432B9C3AD500E65BDE /* KleonButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KleonButtonStyle.swift; sourceTree = "<group>"; };
 		186E8A452B9C4BB500E65BDE /* Color+Adjust.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Adjust.swift"; sourceTree = "<group>"; };
 		1873E1922C070840003C49CD /* ForEach+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ForEach+Additions.swift"; sourceTree = "<group>"; };
+		1873E1942C08AA9C003C49CD /* ReportInputFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportInputFeature.swift; sourceTree = "<group>"; };
+		1873E1962C08AB47003C49CD /* ReportFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportFeature.swift; sourceTree = "<group>"; };
+		1873E1982C08AB81003C49CD /* TransactionHistoryFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionHistoryFeature.swift; sourceTree = "<group>"; };
+		1873E19A2C08AD6C003C49CD /* SavedReportsFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedReportsFeature.swift; sourceTree = "<group>"; };
+		1873E19C2C08ADC9003C49CD /* HomeFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeFeature.swift; sourceTree = "<group>"; };
 		1882CF4D2BDE3D7200EA0B05 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		188A8E3F2BF21D1E00938B81 /* SpendingTrendChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendingTrendChartView.swift; sourceTree = "<group>"; };
 		188AA9032BF5EB8A0032F170 /* GRDBDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GRDBDatabase.swift; sourceTree = "<group>"; };
@@ -274,8 +284,10 @@
 				18C3BFB12B820AEA00E444C8 /* SFSafariView.swift */,
 				186E8A212B9AEDB100E65BDE /* MainTabView.swift */,
 				186E8A232B9AF45200E65BDE /* HomeView.swift */,
+				1873E19C2C08ADC9003C49CD /* HomeFeature.swift */,
 				189641BD2B9D675900716258 /* SettingsView.swift */,
 				189641C02B9D67CE00716258 /* SavedReportsView.swift */,
+				1873E19A2C08AD6C003C49CD /* SavedReportsFeature.swift */,
 				186A80E62BC9F8450015FFC7 /* ChartButtonView.swift */,
 			);
 			path = Views;
@@ -474,9 +486,12 @@
 			children = (
 				188A8E3E2BF21CF700938B81 /* Graphs */,
 				1800034C2BD6919B003C2804 /* ReportView.swift */,
+				1873E1962C08AB47003C49CD /* ReportFeature.swift */,
 				186A80FC2BCCC5DE0015FFC7 /* ReportInputView.swift */,
+				1873E1942C08AA9C003C49CD /* ReportInputFeature.swift */,
 				18E7BAF42BE0CE6D00C0468E /* ReportFetchError.swift */,
 				18E7BAF62BE0E5F300C0468E /* TransactionHistoryView.swift */,
+				1873E1982C08AB81003C49CD /* TransactionHistoryFeature.swift */,
 				18A146B92BECF73B00B4E74F /* ReportFeatureSourceLoader.swift */,
 			);
 			path = ReportViews;
@@ -734,6 +749,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				189641AF2B9C72BE00716258 /* AnimationConstants.swift in Sources */,
+				1873E19D2C08ADC9003C49CD /* HomeFeature.swift in Sources */,
 				186A80F22BCBF4990015FFC7 /* ViewRectReader.swift in Sources */,
 				18E7BAF92BE1081400C0468E /* EdgeInsets+Additions.swift in Sources */,
 				1800034D2BD6919B003C2804 /* ReportView.swift in Sources */,
@@ -744,6 +760,7 @@
 				183F17052BF24186003C1334 /* MonthYearPickerView.swift in Sources */,
 				18F8A75A2C041F750045CB07 /* Error+Stringify.swift in Sources */,
 				188AA9042BF5EB8A0032F170 /* GRDBDatabase.swift in Sources */,
+				1873E19B2C08AD6C003C49CD /* SavedReportsFeature.swift in Sources */,
 				1873E1932C070840003C49CD /* ForEach+Additions.swift in Sources */,
 				18C3BFBF2B82370B00E444C8 /* BudgetSystemService+Config.swift in Sources */,
 				189641BB2B9C8CFE00716258 /* ReportChart.swift in Sources */,
@@ -763,6 +780,7 @@
 				184DF0B72B6E1C3E00BA6F21 /* ReportsApp.swift in Sources */,
 				183ECBEE2B747460006C45B2 /* Array+Safe.swift in Sources */,
 				188AA90C2BFC3E7E0032F170 /* GRDBQueries.swift in Sources */,
+				1873E1992C08AB81003C49CD /* TransactionHistoryFeature.swift in Sources */,
 				18C3BFB72B820DD000E444C8 /* Binding+Additions.swift in Sources */,
 				188A8E402BF21D1E00938B81 /* SpendingTrendChartView.swift in Sources */,
 				18A514C92BD5001300B072DE /* SpendingTotalChartView.swift in Sources */,
@@ -791,7 +809,9 @@
 				18E7BAF52BE0CE6D00C0468E /* ReportFetchError.swift in Sources */,
 				186E8A242B9AF45200E65BDE /* HomeView.swift in Sources */,
 				189641C12B9D67CE00716258 /* SavedReportsView.swift in Sources */,
+				1873E1972C08AB47003C49CD /* ReportFeature.swift in Sources */,
 				18C3BFC12B83993200E444C8 /* URL+Additions.swift in Sources */,
+				1873E1952C08AA9C003C49CD /* ReportInputFeature.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

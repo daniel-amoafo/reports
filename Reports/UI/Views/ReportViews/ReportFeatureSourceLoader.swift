@@ -8,7 +8,7 @@ import Foundation
 // see: https://forums.swift.org/t/macro-circular-reference-error-when-adding-extensions-to-a-type-decorated-by-a-peer-macro/68064/3
 enum ReportFeatureSourceLoader {
 
-    static let logger = LogFactory.create(category: "\(String(describing: ReportFeatureSourceLoader.self))")
+    static let logger = LogFactory.create(Self.self)
 
     // Ensure a report is loaded with valid inputField parameters.
     // This is mainly to confirm a SavedReport data can be load and report run

@@ -13,7 +13,7 @@ struct Database {
             self.swiftData = try swiftData()
             self.grdb = try grdb()
         } catch {
-            let logger = LogFactory.create(category: "Database init")
+            let logger = LogFactory.create(Self.self)
             logger.error("Unable init Database instance...")
             fatalError("\(error.toString())")
         }

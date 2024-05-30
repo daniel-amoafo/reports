@@ -114,7 +114,7 @@ struct SpendingTotalChartFeature {
     @Dependency(\.budgetClient) var budgetClient
     @Dependency(\.database.grdb) var grdb
 
-    let logger = LogFactory.create(category: String(describing: SpendingTotalChartFeature.self))
+    let logger = LogFactory.create(Self.self)
 
     var body: some ReducerOf<Self> {
         BindingReducer()

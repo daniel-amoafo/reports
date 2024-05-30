@@ -35,7 +35,7 @@ extension GRDBDatabase {
 // MARK: - Database Configuration
 
 extension GRDBDatabase {
-    private static let logger = LogFactory.create(category: "GRDBDatabase")
+    private static let logger = LogFactory.create(Self.self)
 
     /// Returns a database configuration suited for `PlayerRepository`.
     ///

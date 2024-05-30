@@ -29,7 +29,7 @@ struct MainTab {
         enum Alert: Equatable { }
     }
 
-    let logger = LogFactory.create(category: "MainTab")
+    let logger = LogFactory.create(Self.self)
 
     var body: some ReducerOf<Self> {
         Scope(state: \.home, action: \.home) {

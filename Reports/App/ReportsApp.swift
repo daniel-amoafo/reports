@@ -6,8 +6,6 @@ import ComposableArchitecture
 import SwiftData
 import SwiftUI
 
-private var subscribers: Set<AnyCancellable> = []
-
 @Reducer
 struct AppFeature {
 
@@ -35,7 +33,7 @@ struct AppFeature {
     @Dependency(\.configProvider) var configProvider
     @Dependency(\.continuousClock) var clock
 
-    var logger = LogFactory.create(category: .appFeature)
+    private let logger = LogFactory.create(Self.self)
 
     var body: some ReducerOf<Self> {
         Scope(state: \.appIntroLogin, action: \.appIntroLogin) {

@@ -5,17 +5,11 @@ import OSLog
 
 struct LogFactory {
 
-    enum Category: String {
-        case appFeature = "AppFeature"
-        case login = "Login"
-        case home = "Home"
-    }
-
-    static func create(category: Category) -> Logger {
-        create(category: category.rawValue)
-    }
-
     static func create(category: String) -> Logger {
         .init(subsystem: "Reports", category: category)
+    }
+
+    static func create(_ category: Any) -> Logger {
+        Self.create(category: String(describing: category.self))
     }
 }
