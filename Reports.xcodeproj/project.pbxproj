@@ -49,6 +49,7 @@
 		186E8A402B9BE5E800E65BDE /* ListStyleViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186E8A3F2B9BE5E800E65BDE /* ListStyleViewModifier.swift */; };
 		186E8A442B9C3AD500E65BDE /* KleonButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186E8A432B9C3AD500E65BDE /* KleonButtonStyle.swift */; };
 		186E8A462B9C4BB500E65BDE /* Color+Adjust.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186E8A452B9C4BB500E65BDE /* Color+Adjust.swift */; };
+		1873E1932C070840003C49CD /* ForEach+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1873E1922C070840003C49CD /* ForEach+Additions.swift */; };
 		1882CF4E2BDE3D7200EA0B05 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 1882CF4D2BDE3D7200EA0B05 /* Localizable.xcstrings */; };
 		188A8E402BF21D1E00938B81 /* SpendingTrendChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 188A8E3F2BF21D1E00938B81 /* SpendingTrendChartView.swift */; };
 		188AA8FF2BF3A4390032F170 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = 188AA8FE2BF3A4390032F170 /* GRDB */; };
@@ -160,6 +161,7 @@
 		186E8A3F2B9BE5E800E65BDE /* ListStyleViewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListStyleViewModifier.swift; sourceTree = "<group>"; };
 		186E8A432B9C3AD500E65BDE /* KleonButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KleonButtonStyle.swift; sourceTree = "<group>"; };
 		186E8A452B9C4BB500E65BDE /* Color+Adjust.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Adjust.swift"; sourceTree = "<group>"; };
+		1873E1922C070840003C49CD /* ForEach+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ForEach+Additions.swift"; sourceTree = "<group>"; };
 		1882CF4D2BDE3D7200EA0B05 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		188A8E3F2BF21D1E00938B81 /* SpendingTrendChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendingTrendChartView.swift; sourceTree = "<group>"; };
 		188AA9032BF5EB8A0032F170 /* GRDBDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GRDBDatabase.swift; sourceTree = "<group>"; };
@@ -348,6 +350,7 @@
 				18A146B72BEBA69300B4E74F /* ProcessorInfo.swift */,
 				188AA9072BF763A70032F170 /* Publisher+Async.swift */,
 				18F8A7592C041F750045CB07 /* Error+Stringify.swift */,
+				1873E1922C070840003C49CD /* ForEach+Additions.swift */,
 			);
 			path = Additions;
 			sourceTree = "<group>";
@@ -741,6 +744,7 @@
 				183F17052BF24186003C1334 /* MonthYearPickerView.swift in Sources */,
 				18F8A75A2C041F750045CB07 /* Error+Stringify.swift in Sources */,
 				188AA9042BF5EB8A0032F170 /* GRDBDatabase.swift in Sources */,
+				1873E1932C070840003C49CD /* ForEach+Additions.swift in Sources */,
 				18C3BFBF2B82370B00E444C8 /* BudgetSystemService+Config.swift in Sources */,
 				189641BB2B9C8CFE00716258 /* ReportChart.swift in Sources */,
 				183ECBE02B747085006C45B2 /* SelectListView.swift in Sources */,
@@ -1183,8 +1187,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture";
 			requirement = {
-				branch = "shared-state-beta";
-				kind = branch;
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
 			};
 		};
 		188AA8FD2BF3A4390032F170 /* XCRemoteSwiftPackageReference "GRDB.swift" */ = {
