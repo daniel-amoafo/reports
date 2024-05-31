@@ -16,6 +16,7 @@ struct SpendingTotalChartFeature {
         let title: String
         let startDate: Date
         let finishDate: Date
+        let accountId: String?
         var contentType: SpendingTotalChartFeature.ContentType = .categoryGroup
 
         var rawSelectedGraphValue: Decimal?
@@ -32,14 +33,16 @@ struct SpendingTotalChartFeature {
             title: String,
             budgetId: String,
             startDate: Date,
-            finishDate: Date
+            finishDate: Date,
+            accountId: String?
         ) {
             self.title = title
             self.startDate = startDate
             self.finishDate = finishDate
+            self.accountId = accountId
 
             self.categoryGroups = SpendingTotalQueries.fetchCategoryGroupTotals(
-                budgetId: budgetId, startDate: startDate, finishDate: finishDate
+                budgetId: budgetId, startDate: startDate, finishDate: finishDate, accountId: accountId
             )
         }
 
@@ -155,7 +158,8 @@ struct SpendingTotalChartFeature {
                     let (records, groupName) = SpendingTotalQueries.fetchCategoryTotals(
                         categoryGroupId: id,
                         startDate: state.startDate,
-                        finishDate: state.finishDate
+                        finishDate: state.finishDate,
+                        accountId: state.accountId
                     )
                     return .send(.catgoriesForCategoryGroupFetched(records, groupName), animation: .smooth)
 
@@ -163,7 +167,8 @@ struct SpendingTotalChartFeature {
                     let transactions = SpendingTotalQueries.fetchTransactionEntries(
                         for: id,
                         startDate: state.startDate,
-                        finishDate: state.finishDate
+                        finishDate: state.finishDate,
+                        accountId: state.accountId
                     )
                     return .send(.delegate(.categoryTapped(transactions)), animation: .smooth)
                 }
@@ -196,13 +201,19 @@ private enum SpendingTotalQueries {
         return grdb
     }
 
-    static func fetchCategoryGroupTotals(budgetId: String, startDate: Date, finishDate: Date) -> [CategoryRecord] {
+    static func fetchCategoryGroupTotals(
+        budgetId: String,
+        startDate: Date,
+        finishDate: Date,
+        accountId: String?
+    ) -> [CategoryRecord] {
         do {
             let categoryGroupBuilder = CategoryRecord
                 .queryTransactionsByCategoryGroupTotals(
                     budgetId: budgetId,
                     startDate: startDate,
-                    finishDate: finishDate
+                    finishDate: finishDate,
+                    accountId: accountId
                 )
 
             return try grdb.fetchRecords(builder: categoryGroupBuilder)
@@ -215,14 +226,16 @@ private enum SpendingTotalQueries {
     static func fetchCategoryTotals(
         categoryGroupId: String,
         startDate: Date,
-        finishDate: Date
+        finishDate: Date,
+        accountId: String?
     ) -> ([CategoryRecord], String) {
         do {
             let categoryBuilder = CategoryRecord
                 .queryTransactionsByCategoryTotals(
                     forCategoryGroupId: categoryGroupId,
                     startDate: startDate,
-                    finishDate: finishDate
+                    finishDate: finishDate,
+                    accountId: accountId
                 )
             let records = try Self.grdb.fetchRecords(builder: categoryBuilder)
 
@@ -235,13 +248,14 @@ private enum SpendingTotalQueries {
         }
     }
 
-    static func fetchTransactionEntries(for categoryId: String, startDate: Date, finishDate: Date)
+    static func fetchTransactionEntries(for categoryId: String, startDate: Date, finishDate: Date, accountId: String?)
     -> IdentifiedArrayOf<TransactionEntry> {
         do {
             let transactionsBuilder = TransactionEntry.queryTransactionsByCategoryId(
                 categoryId,
                 startDate: startDate,
-                finishDate: finishDate
+                finishDate: finishDate,
+                accountId: accountId
             )
             let transactions = try Self.grdb.fetchRecords(builder: transactionsBuilder)
 
@@ -456,7 +470,8 @@ private enum Strings {
                         title: "My Chart Name",
                         budgetId: "Budget1",
                         startDate: .now.firstDayInMonth(),
-                        finishDate: .now.lastDayInMonth()
+                        finishDate: .now.lastDayInMonth(),
+                        accountId: nil
                     )
             ) {
                  SpendingTotalChartFeature()

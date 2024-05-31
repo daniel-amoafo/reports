@@ -61,7 +61,7 @@ extension GRDBDatabase {
                     // information (statement arguments) are not logged
                     // unless config.publicStatementArguments is set
                     // (see below).
-                    logger.debug("\(String(format: "%{public}@", String(describing: $0)))")
+                    logger.debug("SQL: \($0)")
                 }
             }
         }

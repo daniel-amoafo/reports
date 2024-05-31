@@ -31,9 +31,18 @@ struct ReportFeature {
             return savedReportTitle
         }
         var chartContainerId: String { "GraphChartContainer" }
+
         var saveReportSuggestedName: String {
-            "\(inputFields.fromDate.formatted(date: .abbreviated, time: .omitted)) - " +
-            "\(inputFields.toDate.formatted(date: .abbreviated, time: .omitted))"
+            let fromYear = inputFields.fromDate.formatted(.dateTime.year())
+            let fromMonth = inputFields.fromDate.formatted(.dateTime.month())
+            let toYear = inputFields.toDate.formatted(.dateTime.year())
+            let toMonth = inputFields.toDate.formatted(.dateTime.month())
+            let accountName = "\(inputFields.selectedAccountName ?? Account.allAccounts.name)"
+
+            if fromYear == toYear {
+                return "\(fromYear) \(fromMonth) - \(toMonth), \(accountName)"
+            }
+            return "\(fromMonth) \(fromYear) - \(toMonth) \(toYear), \(accountName)"
         }
 
         var budgetId: String {
@@ -166,7 +175,8 @@ struct ReportFeature {
                             title: chartTitle,
                             budgetId: state.budgetId,
                             startDate: state.inputFields.fromDate,
-                            finishDate: state.inputFields.toDate
+                            finishDate: state.inputFields.toDate,
+                            accountId: state.inputFields.santizedSelectedAccountId
                         )
                     )
                 case .spendingByTrend:

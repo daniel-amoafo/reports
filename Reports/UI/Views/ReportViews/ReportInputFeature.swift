@@ -19,6 +19,12 @@ struct ReportInputFeature {
         var popoverFromDate = false
         var popoverToDate = false
 
+        // Return nil if the accountId is set to Account.allAccountsId.
+        var santizedSelectedAccountId: String? {
+            guard selectedAccountId != Account.allAccountsId else { return nil }
+            return selectedAccountId
+        }
+
         var selectedAccountName: String? {
             guard let selectedAccountId else { return nil }
             return accounts?[id: selectedAccountId]?.name
@@ -32,8 +38,8 @@ struct ReportInputFeature {
             !isAccountSelected
         }
 
-        var fromDateFormatted: String { Date.iso8601utc.string(from: fromDate) }
-        var toDateFormatted: String { Date.iso8601utc.string(from: toDate) }
+        var fromDateFormatted: String { Date.iso8601local.string(from: fromDate) }
+        var toDateFormatted: String { Date.iso8601local.string(from: toDate) }
 
         func isEqual(to savedReport: SavedReport) -> Bool {
             savedReport.fromDate == fromDateFormatted &&
@@ -112,24 +118,28 @@ struct ReportInputFeature {
                 return .none
 
             case .onAppear:
-                if state.accounts == nil, let budgetId = configProvider.selectedBudgetId {
-                    do {
-                        let records = try grdb.fetchAccounts(isOnBudget: true, budgetId: budgetId)
-                        guard records.isNotEmpty else { return .none }
-                        var accounts = IdentifiedArrayOf(uniqueElements: records)
-                        let allAccounts = Account.allAccounts
-                        if accounts.insert(allAccounts, at: 0).inserted {
-                            state.selectedAccountId = allAccounts.id
-                        }
-                        state.accounts = accounts
-                    } catch {
-                        logger.error("\(String(describing: error))")
-                    }
-                }
                 // Ensure provided date is first day of month in FromDate
                 // and last day of month ToDate
                 state.fromDate = state.fromDate.firstDayInMonth()
                 state.toDate = state.toDate.lastDayInMonth()
+                
+                if state.accounts == nil, let budgetId = configProvider.selectedBudgetId {
+                    do {
+                        // List account Account Picker
+                        let records = try grdb.fetchAccounts(isOnBudget: true, budgetId: budgetId)
+                        guard records.isNotEmpty else { return .none }
+                        var accounts = IdentifiedArrayOf(uniqueElements: records)
+                        state.accounts = accounts
+
+                        // Add an 'All Accounts' to UI, if no selectedAcountId available, make this the selected
+                        let allAccounts = Account.allAccounts
+                        if accounts.insert(allAccounts, at: 0).inserted, state.selectedAccountId == nil {
+                            state.selectedAccountId = allAccounts.id
+                        }
+                    } catch {
+                        logger.error("\(String(describing: error))")
+                    }
+                }
                 return .none
             }
         }

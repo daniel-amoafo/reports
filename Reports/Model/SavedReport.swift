@@ -32,3 +32,11 @@ final class SavedReport: Identifiable, Equatable {
         self.lastModifield = lastModified
     }
 }
+
+extension SavedReport: CustomDebugStringConvertible {
+
+    var debugDescription: String {
+        "name: \(name), fromDate: \(fromDate), toDate: \(toDate), selectedAccountId: \(selectedAccountId ?? ""), chartId: \(chartId)"
+    }
+
+}

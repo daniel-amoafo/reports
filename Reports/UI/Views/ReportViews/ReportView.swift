@@ -162,7 +162,8 @@ private extension ReportFeature {
                     title: "Spending By Total",
                     budgetId: "Budget1",
                     startDate: Date.distantPast,
-                    finishDate: Date.distantFuture
+                    finishDate: Date.distantFuture,
+                    accountId: nil
                 )
             )
         )
