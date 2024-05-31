@@ -6,16 +6,16 @@ import SwiftData
 enum ModelContextFactory {
 
     static func makeLive() throws -> ModelContext {
-        let savedReport = ModelConfiguration("SavedReportModelConfig", schema: Schema([SavedReport.self]))
+        let savedReport = ModelConfiguration("SavedReportModelConfig", schema: schema)
 
-        let container = try ModelContainer(for: SavedReport.self, configurations: savedReport)
+        let container = try ModelContainer(for: schema, configurations: savedReport)
         return ModelContext(container)
     }
 
     static func makeMock() throws -> ModelContext {
         let savedReport = ModelConfiguration(for: SavedReport.self, isStoredInMemoryOnly: true)
 
-        let container = try ModelContainer(for: SavedReport.self, configurations: savedReport)
+        let container = try ModelContainer(for: schema, configurations: savedReport)
         let context = ModelContext(container)
         for report in SavedReport.mocks {
             context.insert(report)
@@ -26,6 +26,10 @@ enum ModelContextFactory {
             debugPrint("\(error.toString())")
         }
         return ModelContext(container)
+    }
+
+    private static var schema: Schema {
+        Schema([SavedReport.self])
     }
 
 }

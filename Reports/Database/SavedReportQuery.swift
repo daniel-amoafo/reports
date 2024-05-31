@@ -14,8 +14,6 @@ struct SavedReportQuery {
     var add: @Sendable (SavedReport) throws -> Void
     var delete: @Sendable (SavedReport) throws -> Void
 
-    var didUpdateNotification: @Sendable () async -> AsyncStream<Void>
-
     enum SavedReportQueryError: Error {
         case add(String)
         case delete(String)
@@ -31,8 +29,7 @@ extension SavedReportQuery: DependencyKey {
         fetch: unimplemented("\(Self.self).fetchDescriptor"),
         fetchCount: unimplemented("\(Self.self).fetchCountDescriptor"),
         add: unimplemented("\(Self.self).add"),
-        delete: unimplemented("\(Self.self).delete"),
-        didUpdateNotification: unimplemented("\(Self.self).didUpdateNotification")
+        delete: unimplemented("\(Self.self).delete")
     )
 
     // Previews use an in memory modelContext so data is not written to a persistent database.
@@ -88,35 +85,6 @@ private extension SavedReportQuery {
             logger.error("\(error.toString())")
             throw SavedReportQueryError.delete(error.toString())
         }
-    } didUpdateNotification: {
-        AsyncStream(
-            NotificationCenter.default
-            // Should use ModelContext.didSave notificaion name
-            // however due to be a bug as of iOS17.4, it does not fire when modelContext saved oepration runs.
-            // see https://developer.apple.com/forums/thread/731378
-                .notifications(named: .NSManagedObjectContextDidSave)
-                .filter {
-
-                    // filter notifications to SavedReport entries being inserted/updated or deleted
-                    if let insertedObjects: Set<NSManagedObject> = $0.insertedObjects,
-                       insertedObjects
-                        .map(\.entity.name)
-                        .contains(String(describing: SavedReport.self)) {
-                        return true
-                    }
-
-                    if let deletedObjects: Set<NSManagedObject> = $0.deletedObjects,
-                       deletedObjects
-                        .map(\.entity.name)
-                        .contains(String(describing: SavedReport.self)) {
-                        return true
-                    }
-
-                    // Save notification did not include inserted or deleted objects
-                    return false
-                }
-                .map { _ in }
-        )
     }
 }
 

@@ -8,18 +8,29 @@ import SwiftData
 @Reducer
 struct HomeFeature {
 
+    static let maxDisplayedSavedReports = 3
     @ObservableState
     struct State: Equatable {
         var selectedBudgetId: String?
         var budgetList: IdentifiedArrayOf<BudgetSummary>?
         var charts: [ReportChart] = []
-        var savedReports: [SavedReport] = []
-        var savedReportsCount: Int = 0
+        var displayedSavedReports: [SavedReport] = []
+        var totalSavedReportsCount: Int = 0
         var showSelectBudget = false
 
         var selectedBudgetName: String? {
             guard let selectedBudgetId else { return nil }
             return budgetList?[id: selectedBudgetId]?.name
+        }
+
+        func isReportBottomRow(_ savedReport: SavedReport) -> Bool {
+            // if savedReports.count is equal to max then a final row with a button is displayed.
+            // Dont matter if this is the last savedReport entry.
+            guard displayedSavedReports.count != maxDisplayedSavedReports else { return false }
+            if let lastReport = displayedSavedReports.last, lastReport.id == savedReport.id {
+                return true
+            }
+            return false
         }
     }
 
@@ -48,6 +59,7 @@ struct HomeFeature {
     @Dependency(\.configProvider) var configProvider
     @Dependency(\.savedReportQuery) var savedReportQuery
     @Dependency(\.continuousClock) var clock
+    @Dependency(\.modelContextNotifications) var modelContextNotifications
 
     let logger = LogFactory.create(Self.self)
 
@@ -76,9 +88,9 @@ struct HomeFeature {
                 return .send(.delegate(.presentReport(sourceData)))
 
             case .didUpdateSavedReports:
-                let (savedReports, total) = fetchSavedReports()
-                state.savedReports = savedReports
-                state.savedReportsCount = total
+                let (savedReports, total) = fetchDisplayedSavedReports()
+                state.displayedSavedReports = savedReports
+                state.totalSavedReportsCount = total
                 return .none
 
             case let .didSelectSavedReport(savedReport):
@@ -98,7 +110,7 @@ struct HomeFeature {
 
             case .task:
                 return .run { send in
-                    for await _ in await savedReportQuery.didUpdateNotification() {
+                    for await _ in await modelContextNotifications.didUpdate(SavedReport.self) {
                         try? await clock.sleep(for: .seconds(0.5))
                         await send(.didUpdateSavedReports, animation: .smooth)
                     }
@@ -127,14 +139,14 @@ private extension HomeFeature {
         }
     }
 
-    func fetchSavedReports() -> ([SavedReport], Int) {
+    func fetchDisplayedSavedReports() -> ([SavedReport], Int) {
         do {
             var descriptor = FetchDescriptor<SavedReport>(
                 sortBy: [
                     .init(\.lastModifield, order: .reverse)
                 ]
             )
-            descriptor.fetchLimit = 4
+            descriptor.fetchLimit = Self.maxDisplayedSavedReports
             let savedReports = try savedReportQuery.fetch(descriptor)
             let total = try savedReportQuery.fetchCount(FetchDescriptor<SavedReport>())
             return (savedReports, total)

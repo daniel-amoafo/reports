@@ -37,6 +37,7 @@ struct SavedReportsFeature {
 
     // MARK: Dependencies
     @Dependency(\.savedReportQuery) var savedReportQuery
+    @Dependency(\.modelContextNotifications) var modelContextNotifications
 
     let logger = LogFactory.create(Self.self)
 
@@ -58,7 +59,7 @@ struct SavedReportsFeature {
 
             case .onTask:
                 return .run { send in
-                    for await _ in await savedReportQuery.didUpdateNotification() {
+                    for await _ in await modelContextNotifications.didUpdate(SavedReport.self) {
                         await send(.didUpdateSavedReports, animation: .smooth)
                     }
                 }

@@ -303,6 +303,7 @@ extension GRDBDatabase {
             let request = Account
                 .filter(Column(Account.DBCodingKey.onBudget) == onBudgetVal)
                 .filter(Column(Account.DBCodingKey.budgetId) == budgetId)
+                .filter(Column(Account.DBCodingKey.deleted) == "0")
             return try request.fetchAll(db)
         }
     }

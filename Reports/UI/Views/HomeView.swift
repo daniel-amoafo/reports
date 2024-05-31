@@ -11,7 +11,6 @@ struct HomeView: View {
     private let logger = LogFactory.create(Self.self)
 
     @State private var viewAllFrame: CGRect = .zero
-    private let maxDisplayedSavedReports = 3
 
     var body: some View {
         ZStack {
@@ -101,7 +100,7 @@ private extension HomeView {
             }
             .listRowTop(showHorizontalRule: false)
 
-            if store.savedReports.isEmpty {
+            if store.displayedSavedReports.isEmpty {
                 Text("[No Reports]") // fix UI
             } else {
                 savedReportsListView
@@ -113,7 +112,7 @@ private extension HomeView {
 
     var savedReportsListView: some View {
         VStack(spacing: 0) {
-            ForEach(store.savedReports.prefix(maxDisplayedSavedReports)) { savedReport in
+            ForEach(store.displayedSavedReports) { savedReport in
                 if let reportType = ReportChart.defaultCharts[id: savedReport.chartId] {
                     Button(action: {
                         store.send(.didSelectSavedReport(savedReport))
@@ -133,25 +132,23 @@ private extension HomeView {
                             Spacer()
                         }
                     })
-                    .buttonStyle(.listRow)
+                    .buttonStyle(store.state.isReportBottomRow(savedReport) ? .listRowBottom : .listRow)
                 }
             }
 
             // Footer row with View All button if needed
             VStack {
-                if store.savedReports.count > maxDisplayedSavedReports {
-                    Button(String(format: Strings.viewAllButtonTitle, arguments: [store.savedReportsCount])) {
+                if store.totalSavedReportsCount > store.displayedSavedReports.count {
+                    Button(String(format: Strings.viewAllButtonTitle, arguments: [store.totalSavedReportsCount])) {
                         store.send(.viewAllButtonTapped)
                     }
                     .buttonStyle(.kleonPrimary)
                     .containerRelativeFrame(.horizontal) { length, _ in
                         length * 0.7
                     }
-                } else {
-                    Text("")
+                    .listRowBottom()
                 }
             }
-            .listRowBottom()
         }
     }
 }

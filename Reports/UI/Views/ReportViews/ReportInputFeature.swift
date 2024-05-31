@@ -122,20 +122,20 @@ struct ReportInputFeature {
                 // and last day of month ToDate
                 state.fromDate = state.fromDate.firstDayInMonth()
                 state.toDate = state.toDate.lastDayInMonth()
-                
+
                 if state.accounts == nil, let budgetId = configProvider.selectedBudgetId {
                     do {
                         // List account Account Picker
                         let records = try grdb.fetchAccounts(isOnBudget: true, budgetId: budgetId)
                         guard records.isNotEmpty else { return .none }
                         var accounts = IdentifiedArrayOf(uniqueElements: records)
-                        state.accounts = accounts
 
                         // Add an 'All Accounts' to UI, if no selectedAcountId available, make this the selected
                         let allAccounts = Account.allAccounts
                         if accounts.insert(allAccounts, at: 0).inserted, state.selectedAccountId == nil {
                             state.selectedAccountId = allAccounts.id
                         }
+                        state.accounts = accounts
                     } catch {
                         logger.error("\(String(describing: error))")
                     }
