@@ -123,10 +123,10 @@ struct ReportInputFeature {
                 state.fromDate = state.fromDate.firstDayInMonth()
                 state.toDate = state.toDate.lastDayInMonth()
 
-                if state.accounts == nil, let budgetId = configProvider.selectedBudgetId {
+                if state.accounts == nil {
                     do {
                         // List account Account Picker
-                        let records = try grdb.fetchAccounts(isOnBudget: true, budgetId: budgetId)
+                        let records = try Account.fetch(isOnBudget: true, isDeleted: false)
                         guard records.isNotEmpty else { return .none }
                         var accounts = IdentifiedArrayOf(uniqueElements: records)
 

@@ -125,10 +125,6 @@ struct HomeFeature {
 
 private extension HomeFeature {
 
-    var isSelectedBudgetIdSet: Bool {
-        budgetClient.selectedBudgetId != nil
-    }
-
     func updateBudgetClientSelectedBudgetId(_ selectedBudgetId: String) {
         do {
             try budgetClient.updateSelectedBudgetId(selectedBudgetId)

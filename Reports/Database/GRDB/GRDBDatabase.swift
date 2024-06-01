@@ -212,83 +212,65 @@ private extension GRDBDatabase {
 // swiftlint:enable identifier_name
 }
 
-// MARK: - Database Access: Writes
+// MARK: - Database Save
 
 extension GRDBDatabase {
 
-    func saveBudgetSummaries(_ summaries: [BudgetSummary]) async throws {
-        try await dbWriter.write { db in
-            for summary in summaries {
-                try summary.save(db)
-                try saveAccounts(summary.accounts, db: db)
-            }
-        }
+    func save(record: PersistableRecord) throws {
+        try save(records: [record])
     }
 
-    func saveCategoryValues(
-        categoryGroups: [CategoryGroup],
-        categories: [BudgetSystemService.Category],
-        serverKnowledge: Int
-    ) async throws {
-
-        guard let budgetId = categoryGroups.first?.budgetId else { return }
-
-        try await dbWriter.write { db in
-            for categoryGroup in categoryGroups {
-                try categoryGroup.save(db)
-            }
-
-            for category in categories {
-                try category.save(db)
-            }
-
-            try updateServerKnowledge(
-                in: db,
-                budgetId: budgetId,
-                updatedValue: .categories(serverKnowledge)
-            )
-        }
-    }
-
-    func saveTransactions(_ transactions: [TransactionEntry], serverKnowledge: Int) async throws {
-        guard let budgetId = transactions.first?.budgetId else { return }
-        try await dbWriter.write { db in
-            for transaction in transactions {
-                try transaction.save(db)
-            }
-
-            try updateServerKnowledge(
-                in: db,
-                budgetId: budgetId,
-                updatedValue: .transactions(serverKnowledge)
-            )
-        }
-    }
-
-    func saveServerKnowledge(_ serverKnowledge: ServerKnowledgeConfig) throws {
+    func save(records: [PersistableRecord]) throws {
         try dbWriter.write { db in
-            try serverKnowledge.save(db)
+            for record in records {
+                try record.save(db)
+            }
         }
     }
 
+    func save(records: [PersistableRecord], in db: GRDB.Database) throws {
+        for record in records {
+            try record.save(db)
+        }
+    }
 }
 
-// MARK: - Database Access: Read
+// MARK: - Perform
 
 extension GRDBDatabase {
 
-    func fetchServerKnowledgeConfig(budgetId: String) throws -> ServerKnowledgeConfig? {
-        try dbWriter.read { db in
-            try fetchServerKnowledgeConfig(budgetId: budgetId, db: db)
+    func perform(perform: @Sendable @escaping (GRDB.Database) throws -> Void) throws {
+        try dbWriter.write { db in
+            try perform(db)
         }
     }
 
+    func perform(perform: @Sendable @escaping (GRDB.Database) throws -> Void) async throws {
+        try await dbWriter.write { db in
+            try perform(db)
+        }
+    }
+}
+
+// MARK: - Database Access: Fetch
+
+extension GRDBDatabase {
+
+    /// Fetch one record using a `FetchRequest`.
     func fetchRecord<Record: FetchableRecord>(_ record: Record.Type, request: any FetchRequest) throws -> Record? {
         try dbWriter.read { db in
             try record.fetchOne(db, request)
         }
     }
 
+    /// Fetch records using a `FetchRequest`.
+    func fetchRecords<Record: FetchableRecord>(_ record: Record.Type, request: any FetchRequest) throws -> [Record] {
+        try dbWriter.read { db in
+            try record.fetchAll(db, request)
+        }
+    }
+
+    /// Fetch records using `RecordSQLBuilder`.
     func fetchRecords<Record: FetchableRecord>(builder: RecordSQLBuilder<Record>) throws -> [Record] {
         try dbWriter.read { db in
             let sql = builder.sql
@@ -296,64 +278,12 @@ extension GRDBDatabase {
             return try builder.record.fetchAll(db, sql: sql, arguments: arguments)
         }
     }
-
-    func fetchAccounts(isOnBudget: Bool, budgetId: String) throws -> [Account] {
-        try dbWriter.read { db in
-            let onBudgetVal = isOnBudget ? "1" : "0"
-            let request = Account
-                .filter(Column(Account.DBCodingKey.onBudget) == onBudgetVal)
-                .filter(Column(Account.DBCodingKey.budgetId) == budgetId)
-                .filter(Column(Account.DBCodingKey.deleted) == "0")
-            return try request.fetchAll(db)
-        }
-    }
-
-    func fetchTransactions() throws -> [TransactionEntry] {
-        return []
-    }
-}
-
-private extension GRDBDatabase {
-
-    private func saveAccounts(_ accounts: [Account], db: GRDB.Database) throws {
-        for account in accounts {
-            try account.save(db)
-        }
-    }
-
-    func fetchServerKnowledgeConfig(budgetId: String, db: GRDB.Database) throws -> ServerKnowledgeConfig? {
-        guard budgetId.isNotEmpty else {
-            throw ValidationError.missingBudgetId
-        }
-        let budgetIdColumn = ServerKnowledgeConfig.CodingKeys.budgetId.rawValue
-        let request = ServerKnowledgeConfig.filter(Column(budgetIdColumn) == budgetId)
-        return try request.fetchOne(db)
-    }
-
-    func updateServerKnowledge(
-        in db: GRDB.Database,
-        budgetId: String,
-        updatedValue: ServerKnowledgeConfig.Value
-    ) throws {
-        // Update or Create server knowledge config
-        var serverKnowledgeConfig = try fetchServerKnowledgeConfig(budgetId: budgetId, db: db)
-        ?? .init(budgetId: budgetId)
-
-        switch updatedValue {
-        case let .categories(serverKnowledge):
-            serverKnowledgeConfig.categories = serverKnowledge
-        case let .transactions(serverKnowledge):
-            serverKnowledgeConfig.transactions = serverKnowledge
-        }
-        try serverKnowledgeConfig.upsert(db)
-
-        Self.logger.debug("server knowledge entry updated - \(String(reflecting: serverKnowledgeConfig))")
-    }
 }
 
 extension GRDBDatabase {
 
-    /// A struct used to create a SQL to return a record type
+    /// A struct used to create a SQL to return a record type.
+    /// Maybe mislabelled as it's following a Builder pattern, revisit to see if it be made into a builder/
     struct RecordSQLBuilder<Record: FetchableRecord> {
         let record: Record.Type
         let sql: String

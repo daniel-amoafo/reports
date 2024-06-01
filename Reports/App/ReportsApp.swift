@@ -138,9 +138,6 @@ private extension AppFeature {
     }
 
     func syncBudgetData() async {
-        defer {
-
-        }
         do {
             let summaries = try await budgetClient.fetchBudgetSummaries()
             guard summaries.isNotEmpty else {
@@ -148,7 +145,7 @@ private extension AppFeature {
                 return
             }
             logger.debug("Syncing summaries and accounts to db...")
-            try await grdb.saveBudgetSummaries(summaries)
+            try BudgetSummary.save(summaries)
 
             try await syncCategoryValues()
             try await syncTransactionHistory()
@@ -161,7 +158,7 @@ private extension AppFeature {
     func syncCategoryValues() async throws {
         guard let selectedId = configProvider.selectedBudgetId else { return }
 
-        let lastServerKnowledge = try grdb.fetchServerKnowledgeConfig(budgetId: selectedId)?.categories
+        let lastServerKnowledge = try ServerKnowledgeConfig.fetch(budgetId: selectedId)?.categories
         let (groups, categories, newServerKnowledge) = await budgetClient.fetchCategoryValues(
             budgetId: selectedId,
             lastServerKnowledge: lastServerKnowledge
@@ -173,8 +170,8 @@ private extension AppFeature {
         }
 
         logger.debug("Syncing category values to db...")
-        try await grdb.saveCategoryValues(
-            categoryGroups: groups,
+        try CategoryRecord.save(
+            groups: groups,
             categories: categories,
             serverKnowledge: newServerKnowledge
         )
@@ -183,7 +180,7 @@ private extension AppFeature {
     func syncTransactionHistory() async throws {
         guard let selectedId = configProvider.selectedBudgetId else { return }
 
-        let lastServerKnowledge = try grdb.fetchServerKnowledgeConfig(budgetId: selectedId)?.transactions
+        let lastServerKnowledge = try ServerKnowledgeConfig.fetch(budgetId: selectedId)?.transactions
         let (transactions, newServerKnowledge) = try await budgetClient
             .fetchAllTransactions(budgetId: selectedId, lastServerKnowledge: lastServerKnowledge)
 
@@ -193,7 +190,7 @@ private extension AppFeature {
         }
 
         logger.debug("Syncing transaction history to db...")
-        try await grdb.saveTransactions(transactions, serverKnowledge: newServerKnowledge)
+        try TransactionEntry.save(transactions, serverKnowledge: newServerKnowledge)
     }
 
 }

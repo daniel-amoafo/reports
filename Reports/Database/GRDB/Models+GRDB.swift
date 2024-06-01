@@ -21,10 +21,12 @@ struct ServerKnowledgeConfig: Codable, FetchableRecord, PersistableRecord, Custo
 
     var debugDescription: String {
         "budgetId: \(budgetId), categories(\(String(describing: categories)), " +
-        "transactions\(String(describing: transactions)))"
+        "transactions(\(String(describing: transactions)))"
     }
 
-    enum CodingKeys: String, CodingKey {
+    typealias Column = CodingKeys
+
+    enum CodingKeys: String, CodingKey, ColumnExpression {
         case budgetId = "budgetSummaryId"
         case categories
         case transactions
@@ -58,26 +60,26 @@ extension Account: FetchableRecord, PersistableRecord {
 
     static let budgetSummary = belongsTo(BudgetSummary.self)
 
-    enum DBCodingKey: String, CodingKey {
+    enum Column: String, CodingKey, ColumnExpression {
         case id, name, onBudget, deleted
         case budgetId = "budgetSummaryId"
     }
 
     public func encode(to container: inout PersistenceContainer) throws {
-        container[DBCodingKey.id.rawValue] = id
-        container[DBCodingKey.budgetId.rawValue] = budgetId
-        container[DBCodingKey.name.rawValue] = name
-        container[DBCodingKey.onBudget.rawValue] = onBudget
-        container[DBCodingKey.deleted.rawValue] = deleted
+        container[Column.id.rawValue] = id
+        container[Column.budgetId.rawValue] = budgetId
+        container[Column.name.rawValue] = name
+        container[Column.onBudget.rawValue] = onBudget
+        container[Column.deleted.rawValue] = deleted
     }
 
     public init(row: Row) throws {
         self.init(
-            id: row[DBCodingKey.id.rawValue],
-            budgetId: row[DBCodingKey.budgetId.rawValue],
-            name: row[DBCodingKey.name.rawValue],
-            onBudget: row[DBCodingKey.onBudget.rawValue],
-            deleted: row[DBCodingKey.deleted.rawValue]
+            id: row[Column.id.rawValue],
+            budgetId: row[Column.budgetId.rawValue],
+            name: row[Column.name.rawValue],
+            onBudget: row[Column.onBudget.rawValue],
+            deleted: row[Column.deleted.rawValue]
         )
     }
 }
@@ -87,26 +89,26 @@ extension CategoryGroup: FetchableRecord, PersistableRecord {
     static let budgetSummary = belongsTo(BudgetSummary.self)
     static let category = hasMany(Category.self)
 
-    enum DBCodingKey: String, CodingKey {
+    enum Column: String, CodingKey, ColumnExpression {
         case id, name, hidden, deleted
         case budgetId = "budgetSummaryId"
     }
 
     public func encode(to container: inout PersistenceContainer) throws {
-        container[DBCodingKey.id.rawValue] = id
-        container[DBCodingKey.name.rawValue] = name
-        container[DBCodingKey.hidden.rawValue] = hidden
-        container[DBCodingKey.deleted.rawValue] = deleted
-        container[DBCodingKey.budgetId.rawValue] = budgetId
+        container[Column.id.rawValue] = id
+        container[Column.name.rawValue] = name
+        container[Column.hidden.rawValue] = hidden
+        container[Column.deleted.rawValue] = deleted
+        container[Column.budgetId.rawValue] = budgetId
     }
 
     public init(row: Row) throws {
         self.init(
-            id: row[DBCodingKey.id.rawValue],
-            name: row[DBCodingKey.name.rawValue],
-            hidden: row[DBCodingKey.hidden.rawValue],
-            deleted: row[DBCodingKey.deleted.rawValue] as Bool? ?? false,
-            budgetId: row[DBCodingKey.budgetId.rawValue]
+            id: row[Column.id.rawValue],
+            name: row[Column.name.rawValue],
+            hidden: row[Column.hidden.rawValue],
+            deleted: row[Column.deleted.rawValue] as Bool? ?? false,
+            budgetId: row[Column.budgetId.rawValue]
         )
     }
 }
@@ -116,28 +118,28 @@ extension BudgetSystemService.Category: FetchableRecord, PersistableRecord {
     static let budgetSummary = belongsTo(BudgetSummary.self)
     static let categoryGroup = belongsTo(CategoryGroup.self)
 
-    enum DBCodingKey: String, CodingKey {
+    enum Column: String, CodingKey, ColumnExpression {
         case id, name, hidden, deleted, categoryGroupId
         case budgetId = "budgetSummaryId"
     }
 
     public func encode(to container: inout GRDB.PersistenceContainer) throws {
-        container[DBCodingKey.id.rawValue] = id
-        container[DBCodingKey.name.rawValue] = name
-        container[DBCodingKey.hidden.rawValue] = hidden
-        container[DBCodingKey.deleted.rawValue] = deleted
-        container[DBCodingKey.categoryGroupId.rawValue] = categoryGroupId
-        container[DBCodingKey.budgetId.rawValue] = budgetId
+        container[Column.id.rawValue] = id
+        container[Column.name.rawValue] = name
+        container[Column.hidden.rawValue] = hidden
+        container[Column.deleted.rawValue] = deleted
+        container[Column.categoryGroupId.rawValue] = categoryGroupId
+        container[Column.budgetId.rawValue] = budgetId
     }
 
     public init(row: Row) throws {
         self.init(
-            id: row[DBCodingKey.id.rawValue],
-            categoryGroupId: row[DBCodingKey.categoryGroupId.rawValue],
-            name: row[DBCodingKey.name.rawValue],
-            hidden: row[DBCodingKey.hidden.rawValue],
-            deleted: row[DBCodingKey.deleted.rawValue] as Bool? ?? false,
-            budgetId: row[DBCodingKey.budgetId.rawValue]
+            id: row[Column.id.rawValue],
+            categoryGroupId: row[Column.categoryGroupId.rawValue],
+            name: row[Column.name.rawValue],
+            hidden: row[Column.hidden.rawValue],
+            deleted: row[Column.deleted.rawValue] as Bool? ?? false,
+            budgetId: row[Column.budgetId.rawValue]
         )
     }
 }
@@ -150,7 +152,7 @@ extension TransactionEntry: FetchableRecord, PersistableRecord {
         request(for: TransactionEntry.budgetSummary)
      }
 
-    enum DBCodingKey: String, CodingKey {
+    enum Column: String, CodingKey, ColumnExpression {
         case id, date, payeeName, accountId, accountName, categoryId, categoryName
         case categoryGroupId, transferAccountId, deleted, currencyCode
         case budgetId = "budgetSummaryId"
@@ -158,34 +160,34 @@ extension TransactionEntry: FetchableRecord, PersistableRecord {
     }
 
     public func encode(to container: inout GRDB.PersistenceContainer) throws {
-        container[DBCodingKey.id.rawValue] = id
-        container[DBCodingKey.date.rawValue] = date
-        container[DBCodingKey.budgetId.rawValue] = budgetId
-        container[DBCodingKey.rawAmount.rawValue] = rawAmount
-        container[DBCodingKey.currencyCode.rawValue] = currency.code
-        container[DBCodingKey.payeeName.rawValue] = payeeName
-        container[DBCodingKey.accountId.rawValue] = accountId
-        container[DBCodingKey.accountName.rawValue] = accountName
-        container[DBCodingKey.categoryId.rawValue] = categoryId
-        container[DBCodingKey.categoryName.rawValue] = categoryName
-        container[DBCodingKey.transferAccountId.rawValue] = transferAccountId
-        container[DBCodingKey.transferAccountId.rawValue] = deleted
+        container[Column.id.rawValue] = id
+        container[Column.date.rawValue] = date
+        container[Column.budgetId.rawValue] = budgetId
+        container[Column.rawAmount.rawValue] = rawAmount
+        container[Column.currencyCode.rawValue] = currency.code
+        container[Column.payeeName.rawValue] = payeeName
+        container[Column.accountId.rawValue] = accountId
+        container[Column.accountName.rawValue] = accountName
+        container[Column.categoryId.rawValue] = categoryId
+        container[Column.categoryName.rawValue] = categoryName
+        container[Column.transferAccountId.rawValue] = transferAccountId
+        container[Column.transferAccountId.rawValue] = deleted
     }
 
     public init(row: Row) {
         self.init(
-            id: row[DBCodingKey.id.rawValue],
-            budgetId: row[DBCodingKey.budgetId.rawValue],
-            date: row[DBCodingKey.date.rawValue],
-            rawAmount: row[DBCodingKey.rawAmount.rawValue],
-            currencyCode: row[DBCodingKey.currencyCode.rawValue],
-            payeeName: row[DBCodingKey.payeeName.rawValue],
-            accountId: row[DBCodingKey.accountId.rawValue],
-            accountName: row[DBCodingKey.accountName.rawValue],
-            categoryId: row[DBCodingKey.categoryId.rawValue],
-            categoryName: row[DBCodingKey.categoryName.rawValue],
-            transferAccountId: row[DBCodingKey.transferAccountId.rawValue],
-            deleted: row[DBCodingKey.deleted.rawValue] as Bool? ?? false
+            id: row[Column.id.rawValue],
+            budgetId: row[Column.budgetId.rawValue],
+            date: row[Column.date.rawValue],
+            rawAmount: row[Column.rawAmount.rawValue],
+            currencyCode: row[Column.currencyCode.rawValue],
+            payeeName: row[Column.payeeName.rawValue],
+            accountId: row[Column.accountId.rawValue],
+            accountName: row[Column.accountName.rawValue],
+            categoryId: row[Column.categoryId.rawValue],
+            categoryName: row[Column.categoryName.rawValue],
+            transferAccountId: row[Column.transferAccountId.rawValue],
+            deleted: row[Column.deleted.rawValue] as Bool? ?? false
         )
     }
 
