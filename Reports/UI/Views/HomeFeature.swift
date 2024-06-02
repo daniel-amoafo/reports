@@ -84,7 +84,10 @@ struct HomeFeature {
                 }
 
             case let .didSelectChart(chart):
-                let sourceData = ReportFeature.State.SourceData.new(.init(chart: chart))
+                guard let budgetId = state.selectedBudgetId else {
+                    return .none
+                }
+                let sourceData = ReportFeature.State.SourceData.new(.init(chart: chart, budgetId: budgetId))
                 return .send(.delegate(.presentReport(sourceData)))
 
             case .didUpdateSavedReports:

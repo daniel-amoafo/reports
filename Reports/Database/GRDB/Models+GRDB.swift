@@ -61,7 +61,7 @@ extension Account: FetchableRecord, PersistableRecord {
     static let budgetSummary = belongsTo(BudgetSummary.self)
 
     enum Column: String, CodingKey, ColumnExpression {
-        case id, name, onBudget, deleted
+        case id, name, onBudget, closed, deleted
         case budgetId = "budgetSummaryId"
     }
 
@@ -70,6 +70,7 @@ extension Account: FetchableRecord, PersistableRecord {
         container[Column.budgetId.rawValue] = budgetId
         container[Column.name.rawValue] = name
         container[Column.onBudget.rawValue] = onBudget
+        container[Column.closed.rawValue] = closed
         container[Column.deleted.rawValue] = deleted
     }
 
@@ -79,6 +80,7 @@ extension Account: FetchableRecord, PersistableRecord {
             budgetId: row[Column.budgetId.rawValue],
             name: row[Column.name.rawValue],
             onBudget: row[Column.onBudget.rawValue],
+            closed: row[Column.closed.rawValue],
             deleted: row[Column.deleted.rawValue]
         )
     }

@@ -117,10 +117,18 @@ extension GRDBDatabase {
     }
 
     /// Used by Unit tests and Preview builds.
-    static func makeMock() throws -> Self {
+    static func makeMock(insertSampleData: Bool) throws -> Self {
         // Connect to an in-memory database
         let dbQueue = try DatabaseQueue(configuration: Self.makeConfiguration())
-        return try Self(dbQueue)
+        let instance = try Self(dbQueue)
+        if insertSampleData {
+            do {
+                try MockData.insertSampleData(grdb: instance)
+            } catch {
+                debugPrint(error)
+            }
+        }
+        return instance
     }
 }
 
@@ -154,6 +162,7 @@ private extension GRDBDatabase {
                 t.primaryKey("id", .text).notNull()
                 t.column("name", .text).notNull()
                 t.column("onBudget", .boolean).notNull()
+                t.column("closed", .boolean).notNull()
                 t.column("deleted", .boolean).notNull()
                 t.belongsTo("budgetSummary", onDelete: .cascade).notNull()
             }
@@ -220,7 +229,7 @@ extension GRDBDatabase {
         try save(records: [record])
     }
 
-    func save(records: [PersistableRecord]) throws {
+    func save(records: [any PersistableRecord]) throws {
         try dbWriter.write { db in
             for record in records {
                 try record.save(db)
@@ -263,6 +272,14 @@ extension GRDBDatabase {
         }
     }
 
+    /// Fetch all records using for the provided Record type.
+    func fetchAllRecords<Record: FetchableRecord & TableRecord>(_ record: Record.Type)
+    throws -> [Record] {
+        try dbWriter.read { db in
+            try record.fetchAll(db)
+        }
+    }
+
     /// Fetch records using a `FetchRequest`.
     func fetchRecords<Record: FetchableRecord>(_ record: Record.Type, request: any FetchRequest) throws -> [Record] {
         try dbWriter.read { db in
@@ -278,6 +295,7 @@ extension GRDBDatabase {
             return try builder.record.fetchAll(db, sql: sql, arguments: arguments)
         }
     }
+
 }
 
 extension GRDBDatabase {

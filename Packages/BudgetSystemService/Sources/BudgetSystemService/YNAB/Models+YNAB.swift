@@ -11,6 +11,7 @@ extension Account {
         self.budgetId = budgetId
         self.name = ynabAccount.name
         self.onBudget = ynabAccount.onBudget
+        self.closed = ynabAccount.closed
         self.deleted = ynabAccount.deleted
     }
 }

@@ -102,7 +102,7 @@ private enum Strings {
 #Preview("Input Fields") {
     NavigationStack {
         ReportView(
-            store: .init(initialState: ReportFeature.mockInputFields) {
+            store: .init(initialState: Factory.mockInputFields) {
                 ReportFeature()
             }
         )
@@ -112,7 +112,7 @@ private enum Strings {
 #Preview("Fetched Results") {
     NavigationStack {
         ReportView(
-            store: .init(initialState: ReportFeature.mockFetchedResults) {
+            store: .init(initialState: Factory.mockFetchedResults) {
                 ReportFeature()
             }
         )
@@ -122,7 +122,7 @@ private enum Strings {
 #Preview("Fetched No Results") {
     NavigationStack {
         ReportView(
-            store: .init(initialState: ReportFeature.mockFetchedNoResults) {
+            store: .init(initialState: Factory.mockFetchedNoResults) {
                 ReportFeature()
             }
         )
@@ -130,10 +130,14 @@ private enum Strings {
 }
 
 // swiftlint:disable force_try
-private extension ReportFeature {
+private enum Factory {
 
-    static var selectedAccountId: String {
+    static var selectedAccountIds: String {
         IdentifiedArrayOf<Account>.mocks[1].id
+    }
+
+    static var budgetId: String {
+        IdentifiedArrayOf<BudgetSummary>.mocks[1].id
     }
 
     static var mockInputFields: ReportFeature.State {
@@ -141,8 +145,8 @@ private extension ReportFeature {
             sourceData: .new(
                 .init(
                     chart: .mock,
-                    accounts: .mocks,
-                    selectedAccountId: selectedAccountId
+                    budgetId: budgetId,
+                    selectedAccountIds: selectedAccountIds
                 )
             )
         )
@@ -153,17 +157,17 @@ private extension ReportFeature {
             sourceData: .new(
                 .init(
                     chart: .mock,
-                    accounts: .mocks,
-                    selectedAccountId: selectedAccountId
+                    budgetId: budgetId,
+                    selectedAccountIds: selectedAccountIds
                 )
             ),
             chartGraph: .spendingByTotal(
                 .init(
                     title: "Spending By Total",
-                    budgetId: "Budget1",
+                    budgetId: Factory.budgetId,
                     startDate: Date.distantPast,
                     finishDate: Date.distantFuture,
-                    accountId: nil
+                    accountIds: nil
                 )
             )
         )
@@ -174,8 +178,8 @@ private extension ReportFeature {
             sourceData: .new(
                 .init(
                     chart: .mock,
-                    accounts: .mocks,
-                    selectedAccountId: selectedAccountId
+                    budgetId: MockData.budgetId,
+                    selectedAccountIds: selectedAccountIds
                 )
             )
         )

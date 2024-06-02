@@ -172,7 +172,7 @@ struct ReportInputView: View {
     var accountSection: some View {
         Button(
             action: {
-                store.send(.selectAccountRowTapped(true))
+                store.send(.selectAccountRowTapped)
             }, label: {
                 HStack(spacing: 0) {
                     HStack(alignment: .iconAndTitleAlignment, spacing: .Spacing.pt8) {
@@ -195,12 +195,8 @@ struct ReportInputView: View {
                                     computeValue: { dimension in dimension[VerticalAlignment.center] }
                                 )
 
-                            Text("\(store.selectedAccountName ?? Strings.selectAccountPlaceholder)")
-                                .typography(store.isAccountSelected ? .body : .bodyItalic)
-                                .foregroundStyle(
-                                    store.isAccountSelected ?
-                                    Color.Text.primary : Color.Text.secondary
-                                )
+                            Text("\(store.selectedAccountNames ?? AppStrings.allAccountsName)")
+                                .foregroundStyle(Color.Text.primary)
                         }
                         Spacer()
                     }
@@ -211,13 +207,8 @@ struct ReportInputView: View {
             }
         )
         .buttonStyle(.listRow)
-        .popover(isPresented: $store.showAccountList.sending(\.selectAccountRowTapped)) {
-            if let accounts = store.accounts {
-                SelectListView<Account>(
-                    items: accounts,
-                    selectedItem: $store.selectedAccountId.sending(\.didSelectAccountId)
-                )
-            }
+        .popover(item: $store.scope(state: \.selectedAccounts, action: \.selectAccounts)) { store in
+            SelectAccountsView(store: store)
         }
     }
 
@@ -255,10 +246,6 @@ private enum Strings {
         localized: "Select Account",
         comment: "title for selecting the bank account to run report from"
     )
-    static let selectAccountPlaceholder = String(
-        localized: "Please select an account for the report",
-        comment: "the account for which the transactions the report will be based on"
-    )
 }
 
 // MARK: - Private
@@ -285,7 +272,10 @@ private extension VerticalAlignment {
     ScrollView {
         ReportInputView(
             store: Store(
-                initialState: ReportInputFeature.State(chart: .mock, accounts: .mocks)
+                initialState: ReportInputFeature.State(
+                    chart: .mock,
+                    budgetId: Factory.budgetId
+                )
             ) {
                 ReportInputFeature()
             }
@@ -293,4 +283,9 @@ private extension VerticalAlignment {
     }
     .contentMargins(.all, .Spacing.pt16, for: .scrollContent)
     .background(Color.Surface.primary)
+}
+
+private enum Factory {
+
+    static var budgetId: String { IdentifiedArrayOf<BudgetSummary>.mocks[0].id }
 }

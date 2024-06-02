@@ -16,7 +16,7 @@ struct SpendingTotalChartFeature {
         let title: String
         let startDate: Date
         let finishDate: Date
-        let accountId: String?
+        let accountIds: String?
         var contentType: SpendingTotalChartFeature.ContentType = .categoryGroup
 
         var rawSelectedGraphValue: Decimal?
@@ -34,15 +34,15 @@ struct SpendingTotalChartFeature {
             budgetId: String,
             startDate: Date,
             finishDate: Date,
-            accountId: String?
+            accountIds: String?
         ) {
             self.title = title
             self.startDate = startDate
             self.finishDate = finishDate
-            self.accountId = accountId
+            self.accountIds = accountIds
 
             self.categoryGroups = SpendingTotalQueries.fetchCategoryGroupTotals(
-                budgetId: budgetId, startDate: startDate, finishDate: finishDate, accountId: accountId
+                budgetId: budgetId, startDate: startDate, finishDate: finishDate, accountIds: accountIds
             )
         }
 
@@ -159,7 +159,7 @@ struct SpendingTotalChartFeature {
                         categoryGroupId: id,
                         startDate: state.startDate,
                         finishDate: state.finishDate,
-                        accountId: state.accountId
+                        accountIds: state.accountIds
                     )
                     return .send(.catgoriesForCategoryGroupFetched(records, groupName), animation: .smooth)
 
@@ -168,7 +168,7 @@ struct SpendingTotalChartFeature {
                         for: id,
                         startDate: state.startDate,
                         finishDate: state.finishDate,
-                        accountId: state.accountId
+                        accountIds: state.accountIds
                     )
                     return .send(.delegate(.categoryTapped(transactions)), animation: .smooth)
                 }
@@ -205,7 +205,7 @@ private enum SpendingTotalQueries {
         budgetId: String,
         startDate: Date,
         finishDate: Date,
-        accountId: String?
+        accountIds: String?
     ) -> [CategoryRecord] {
         do {
             let categoryGroupBuilder = CategoryRecord
@@ -213,7 +213,7 @@ private enum SpendingTotalQueries {
                     budgetId: budgetId,
                     startDate: startDate,
                     finishDate: finishDate,
-                    accountId: accountId
+                    accountIds: accountIds
                 )
 
             return try grdb.fetchRecords(builder: categoryGroupBuilder)
@@ -227,7 +227,7 @@ private enum SpendingTotalQueries {
         categoryGroupId: String,
         startDate: Date,
         finishDate: Date,
-        accountId: String?
+        accountIds: String?
     ) -> ([CategoryRecord], String) {
         do {
             let categoryBuilder = CategoryRecord
@@ -235,7 +235,7 @@ private enum SpendingTotalQueries {
                     forCategoryGroupId: categoryGroupId,
                     startDate: startDate,
                     finishDate: finishDate,
-                    accountId: accountId
+                    accountIds: accountIds
                 )
             let records = try Self.grdb.fetchRecords(builder: categoryBuilder)
 
@@ -248,14 +248,14 @@ private enum SpendingTotalQueries {
         }
     }
 
-    static func fetchTransactionEntries(for categoryId: String, startDate: Date, finishDate: Date, accountId: String?)
+    static func fetchTransactionEntries(for categoryId: String, startDate: Date, finishDate: Date, accountIds: String?)
     -> IdentifiedArrayOf<TransactionEntry> {
         do {
             let transactionsBuilder = TransactionEntry.queryTransactionsByCategoryId(
                 categoryId,
                 startDate: startDate,
                 finishDate: finishDate,
-                accountId: accountId
+                accountIds: accountIds
             )
             let transactions = try Self.grdb.fetchRecords(builder: transactionsBuilder)
 
@@ -471,7 +471,7 @@ private enum Strings {
                         budgetId: "Budget1",
                         startDate: .now.firstDayInMonth(),
                         finishDate: .now.lastDayInMonth(),
-                        accountId: nil
+                        accountIds: nil
                     )
             ) {
                  SpendingTotalChartFeature()

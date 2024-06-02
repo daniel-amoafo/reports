@@ -10,7 +10,7 @@ struct SelectListView<Element: Identifiable & CustomStringConvertible>: View {
     @Environment(\.dismiss) var dismiss
 
     private let items: IdentifiedArrayOf<Element>
-    @Binding private var selected: [Element.ID]
+    @Binding private var selected: Set<Element.ID>
     private var mode: SelectListViewSelectionMode
     private var noSelectionAllowed: Bool
     private var typography: Typography
@@ -18,7 +18,7 @@ struct SelectListView<Element: Identifiable & CustomStringConvertible>: View {
 
     init(
         items: IdentifiedArrayOf<Element>,
-        selectedItems: Binding<[Element.ID]>,
+        selectedItems: Binding<Set<Element.ID>>,
         noSelectionAllowed: Bool = false,
         typography: Typography = .title3Emphasized,
         showDoneButton: Bool = true
@@ -71,22 +71,19 @@ struct SelectListView<Element: Identifiable & CustomStringConvertible>: View {
                 ScrollView {
                     VStack(spacing: 0) {
                         ForEach(items) { item in
-                            Button(
-                                action: {
-                                    toggleSelection(item)
-                                },
-                                label: {
-                                    HStack {
-                                        Text(item.description)
-                                            .typography(typography)
-                                        Spacer()
-                                        Image(
-                                            systemName: selected.contains(item.id) ? "square.inset.filled" : "square"
-                                        )
-                                        .symbolRenderingMode(.hierarchical)
-                                    }
+                            Button {
+                                toggleSelection(item)
+                            } label: {
+                                HStack {
+                                    Text(item.description)
+                                        .typography(typography)
+                                    Spacer()
+                                    Image(
+                                        systemName: selected.contains(item.id) ? "square.inset.filled" : "square"
+                                    )
+                                    .symbolRenderingMode(.hierarchical)
                                 }
-                            )
+                            }
                             .tag(item.id)
                             .buttonStyle(listButtonStyle(for: item))
                         }
@@ -99,7 +96,6 @@ struct SelectListView<Element: Identifiable & CustomStringConvertible>: View {
                                 dismiss()
                             }
                             .foregroundStyle(Color.Text.primary)
-                            .fontWeight(.bold)
                         }
                     }
                 }
@@ -132,12 +128,13 @@ struct SelectListView<Element: Identifiable & CustomStringConvertible>: View {
             case .single:
                 assert(selected.count < 2)
                 if selected.isEmpty {
-                    selected.append(item.id)
+                    selected.insert(item.id)
                 } else {
-                    selected[0] = item.id
+                    selected.removeAll()
+                    selected.insert(item.id)
                 }
             case .multi:
-                selected.append(item.id)
+                selected.insert(item.id)
             }
         }
     }
@@ -160,7 +157,7 @@ private struct ContainerView: View {
         case single, multi
     }
 
-    @State private var multiSelect: [String] = ["2", "4"]
+    @State private var multiSelect: Set<String> = ["2", "4"]
     @State private var singleSelect: String?
     @State private var noSelectionAllowed: Bool = false
     @State private var showDoneButton: Bool = true

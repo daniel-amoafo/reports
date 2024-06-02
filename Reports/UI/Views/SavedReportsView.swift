@@ -40,7 +40,8 @@ private extension SavedReportsView {
             } label: {
                 HStack {
                     if let reportType = ReportChart.defaultCharts[id: savedReport.chartId] {
-                        let accountName = store.state.fetchAccountNameOrDefaultToAll(id: savedReport.selectedAccountId)
+                        let accountNames = store
+                            .state.fetchAccountNamesOrDefaultToAll(ids: savedReport.selectedAccountIds)
                         reportType.type.image
                             .resizable()
                             .scaledToFit()
@@ -53,7 +54,7 @@ private extension SavedReportsView {
                             HStack {
                                 HStack {
                                     Image(systemName: "building.columns.fill")
-                                    Text(accountName)
+                                    Text(accountNames)
                                 }
                             }
                             .font(Typography.subheadline.font)
@@ -90,9 +91,14 @@ private enum Strings {
 #Preview {
     NavigationStack {
         SavedReportsView(
-            store: .init(initialState: .init()) {
+            store: .init(initialState: .init(budgetId: Factory.budgetId)) {
                 SavedReportsFeature()
             }
         )
     }
+}
+
+private enum Factory {
+
+    static var budgetId: String { IdentifiedArrayOf<BudgetSummary>.mocks[0].id }
 }

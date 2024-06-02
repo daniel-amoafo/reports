@@ -9,7 +9,7 @@ struct MainTab {
     enum Tab { case home, reports, settings }
 
     @ObservableState
-    struct State: Equatable {
+    struct State {
         var currentTab = Tab.home
         var home = HomeFeature.State()
         var savedReports = SavedReportsFeature.State()

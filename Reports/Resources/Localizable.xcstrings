@@ -4,6 +4,9 @@
     "" : {
 
     },
+    " | " : {
+
+    },
     "[No Reports]" : {
 
     },
@@ -43,6 +46,9 @@
     "Aug 23 - Dec 23, Main Budget" : {
 
     },
+    "Budget Accounts" : {
+      "comment" : "Title for accounts that are currently open."
+    },
     "Budget Reports" : {
       "comment" : "The home screen main title"
     },
@@ -57,6 +63,9 @@
     },
     "Chart" : {
       "comment" : "the title name for the chart section"
+    },
+    "Closed Accounts" : {
+      "comment" : "Title for accounts that have been closed."
     },
     "Date" : {
 
@@ -139,9 +148,6 @@
     "Outline Compact" : {
 
     },
-    "Please select an account for the report" : {
-      "comment" : "the account for which the transactions the report will be based on"
-    },
     "Primary" : {
 
     },
@@ -180,6 +186,12 @@
     },
     "Select Account" : {
       "comment" : "title for selecting the bank account to run report from"
+    },
+    "Select All" : {
+      "comment" : "button to select all accounts"
+    },
+    "Select None" : {
+      "comment" : "button to select deselect all accounts"
     },
     "Selected Values:" : {
 

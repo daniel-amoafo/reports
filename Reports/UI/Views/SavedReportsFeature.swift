@@ -9,16 +9,46 @@ struct SavedReportsFeature {
 
     @ObservableState
     struct State: Equatable {
-        var savedReports: [SavedReport] = []
+        var savedReports: [SavedReport]
+        var budgetId: String
 
-        func fetchAccountNameOrDefaultToAll(id: String?) -> String {
-            @Dependency(\.budgetClient) var budgetClient
-            guard let id,
-                  let name = budgetClient.accounts[id: id]?.name
-            else {
-                return Account.allAccounts.name
+        private var accountsNames: [String: String]
+
+        init(savedReports: [SavedReport] = [], budgetId: String? = nil) {
+            self.savedReports = savedReports
+            self.budgetId = budgetId ?? ""
+            self.accountsNames = Self.loadAccountNames(for: budgetId)
+        }
+
+        func fetchAccountNamesOrDefaultToAll(ids: String?) -> String {
+            guard let ids, ids.isNotEmpty else { return AppStrings.allAccountsName }
+            let names = ids.split(separator: ",")
+                .compactMap {
+                    accountsNames[String($0)]
+                }
+                .joined(separator: ", ")
+            return names
+        }
+
+        static func loadAccountNames(for maybeBudgetId: String?) -> [String: String] {
+            let budgetId: String
+            if let maybeBudgetId {
+                budgetId = maybeBudgetId
+            } else {
+                @Dependency(\.configProvider) var configProvider
+                guard let abudgetId = configProvider.selectedBudgetId else {
+                    return [:]
+                }
+                budgetId = abudgetId
             }
-            return name
+
+            let accountsArray = try? Account.fetchAll(budgetId: budgetId)
+            // get available account names using id as key
+            let names = (accountsArray ?? [])
+                .reduce(into: [String: String]()) {
+                    $0[$1.id] = $1.name
+                }
+            return names
         }
     }
 
@@ -59,9 +89,13 @@ struct SavedReportsFeature {
 
             case .onTask:
                 return .run { send in
-                    for await _ in await modelContextNotifications.didUpdate(SavedReport.self) {
-                        await send(.didUpdateSavedReports, animation: .smooth)
+                    Task { @MainActor in
+                        for await _ in await modelContextNotifications.didUpdate(SavedReport.self) {
+                            send(.didUpdateSavedReports, animation: .smooth)
+                        }
                     }
+
+                    // mointor when selected budgetId changes and update saved reports
                 }
 
             case .delegate:

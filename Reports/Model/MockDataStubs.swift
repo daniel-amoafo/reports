@@ -2,13 +2,44 @@
 
 import BudgetSystemService
 import Foundation
+import GRDB
 import IdentifiedCollections
 import MoneyCommon
 
+private typealias Category = BudgetSystemService.Category
 /**
- Mocked values on this page are used to populate SwiftUI Previews and sample data for Unit Tests.
- Note: Changing values may lead to expectation failures in tests. Update test accordingly where needed/
+ Mocked values on this page are used to populate SwiftUI Previews and sample data.
  */
+
+enum MockData {
+
+    static var budgetId: String { IdentifiedArrayOf<BudgetSummary>.mocks[0].id }
+
+    static func insertSampleData(grdb: GRDBDatabase) throws {
+        let budgets: IdentifiedArrayOf<BudgetSummary> = .mocks
+        let accounts: IdentifiedArrayOf<Account> = .mocks
+        let accountsClosed: IdentifiedArrayOf<Account> = .mocksClosed
+        let categoryGroup: IdentifiedArrayOf<CategoryGroup> = .mocks
+        let category: IdentifiedArrayOf<Category> = .mocks
+        let transactions: IdentifiedArrayOf<TransactionEntry> = .mocks
+
+        var records: [any PersistableRecord] = []
+        records.append(contentsOf: budgets.elements)
+        records.append(contentsOf: accounts.elements)
+        records.append(contentsOf: accountsClosed.elements)
+        records.append(contentsOf: categoryGroup.elements)
+        records.append(contentsOf: category.elements)
+        records.append(contentsOf: transactions.elements)
+
+        try grdb.save(records: records)
+
+        debugPrint("inserted mock records into db (\(records.count))")
+    }
+
+    static func insertConfigData(_ config: ConfigProvider) {
+        config.selectedBudgetId = IdentifiedArrayOf<BudgetSummary>.mocks[0].id
+    }
+}
 
 extension ReportChart {
 
@@ -17,18 +48,32 @@ extension ReportChart {
 
 // MARK: - Account
 
-extension IdentifiedArray where ID == Account.ID, Element == Account {
+extension IdentifiedArrayOf where ID == Account.ID, Element == Account {
 
     static let mocks: Self = [
-        .init(id: "01", budgetId: "Budget1", name: "Everyday Account", onBudget: true, deleted: false),
-        .init(id: "02", budgetId: "Budget1", name: "Acme Account", onBudget: true, deleted: false),
-        .init(id: "03", budgetId: "Budget1", name: "Appleseed Account", onBudget: true, deleted: false),
+        .init(id: "01", budgetId: "Budget1", name: "Everyday Account", onBudget: true, closed: false, deleted: false),
+        .init(id: "02", budgetId: "Budget1", name: "Acme Account", onBudget: true, closed: false, deleted: false),
+        .init(id: "03", budgetId: "Budget1", name: "Appleseed Account", onBudget: true, closed: false, deleted: false),
+        .init(
+            id: "07",
+            budgetId: "Budget2",
+            name: "Budget Twwo Account",
+            onBudget: true,
+            closed: false,
+            deleted: false
+        ),
+    ]
+
+    static let mocksClosed: Self = [
+        .init(id: "04", budgetId: "Budget1", name: "Grandpa Account", onBudget: true, closed: true, deleted: false),
+        .init(id: "05", budgetId: "Budget1", name: "Nona Account", onBudget: true, closed: true, deleted: false),
+        .init(id: "06", budgetId: "Budget1", name: "Jerry Account", onBudget: true, closed: true, deleted: false),
     ]
 }
 
 // MARK: - BudgetSummary
 
-extension IdentifiedArray where Element == BudgetSummary, ID == BudgetSummary.ID {
+extension IdentifiedArrayOf where Element == BudgetSummary, ID == BudgetSummary.ID {
 
     static let mocks: Self = [
         .init(
@@ -54,7 +99,7 @@ extension IdentifiedArray where Element == BudgetSummary, ID == BudgetSummary.ID
 
 // MARK: - CategoryGroup
 
-extension IdentifiedArray where Element == CategoryGroup, ID == CategoryGroup.ID {
+extension IdentifiedArrayOf where Element == CategoryGroup, ID == CategoryGroup.ID {
 
     static let mocks: Self = [
         .init(
@@ -83,7 +128,7 @@ extension IdentifiedArray where Element == CategoryGroup, ID == CategoryGroup.ID
 
 // MARK: - Category
 
-extension IdentifiedArray where Element == BudgetSystemService.Category, ID == BudgetSystemService.Category.ID {
+extension IdentifiedArray where Element == Category, ID == Category.ID {
 
     static let mocks: Self = [
         .init(
@@ -304,6 +349,7 @@ extension SavedReport {
                 fromDate: "2024-01-01",
                 toDate: "2024-02-28",
                 chartId: ReportChart.firstChart.id,
+                budgetId: MockData.budgetId,
                 lastModified: Date.iso8601utc.date(from: "2024-03-30T14:30")!
             ),
             .init(
@@ -312,6 +358,7 @@ extension SavedReport {
                 fromDate: "2024-03-05",
                 toDate: "2024-04-04",
                 chartId: ReportChart.firstChart.id,
+                budgetId: MockData.budgetId,
                 lastModified: Date.iso8601utc.date(from: "2024-05-12T16:45")!
             ),
             .init(
@@ -320,7 +367,7 @@ extension SavedReport {
                 fromDate: "2024-02-02",
                 toDate: "2024-02-09",
                 chartId: ReportChart.firstChart.id,
-                selectedAccountId: Account.allAccountsId,
+                budgetId: MockData.budgetId,
                 lastModified: Date.iso8601utc.date(from: "2024-02-12T08:45")!
             ),
             .init(
@@ -329,7 +376,7 @@ extension SavedReport {
                 fromDate: "2024-05-01",
                 toDate: "2024-05-09",
                 chartId: ReportChart.firstChart.id,
-                selectedAccountId: Account.allAccountsId,
+                budgetId: MockData.budgetId,
                 lastModified: Date.iso8601utc.date(from: "2024-05-08T17:12")!
             ),
         ]

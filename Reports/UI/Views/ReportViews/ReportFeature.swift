@@ -8,7 +8,7 @@ import Foundation
 struct ReportFeature {
 
     @ObservableState
-    struct State: Equatable {
+    struct State {
 
         enum SourceData {
             case new(ReportInputFeature.State)
@@ -37,7 +37,7 @@ struct ReportFeature {
             let fromMonth = inputFields.fromDate.formatted(.dateTime.month())
             let toYear = inputFields.toDate.formatted(.dateTime.year())
             let toMonth = inputFields.toDate.formatted(.dateTime.month())
-            let accountName = "\(inputFields.selectedAccountName ?? Account.allAccounts.name)"
+            let accountName = "\(inputFields.selectedAccountNames ?? AppStrings.allAccountsName)"
 
             if fromYear == toYear {
                 return "\(fromYear) \(fromMonth) - \(toMonth), \(accountName)"
@@ -176,7 +176,7 @@ struct ReportFeature {
                             budgetId: state.budgetId,
                             startDate: state.inputFields.fromDate,
                             finishDate: state.inputFields.toDate,
-                            accountId: state.inputFields.santizedSelectedAccountId
+                            accountIds: state.inputFields.selectedAccountIds
                         )
                     )
                 case .spendingByTrend:
@@ -254,15 +254,12 @@ private extension ReportFeature {
 
     func saveReport(name: String, inputFields: ReportInputFeature.State, existing: SavedReport?) {
         do {
-            let selectedAccountId = inputFields.selectedAccountId == Account.allAccountsId ?
-            nil : inputFields.selectedAccountId
-
             let savedReport: SavedReport
             if let existingReport = existing {
                 existingReport.name = name
                 existingReport.fromDate = inputFields.fromDateFormatted
                 existingReport.toDate = inputFields.toDateFormatted
-                existingReport.selectedAccountId = selectedAccountId
+                existingReport.selectedAccountIds = inputFields.selectedAccountIds
                 existingReport.lastModifield = .now
                 savedReport = existingReport
             } else {
@@ -271,7 +268,8 @@ private extension ReportFeature {
                     fromDate: inputFields.fromDateFormatted,
                     toDate: inputFields.toDateFormatted,
                     chartId: inputFields.chart.id,
-                    selectedAccountId: selectedAccountId,
+                    budgetId: inputFields.budgetId,
+                    selectedAccountIds: inputFields.selectedAccountIds,
                     lastModified: .now
                 )
             }

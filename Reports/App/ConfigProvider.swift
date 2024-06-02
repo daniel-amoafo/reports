@@ -57,12 +57,16 @@ extension ConfigProvider: DependencyKey {
         .init()
     }
 
-    static var previewValue: ConfigProvider {
+    static var testValue: ConfigProvider {
         .init(defaultStore: InMemoryKeyValueStore(), secureStore: InMemoryKeyValueStore())
     }
 
-    static var testValue: ConfigProvider {
-        .init(defaultStore: InMemoryKeyValueStore(), secureStore: InMemoryKeyValueStore())
+    static var previewValue: ConfigProvider {
+        let config: ConfigProvider = .init(
+            defaultStore: InMemoryKeyValueStore(), secureStore: InMemoryKeyValueStore()
+        )
+        MockData.insertConfigData(config)
+        return config
     }
 }
 

@@ -24,6 +24,7 @@ enum ReportFeatureSourceLoader {
 
         case let .existing(report):
             savedReport = report
+            let budgetId = report.budgetId
             guard let chart = ReportChart.defaultCharts[id: report.chartId] else {
                 throw LoadError.invalidChartId(
                     "\(String(describing: SavedReport.self)) chart id (\(report.chartId)) not found."
@@ -38,16 +39,24 @@ enum ReportFeatureSourceLoader {
                 throw LoadError.invalidDateFormat(Strings.invalidDate)
             }
 
-            let selectedAcountId: String?
+            let selectedAcountIds: String?
             do {
-                if let accountId = report.selectedAccountId {
-                    guard try Account.fetch(id: accountId) != nil else {
-                        logger.error("\(String(describing: SavedReport.self)) - invalid account id (\(accountId)).")
+                if let accountIdsString = report.selectedAccountIds, accountIdsString.isNotEmpty {
+                    let allAccounts = try Account.fetchAll(budgetId: budgetId).map(\.id)
+                    let accountIds = accountIdsString
+                        .split(separator: ",")
+                        .map { String($0) }
+
+                    guard accountIds.allSatisfy({ allAccounts.contains($0) }) else {
+                        logger.error(
+                            "\(String(describing: SavedReport.self)) - invalid account id(s) in (\(accountIdsString))."
+                        )
                         throw LoadError.invalidSelectedAccount(Strings.invalidAccount)
+
                     }
-                    selectedAcountId = accountId
+                    selectedAcountIds = accountIdsString
                 } else {
-                    selectedAcountId = nil
+                    selectedAcountIds = nil
                 }
             } catch {
                 logger.error("\(error.toString())")
@@ -56,9 +65,10 @@ enum ReportFeatureSourceLoader {
 
             inputFeatureState = .init(
                 chart: chart,
+                budgetId: budgetId,
                 fromDate: fromDate,
                 toDate: toDate,
-                selectedAccountId: selectedAcountId
+                selectedAccountIds: selectedAcountIds
             )
         }
 

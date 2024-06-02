@@ -77,10 +77,19 @@ extension Account {
         return try Shared.grdb.fetchRecord(Self.self, request: request)
     }
 
-    static func fetch(isOnBudget: Bool, isDeleted: Bool) throws -> [Self] {
+    static func fetchAll(budgetId: String) throws -> [Self] {
         let request = Account
-            .filter(Account.Column.onBudget == isOnBudget)
-            .filter(Account.Column.deleted == isDeleted)
+            .filter(Column.budgetId == budgetId)
+            .order(Column.name)
+        return try Shared.grdb.fetchRecords(Self.self, request: request)
+    }
+
+    static func fetch(isOnBudget: Bool, isClosed: Bool, budgetId: String) throws -> [Self] {
+        let request = Account
+            .filter(Column.onBudget == isOnBudget)
+            .filter(Column.closed == isClosed)
+            .filter(Column.budgetId == budgetId)
+            .order(Column.name)
 
         return try Shared.grdb.fetchRecords(Self.self, request: request)
     }
@@ -117,7 +126,7 @@ extension TransactionEntry {
 
     // MARK: TransactionEntry Queries
 
-    static func queryTransactionsByCategoryId(_ categoryId: String, startDate: Date, finishDate: Date, accountId: String?)
+    static func queryTransactionsByCategoryId(_ categoryId: String, startDate: Date, finishDate: Date, accountIds: String?)
     -> GRDBDatabase.RecordSQLBuilder<TransactionEntry> {
         .init(
             record: TransactionEntry.self,
@@ -130,7 +139,7 @@ extension TransactionEntry {
             WHERE date BETWEEN :startDate AND :finishDate
             AND account.onBudget = 1
             """ +
-            SQLHelper.contionalAccountId(accountId) +
+            SQLHelper.conditionalAccountId(accountIds) +
             """
             AND transactionEntry.categoryId = :categoryId
             AND ( categoryGroup.name <> 'Internal Master Category' OR (categoryGroup.name = 'Internal Master Category' AND category.name = 'Uncategorized' ))
@@ -140,8 +149,7 @@ extension TransactionEntry {
                 "startDate": Date.iso8601local.string(from: startDate),
                 "finishDate": Date.iso8601local.string(from: finishDate),
                 "categoryId": categoryId,
-                "accountId": accountId,
-            ].compactMapValues { $0 }
+            ]
         )
     }
 }
@@ -180,7 +188,7 @@ extension CategoryRecord {
 
     /// Creates `CategoryGroup` total amounts  for a given date range.
     /// The record entry values can be used directly to plot data in a chart.
-    static func queryTransactionsByCategoryGroupTotals(budgetId: String, startDate: Date, finishDate: Date, accountId: String?)
+    static func queryTransactionsByCategoryGroupTotals(budgetId: String, startDate: Date, finishDate: Date, accountIds: String?)
     -> GRDBDatabase.RecordSQLBuilder<CategoryRecord> {
         .init(
             record: CategoryRecord.self,
@@ -194,7 +202,7 @@ extension CategoryRecord {
             WHERE date BETWEEN :startDate AND :finishDate
             AND account.onBudget = 1
             """ +
-            SQLHelper.contionalAccountId(accountId) +
+            SQLHelper.conditionalAccountId(accountIds) +
             """
             AND transactionEntry.budgetSummaryId = :budgetId
             AND ( categoryGroup.name <> 'Internal Master Category' OR (categoryGroup.name = 'Internal Master Category' AND category.name = 'Uncategorized' ))
@@ -206,8 +214,7 @@ extension CategoryRecord {
                 "startDate": Date.iso8601local.string(from: startDate),
                 "finishDate": Date.iso8601local.string(from: finishDate),
                 "budgetId": budgetId,
-                "accountId": accountId,
-            ].compactMapValues { $0 }
+            ]
         )
     }
 
@@ -217,7 +224,7 @@ extension CategoryRecord {
         forCategoryGroupId categoryGroupId: String,
         startDate: Date,
         finishDate: Date,
-        accountId: String?
+        accountIds: String?
     )
     -> GRDBDatabase.RecordSQLBuilder<CategoryRecord> {
         .init(
@@ -232,7 +239,7 @@ extension CategoryRecord {
             WHERE date BETWEEN :startDate AND :finishDate
             AND account.onBudget = 1
             """ +
-            SQLHelper.contionalAccountId(accountId) +
+            SQLHelper.conditionalAccountId(accountIds) +
             """
             AND categoryGroup.id = :categoryGroupId
             AND ( categoryGroup.name <> 'Internal Master Category' OR (categoryGroup.name = 'Internal Master Category' AND category.name = 'Uncategorized' ))
@@ -244,8 +251,7 @@ extension CategoryRecord {
                 "startDate": Date.iso8601local.string(from: startDate),
                 "finishDate": Date.iso8601local.string(from: finishDate),
                 "categoryGroupId": categoryGroupId,
-                "accountId": accountId,
-            ].compactMapValues { $0 }
+            ]
         )
     }
 
@@ -255,11 +261,12 @@ extension CategoryRecord {
 
 private enum SQLHelper {
 
-    static func contionalAccountId(_ accountId: String?) -> String {
-        guard accountId != nil else { return " " }
+    static func conditionalAccountId(_ accountIds: String?) -> String {
+        guard let accountIds, accountIds.isNotEmpty else { return " " }
+        let inValues = "(\(accountIds.replacingOccurrences(of: ",", with: "'"))')"
         return """
 
-        AND account.id = :accountId
+        AND account.id IN \(inValues)
 
         """
     }

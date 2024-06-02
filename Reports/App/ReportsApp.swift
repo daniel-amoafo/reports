@@ -10,7 +10,7 @@ import SwiftUI
 struct AppFeature {
 
     @ObservableState
-    struct State: Equatable {
+    struct State {
         var appIntroLogin = AppIntroLogin.State()
         var mainTab = MainTab.State()
         var authStatus: AuthorizationStatus = .unknown
