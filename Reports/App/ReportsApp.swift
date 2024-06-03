@@ -139,20 +139,45 @@ private extension AppFeature {
 
     func syncBudgetData() async {
         do {
-            let summaries = try await budgetClient.fetchBudgetSummaries()
-            guard summaries.isNotEmpty else {
-                logger.warning("No budget summaries fetched! Halting db sync.")
+            WorkspaceValues.clearAll()
+            guard try await syncBudgetSummaries() else {
                 return
             }
-            logger.debug("Syncing summaries and accounts to db...")
-            try BudgetSummary.save(summaries)
-
+            try syncWorkspaceValues()
             try await syncCategoryValues()
             try await syncTransactionHistory()
 
         } catch {
             logger.error("\(String(describing: error))")
+            // !! User friendly alert required to flag something important hasn't completed.
         }
+    }
+
+    /// Load account names into memory, it's access by multiple screens
+    /// This reduces database I/O fetches
+    func syncWorkspaceValues() throws {
+
+        guard let budgetId = configProvider.selectedBudgetId else { return }
+        let accounts = try Account.fetchAll(budgetId: budgetId)
+
+        let accountNames = accounts.reduce(into: [String: String]()) {
+            $0[$1.id] = $1.name
+        }
+        @Shared(.wsValues) var workspaceValues
+        workspaceValues.accountsOnBudgetNames = accountNames
+        logger.debug("Synced workspace values")
+    }
+
+    func syncBudgetSummaries() async throws -> Bool {
+        let summaries = try await budgetClient.fetchBudgetSummaries()
+        guard summaries.isNotEmpty else {
+            logger.warning("No budget summaries fetched! Halting db sync.")
+            return false
+        }
+        logger.debug("Syncing summaries and accounts to db...")
+        try BudgetSummary.save(summaries)
+
+        return true
     }
 
     func syncCategoryValues() async throws {

@@ -10,24 +10,21 @@ struct SavedReportsFeature {
     @ObservableState
     struct State: Equatable {
         var savedReports: [SavedReport]
-        var budgetId: String
+        @Shared(.wsValues) var workspaceValues
 
-        private var accountsNames: [String: String]
-
-        init(savedReports: [SavedReport] = [], budgetId: String? = nil) {
+        init(savedReports: [SavedReport] = []) {
             self.savedReports = savedReports
-            self.budgetId = budgetId ?? ""
-            self.accountsNames = Self.loadAccountNames(for: budgetId)
         }
 
         func fetchAccountNamesOrDefaultToAll(ids: String?) -> String {
-            guard let ids, ids.isNotEmpty else { return AppStrings.allAccountsName }
-            let names = ids.split(separator: ",")
-                .compactMap {
-                    accountsNames[String($0)]
-                }
-                .joined(separator: ", ")
-            return names
+            guard let ids else {
+                let logger = LogFactory.create(Self.self)
+                logger.warning(
+                    "Should not have nil account ids associated to a saved report. This seems to be an error."
+                )
+                return ""
+            }
+            return workspaceValues.accountNames(for: ids) ?? ""
         }
 
         static func loadAccountNames(for maybeBudgetId: String?) -> [String: String] {

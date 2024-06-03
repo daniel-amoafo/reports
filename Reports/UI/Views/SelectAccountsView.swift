@@ -82,7 +82,7 @@ private extension SelectAccountsView {
 
             SelectListView(
                 items: store.activeAccounts,
-                selectedItems: $store.selectedIds,
+                selectedItems: store.selectedAccountIdsSet,
                 noSelectionAllowed: true,
                 typography: .headlineEmphasized,
                 showDoneButton: false
@@ -114,7 +114,7 @@ private extension SelectAccountsView {
 
             SelectListView(
                 items: store.closedAccounts,
-                selectedItems: $store.selectedIds,
+                selectedItems: store.selectedAccountIdsSet,
                 noSelectionAllowed: true,
                 typography: .headlineEmphasized,
                 showDoneButton: false
@@ -149,8 +149,7 @@ private enum Strings {
         SelectAccountsView(
             store: .init(
                 initialState: .init(
-                    budgetId: Factory.budgetId,
-                    selectedIds: Shared(Set<String>())
+                    budgetId: Factory.budgetId
                 )
             ) {
                 SelectAccountsFeature()

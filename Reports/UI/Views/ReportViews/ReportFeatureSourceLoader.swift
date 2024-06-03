@@ -41,7 +41,7 @@ enum ReportFeatureSourceLoader {
 
             let selectedAcountIds: String?
             do {
-                if let accountIdsString = report.selectedAccountIds, accountIdsString.isNotEmpty {
+                if case let accountIdsString = report.selectedAccountIds, accountIdsString.isNotEmpty {
                     let allAccounts = try Account.fetchAll(budgetId: budgetId).map(\.id)
                     let accountIds = accountIdsString
                         .split(separator: ",")

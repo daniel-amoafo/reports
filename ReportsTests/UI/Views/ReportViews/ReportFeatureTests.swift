@@ -8,10 +8,6 @@ import XCTest
 final class ReportFeatureTests: XCTestCase {
 
     var store: TestStoreOf<ReportFeature>!
-    // assume first entry is the .spendingByTotal chart type.
-    let chart = ReportChart.firstChart
-    let fromDate = Date.dateFormatter.date(from: "2024/05/01")!
-    let toDate = Date.dateFormatter.date(from: "2024/05/23")!
 
     @MainActor
     func testSavingNewReport() async throws {
@@ -101,7 +97,7 @@ final class ReportFeatureTests: XCTestCase {
 
     @MainActor
     func testTransactionHistoryUpdatedDestination() async throws {
-        store = createStoreWithNewReport()
+        store = Factory.createStoreWithNewReport()
 
         // Given
         store.exhaustivity = .off
@@ -117,13 +113,28 @@ final class ReportFeatureTests: XCTestCase {
 
 }
 
-private extension ReportFeatureTests {
+private enum Factory {
 
-    @MainActor
-    private func createStoreWithNewReport() -> TestStoreOf<ReportFeature> {
+    // assume first entry is the .spendingByTotal chart type.
+    static let chart = ReportChart.firstChart
+    static let fromDate = Date.dateFormatter.date(from: "2024/05/01")!
+    static let toDate = Date.dateFormatter.date(from: "2024/05/23")!
+
+    static var budgetId: String {
+        IdentifiedArrayOf<BudgetSummary>.mocks[0].id
+    }
+
+    static func createStoreWithNewReport() -> TestStoreOf<ReportFeature> {
         TestStore(
             initialState: try! .init(
-                sourceData: .new(.init(chart: chart, fromDate: fromDate, toDate: toDate))
+                sourceData: .new(
+                    .init(
+                        chart: chart,
+                        budgetId: budgetId,
+                        fromDate: fromDate,
+                        toDate: toDate
+                    )
+                )
             )
         ) {
             ReportFeature()
@@ -132,8 +143,7 @@ private extension ReportFeatureTests {
         }
     }
 
-    @MainActor
-    func createStoreWithSavedReport(_ savedReport: SavedReport) throws -> TestStoreOf<ReportFeature> {
+    static func createStoreWithSavedReport(_ savedReport: SavedReport) throws -> TestStoreOf<ReportFeature> {
         @Dependency(\.database) var database
         let ctx = database.swiftData
         ctx.insert(savedReport)

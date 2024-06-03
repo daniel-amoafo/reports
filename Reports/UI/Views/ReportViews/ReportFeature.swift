@@ -155,11 +155,14 @@ struct ReportFeature {
             case let .savedReportName(shouldSave):
                 state.showSavedReportNameAlert = false
                 guard shouldSave else { return .none }
-                saveReport(
+                guard saveReport(
                     name: state.savedReportName,
                     inputFields: state.inputFields,
                     existing: state.savedReport
-                )
+                ) else {
+                    // alert user there was a problem saving
+                    return .none
+                }
                 return .run { _ in
                     if isPresented {
                         await dismiss()
@@ -252,14 +255,19 @@ private extension ReportFeature {
         }
     }
 
-    func saveReport(name: String, inputFields: ReportInputFeature.State, existing: SavedReport?) {
+    // Persist SaveReport
+    func saveReport(name: String, inputFields: ReportInputFeature.State, existing: SavedReport?) -> Bool {
+        // validate input fields re
+        guard let selectedAccounts = inputFields.selectedAccountIds, selectedAccounts.isNotEmpty else {
+            return false
+        }
         do {
             let savedReport: SavedReport
             if let existingReport = existing {
                 existingReport.name = name
                 existingReport.fromDate = inputFields.fromDateFormatted
                 existingReport.toDate = inputFields.toDateFormatted
-                existingReport.selectedAccountIds = inputFields.selectedAccountIds
+                existingReport.selectedAccountIds = selectedAccounts
                 existingReport.lastModifield = .now
                 savedReport = existingReport
             } else {
@@ -269,14 +277,15 @@ private extension ReportFeature {
                     toDate: inputFields.toDateFormatted,
                     chartId: inputFields.chart.id,
                     budgetId: inputFields.budgetId,
-                    selectedAccountIds: inputFields.selectedAccountIds,
+                    selectedAccountIds: selectedAccounts,
                     lastModified: .now
                 )
             }
             try savedReportQuery.add(savedReport)
-
+            return true
         } catch {
             logger.error("\(error.toString())")
+            return false
         }
     }
 

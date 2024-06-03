@@ -75,6 +75,7 @@
 		18A146BA2BECF73B00B4E74F /* ReportFeatureSourceLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A146B92BECF73B00B4E74F /* ReportFeatureSourceLoader.swift */; };
 		18A1AE272BF339E10013EAD3 /* Date+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A1AE262BF339E10013EAD3 /* Date+Additions.swift */; };
 		18A514C92BD5001300B072DE /* SpendingTotalChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A514C82BD5001300B072DE /* SpendingTotalChartView.swift */; };
+		18BC9F402C0DE62C003B1E3D /* WorkspaceValues.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18BC9F3F2C0DE62C003B1E3D /* WorkspaceValues.swift */; };
 		18C3BFB02B81874000E444C8 /* AppIntroLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C3BFAF2B81874000E444C8 /* AppIntroLoginView.swift */; };
 		18C3BFB22B820AEA00E444C8 /* SFSafariView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C3BFB12B820AEA00E444C8 /* SFSafariView.swift */; };
 		18C3BFB72B820DD000E444C8 /* Binding+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C3BFB62B820DD000E444C8 /* Binding+Additions.swift */; };
@@ -195,6 +196,7 @@
 		18A1AE262BF339E10013EAD3 /* Date+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Additions.swift"; sourceTree = "<group>"; };
 		18A514C22BCFF5FC00B072DE /* MoneyCommon */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = MoneyCommon; path = Packages/MoneyCommon; sourceTree = "<group>"; };
 		18A514C82BD5001300B072DE /* SpendingTotalChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendingTotalChartView.swift; sourceTree = "<group>"; };
+		18BC9F3F2C0DE62C003B1E3D /* WorkspaceValues.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceValues.swift; sourceTree = "<group>"; };
 		18C3BFAE2B806A7500E444C8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		18C3BFAF2B81874000E444C8 /* AppIntroLoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIntroLoginView.swift; sourceTree = "<group>"; };
 		18C3BFB12B820AEA00E444C8 /* SFSafariView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SFSafariView.swift; sourceTree = "<group>"; };
@@ -513,6 +515,7 @@
 				18C3BFCA2B87522200E444C8 /* Logger.swift */,
 				186E8A1D2B99872F00E65BDE /* ConfigProvider.swift */,
 				1894264A2BDFB6D700C06018 /* AppStrings.swift */,
+				18BC9F3F2C0DE62C003B1E3D /* WorkspaceValues.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -804,6 +807,7 @@
 				1868BAC62BE7881900757E78 /* SavedReport.swift in Sources */,
 				186E8A312B9B169C00E65BDE /* CGFloat+DesignStyleMetrics.swift in Sources */,
 				1894264B2BDFB6D700C06018 /* AppStrings.swift in Sources */,
+				18BC9F402C0DE62C003B1E3D /* WorkspaceValues.swift in Sources */,
 				18E7BAF72BE0E5F300C0468E /* TransactionHistoryView.swift in Sources */,
 				186E8A462B9C4BB500E65BDE /* Color+Adjust.swift in Sources */,
 				18A1AE272BF339E10013EAD3 /* Date+Additions.swift in Sources */,

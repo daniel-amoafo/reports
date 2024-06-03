@@ -15,6 +15,10 @@ enum MockData {
 
     static var budgetId: String { IdentifiedArrayOf<BudgetSummary>.mocks[0].id }
 
+    static var accountId: String {
+        IdentifiedArrayOf<Account>.mocks[0].id
+    }
+
     static func insertSampleData(grdb: GRDBDatabase) throws {
         let budgets: IdentifiedArrayOf<BudgetSummary> = .mocks
         let accounts: IdentifiedArrayOf<Account> = .mocks
@@ -350,6 +354,7 @@ extension SavedReport {
                 toDate: "2024-02-28",
                 chartId: ReportChart.firstChart.id,
                 budgetId: MockData.budgetId,
+                selectedAccountIds: MockData.accountId,
                 lastModified: Date.iso8601utc.date(from: "2024-03-30T14:30")!
             ),
             .init(
@@ -359,6 +364,7 @@ extension SavedReport {
                 toDate: "2024-04-04",
                 chartId: ReportChart.firstChart.id,
                 budgetId: MockData.budgetId,
+                selectedAccountIds: MockData.accountId,
                 lastModified: Date.iso8601utc.date(from: "2024-05-12T16:45")!
             ),
             .init(
@@ -368,6 +374,7 @@ extension SavedReport {
                 toDate: "2024-02-09",
                 chartId: ReportChart.firstChart.id,
                 budgetId: MockData.budgetId,
+                selectedAccountIds: MockData.accountId,
                 lastModified: Date.iso8601utc.date(from: "2024-02-12T08:45")!
             ),
             .init(
@@ -377,6 +384,7 @@ extension SavedReport {
                 toDate: "2024-05-09",
                 chartId: ReportChart.firstChart.id,
                 budgetId: MockData.budgetId,
+                selectedAccountIds: MockData.accountId,
                 lastModified: Date.iso8601utc.date(from: "2024-05-08T17:12")!
             ),
         ]

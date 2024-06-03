@@ -8,21 +8,16 @@ import Foundation
 struct ReportInputFeature {
 
     @ObservableState
-    struct State {
+    struct State: Equatable {
         let chart: ReportChart
         let budgetId: String
         var showChartMoreInfo = false
         var fromDate: Date
         var toDate: Date
-        @Shared var selectedAccountIdsSet: Set<String>
+        @Shared(.wsValues) var workspaceValues
         @Presents var selectedAccounts: SelectAccountsFeature.State?
         var popoverFromDate = false
         var popoverToDate = false
-
-        private let loadedAccounts: IdentifiedArrayOf<Account>
-        private let loadedAccountIds: Set<String>
-
-        private let logger = LogFactory.create(Self.self)
 
         init(
             chart: ReportChart,
@@ -35,48 +30,19 @@ struct ReportInputFeature {
             self.budgetId = budgetId
             self.fromDate = fromDate
             self.toDate = toDate
-            self._selectedAccountIdsSet = Shared(Self.setSelectedAccountIds(selectedAccountIds))
-            let accounts = Self.fetchAccounts(budgetId: budgetId)
-            self.loadedAccountIds = Set(accounts.ids)
-            self.loadedAccounts = accounts
-        }
-
-        static func setSelectedAccountIds(_ ids: String?) -> Set<String> {
-            guard let ids else { return .init() }
-            let array = ids
-                .split(separator: ",")
-                .map { String($0) }
-            return Set(array)
-        }
-
-        static func fetchAccounts(budgetId: String) -> IdentifiedArrayOf<Account> {
-            do {
-                let accounts = try Account.fetchAll(budgetId: budgetId)
-                return .init(uniqueElements: accounts)
-            } catch {
-                let logger = LogFactory.create(Self.self)
-                logger.error("\(error.toString())")
-                return []
-            }
+            self.workspaceValues.updateSelecteAccountIds(ids: selectedAccountIds)
         }
 
         var selectedAccountIds: String? {
-            guard selectedAccountIdsSet.isNotEmpty else { return nil }
-            return selectedAccountIdsSet.joined(separator: ",")
+            workspaceValues.selectedAccountIds
+        }
+
+        var selectedAccountIdsSet: Set<String> {
+            workspaceValues.selectedAccountIdsSet
         }
 
         var selectedAccountNames: String? {
-            guard selectedAccountIdsSet.isNotEmpty else { return nil }
-            if selectedAccountIdsSet.count == loadedAccountIds.count {
-                return AppStrings.allAccountsName
-            }
-            guard selectedAccountIdsSet.count < 3 else {
-                return AppStrings.someAccountsName
-            }
-            let names = loadedAccounts.filter {
-                selectedAccountIdsSet.contains($0.id)
-            }.map(\.name).joined(separator: ", ")
-            return names
+            workspaceValues.selectedAccountOnBudgetIdNames
         }
 
         var isAccountSelected: Bool {
@@ -90,9 +56,17 @@ struct ReportInputFeature {
         var toDateFormatted: String { Date.iso8601local.string(from: toDate) }
 
         func isEqual(to savedReport: SavedReport) -> Bool {
-            savedReport.fromDate == fromDateFormatted &&
+            func accountIdsAreEqual(_ lhs: String, _ rhs: String) -> Bool {
+                if lhs == rhs {
+                    return true
+                }
+                let lhsSet = workspaceValues.makeSet(for: lhs)
+                let rhsSet = workspaceValues.makeSet(for: rhs)
+                return lhsSet == rhsSet
+            }
+            return savedReport.fromDate == fromDateFormatted &&
             savedReport.toDate == toDateFormatted &&
-            savedReport.selectedAccountIds == selectedAccountIds
+            accountIdsAreEqual(savedReport.selectedAccountIds, selectedAccountIds ?? "")
         }
     }
 
@@ -102,9 +76,9 @@ struct ReportInputFeature {
         case selectAccounts(PresentationAction<SelectAccountsFeature.Action>)
         case updateFromDateTapped(Date)
         case updateToDateTapped(Date)
-        case selectAccountRowTapped
         case setPopoverFromDate(Bool)
         case setPopoverToDate(Bool)
+        case selectAccountRowTapped
         case runReportTapped
         case onAppear
 
@@ -121,7 +95,7 @@ struct ReportInputFeature {
     let logger = LogFactory.create(Self.self)
 
     var body: some ReducerOf<Self> {
-        Reduce { state, action in
+        Reduce<State, Action> { state, action in
             switch action {
             case .chartMoreInfoTapped:
                 state.showChartMoreInfo = !state.showChartMoreInfo
@@ -153,10 +127,7 @@ struct ReportInputFeature {
                 return .send(.delegate(.reportReadyToRun), animation: .smooth)
 
             case .selectAccountRowTapped:
-                state.selectedAccounts = .init(
-                    budgetId: state.budgetId, selectedIds: state.$selectedAccountIdsSet
-                )
-
+                state.selectedAccounts = .init(budgetId: state.budgetId)
                 return .none
 
             case .onAppear:

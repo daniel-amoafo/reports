@@ -3,23 +3,22 @@
 import BudgetSystemService
 import ComposableArchitecture
 import Foundation
+import SwiftUI
 
 @Reducer
 struct SelectAccountsFeature {
 
     @ObservableState
-    struct State {
+    struct State: Equatable {
         var activeAccounts: IdentifiedArrayOf<Account>
         var closedAccounts: IdentifiedArrayOf<Account>
         var activeAllAccounts: Bool = true
         var closedAllAccounts: Bool = true
         let budgetId: String
-        // shared with ReportInputFeature
-        @Shared var selectedIds: Set<String>
+        @Shared(.wsValues) var workspaceValues
 
-        init(budgetId: String, selectedIds: Shared<Set<String>>) {
+        init(budgetId: String) {
             self.budgetId = budgetId
-            self._selectedIds = selectedIds
             self.activeAccounts = []
             self.closedAccounts = []
 
@@ -37,6 +36,14 @@ struct SelectAccountsFeature {
             }
         }
 
+        var selectedAccountIdsSet: Binding<Set<String>> {
+            .init {
+                workspaceValues.selectedAccountIdsSet
+            } set: {
+                workspaceValues.selectedAccountIdsSet = $0
+            }
+        }
+
         var isAllActiveEnabled: Bool {
             selectedContainsAll(of: activeAccounts)
         }
@@ -47,7 +54,7 @@ struct SelectAccountsFeature {
 
         func selectedContainsAll(of other: IdentifiedArrayOf<Account>) -> Bool {
             let otherSet = Set(other.elements.map(\.id))
-            return selectedIds.isSuperset(of: otherSet)
+            return workspaceValues.selectedAccountIdsSet.isSuperset(of: otherSet)
         }
 
         mutating func selectAll() {
@@ -68,7 +75,7 @@ struct SelectAccountsFeature {
         mutating func toggleAll(for other: IdentifiedArrayOf<Account>, isSelected: Bool) {
             let otherIds = other.elements.map(\.id)
             // Remove all other list ids from selectedIds
-            selectedIds = selectedIds.filter {
+            workspaceValues.selectedAccountIdsSet = workspaceValues.selectedAccountIdsSet.filter {
                 !otherIds.contains($0)
             }
 
@@ -76,7 +83,7 @@ struct SelectAccountsFeature {
 
             // Add all all other list ids to selectedIds
             for otherId in otherIds {
-                selectedIds.insert(otherId)
+                workspaceValues.selectedAccountIdsSet.insert(otherId)
             }
         }
     }
@@ -109,7 +116,7 @@ struct SelectAccountsFeature {
             case .deselectAll:
                 state.deselectAll()
                 return .none
-            case .binding(\.selectedIds):
+            case .binding(\.workspaceValues.selectedAccountIdsSet):
                 state.syncSelectedStates()
                 return .none
             case .binding:

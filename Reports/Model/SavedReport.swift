@@ -12,7 +12,7 @@ final class SavedReport: Identifiable, Equatable {
     var toDate: String
     var chartId: String
     var budgetId: String
-    var selectedAccountIds: String?
+    var selectedAccountIds: String
     var lastModifield: Date
 
     init(
@@ -22,7 +22,7 @@ final class SavedReport: Identifiable, Equatable {
         toDate: String,
         chartId: String,
         budgetId: String,
-        selectedAccountIds: String? = nil,
+        selectedAccountIds: String,
         lastModified: Date
     ) {
         self.id = id
@@ -41,7 +41,7 @@ extension SavedReport: CustomDebugStringConvertible {
     var debugDescription: String {
         "name: \(name), fromDate: \(fromDate), toDate: \(toDate), " +
         "budgetId: \(budgetId)" +
-        "selectedAccountIds: \(selectedAccountIds ?? ""), chartId: \(chartId)"
+        "selectedAccountIds: \(selectedAccountIds), chartId: \(chartId)"
     }
 
 }

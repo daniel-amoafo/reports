@@ -91,14 +91,9 @@ private enum Strings {
 #Preview {
     NavigationStack {
         SavedReportsView(
-            store: .init(initialState: .init(budgetId: Factory.budgetId)) {
+            store: .init(initialState: .init()) {
                 SavedReportsFeature()
             }
         )
     }
-}
-
-private enum Factory {
-
-    static var budgetId: String { IdentifiedArrayOf<BudgetSummary>.mocks[0].id }
 }

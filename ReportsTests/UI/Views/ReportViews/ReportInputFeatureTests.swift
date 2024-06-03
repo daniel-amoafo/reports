@@ -5,14 +5,14 @@ import ComposableArchitecture
 @testable import Reports
 import XCTest
 
-final class ReportInputFeatureTests: XCTestCase {
-
-    var store: TestStoreOf<ReportInputFeature>!
-    let chart = ReportChart.firstChart
-    let startDate = Date.dateFormatter.date(from: "2024/01/01")!
-    let endDate = Date.dateFormatter.date(from: "2025/05/31")!
-
-    @MainActor
+// final class ReportInputFeatureTests: XCTestCase {
+//
+//    var store: TestStoreOf<ReportInputFeature>!
+//    let chart = ReportChart.firstChart
+//    let startDate = Date.dateFormatter.date(from: "2024/01/01")!
+//    let endDate = Date.dateFormatter.date(from: "2025/05/31")!
+//
+//    @MainActor
 //    override func setUp() async throws {
 //        store = TestStore(
 //            initialState: .init(
@@ -99,5 +99,5 @@ final class ReportInputFeatureTests: XCTestCase {
 //        }
 //        XCTAssertEqual(store.state.selectedAccountName, expectedAllAccount.name)
 //    }
-
-}
+//
+// }
