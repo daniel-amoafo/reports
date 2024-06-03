@@ -15,17 +15,14 @@ struct SelectAccountsFeature {
         var closedAllAccounts: Bool = true
         let budgetId: String
         // shared with ReportInputFeature
-        // note: if selectedIds is empty, then all accounts are deemed selected
         @Shared var selectedIds: Set<String>
-        // rendered for displayed, when all
-        var displaySelectedIds: Set<String>
 
         init(budgetId: String, selectedIds: Shared<Set<String>>) {
             self.budgetId = budgetId
             self._selectedIds = selectedIds
             self.activeAccounts = []
             self.closedAccounts = []
-            self.displaySelectedIds = []
+
             do {
                 let activeAccounts = try Account.fetch(isOnBudget: true, isClosed: false, budgetId: budgetId)
                 self.activeAccounts = .init(uniqueElements: activeAccounts)
@@ -33,10 +30,6 @@ struct SelectAccountsFeature {
                 let closedAccounts = try Account.fetch(isOnBudget: true, isClosed: true, budgetId: budgetId)
                 self.closedAccounts = .init(uniqueElements: closedAccounts)
 
-                if selectedIds.wrappedValue.isEmpty {
-                    // means All Accounts are selected
-                    selectAll()
-                }
                 syncSelectedStates()
             } catch {
                 let logger = LogFactory.create(Self.self)
@@ -54,7 +47,7 @@ struct SelectAccountsFeature {
 
         func selectedContainsAll(of other: IdentifiedArrayOf<Account>) -> Bool {
             let otherSet = Set(other.elements.map(\.id))
-            return displaySelectedIds.isSuperset(of: otherSet)
+            return selectedIds.isSuperset(of: otherSet)
         }
 
         mutating func selectAll() {
@@ -70,15 +63,12 @@ struct SelectAccountsFeature {
         mutating func syncSelectedStates () {
             activeAllAccounts = selectedContainsAll(of: activeAccounts)
             closedAllAccounts = selectedContainsAll(of: closedAccounts)
-            let allAccountsSelected = activeAllAccounts && closedAllAccounts
-            // if all accounts selected, then selectedIds is emptied
-            selectedIds = allAccountsSelected ? [] : displaySelectedIds
         }
 
         mutating func toggleAll(for other: IdentifiedArrayOf<Account>, isSelected: Bool) {
             let otherIds = other.elements.map(\.id)
             // Remove all other list ids from selectedIds
-            displaySelectedIds = displaySelectedIds.filter {
+            selectedIds = selectedIds.filter {
                 !otherIds.contains($0)
             }
 
@@ -86,7 +76,7 @@ struct SelectAccountsFeature {
 
             // Add all all other list ids to selectedIds
             for otherId in otherIds {
-                displaySelectedIds.insert(otherId)
+                selectedIds.insert(otherId)
             }
         }
     }
@@ -119,7 +109,7 @@ struct SelectAccountsFeature {
             case .deselectAll:
                 state.deselectAll()
                 return .none
-            case .binding(\.displaySelectedIds):
+            case .binding(\.selectedIds):
                 state.syncSelectedStates()
                 return .none
             case .binding:

@@ -80,6 +80,8 @@ extension Account {
     static func fetchAll(budgetId: String) throws -> [Self] {
         let request = Account
             .filter(Column.budgetId == budgetId)
+            .filter(Column.onBudget == 1)
+            .filter(Column.deleted == 0)
             .order(Column.name)
         return try Shared.grdb.fetchRecords(Self.self, request: request)
     }
@@ -89,6 +91,7 @@ extension Account {
             .filter(Column.onBudget == isOnBudget)
             .filter(Column.closed == isClosed)
             .filter(Column.budgetId == budgetId)
+            .filter(Column.deleted == 0)
             .order(Column.name)
 
         return try Shared.grdb.fetchRecords(Self.self, request: request)
@@ -138,8 +141,9 @@ extension TransactionEntry {
             INNER JOIN  categoryGroup on categoryGroup.id = category.categoryGroupId
             WHERE date BETWEEN :startDate AND :finishDate
             AND account.onBudget = 1
+            AND transactionEntry.deleted <> 1
             """ +
-            SQLHelper.conditionalAccountId(accountIds) +
+            .andAccountIds(accountIds) +
             """
             AND transactionEntry.categoryId = :categoryId
             AND ( categoryGroup.name <> 'Internal Master Category' OR (categoryGroup.name = 'Internal Master Category' AND category.name = 'Uncategorized' ))
@@ -201,8 +205,9 @@ extension CategoryRecord {
             INNER JOIN  categoryGroup on categoryGroup.id = category.categoryGroupId
             WHERE date BETWEEN :startDate AND :finishDate
             AND account.onBudget = 1
+            AND transactionEntry.deleted <> 1
             """ +
-            SQLHelper.conditionalAccountId(accountIds) +
+            .andAccountIds(accountIds) +
             """
             AND transactionEntry.budgetSummaryId = :budgetId
             AND ( categoryGroup.name <> 'Internal Master Category' OR (categoryGroup.name = 'Internal Master Category' AND category.name = 'Uncategorized' ))
@@ -238,8 +243,9 @@ extension CategoryRecord {
             INNER JOIN  categoryGroup on categoryGroup.id = category.categoryGroupId
             WHERE date BETWEEN :startDate AND :finishDate
             AND account.onBudget = 1
+            AND transactionEntry.deleted <> 1
             """ +
-            SQLHelper.conditionalAccountId(accountIds) +
+            .andAccountIds(accountIds) +
             """
             AND categoryGroup.id = :categoryGroupId
             AND ( categoryGroup.name <> 'Internal Master Category' OR (categoryGroup.name = 'Internal Master Category' AND category.name = 'Uncategorized' ))
@@ -259,11 +265,13 @@ extension CategoryRecord {
 
 // MARK: -
 
-private enum SQLHelper {
+private extension String {
 
-    static func conditionalAccountId(_ accountIds: String?) -> String {
+    static func andAccountIds(_ accountIds: String?) -> String {
         guard let accountIds, accountIds.isNotEmpty else { return " " }
-        let inValues = "(\(accountIds.replacingOccurrences(of: ",", with: "'"))')"
+        // expecting a comma , separated list of account ids, convert to a SQL IN expression.
+        // e.g. account.id IN ('SomeUUID','AnotherUUID')
+        let inValues = "('\(accountIds.replacingOccurrences(of: ",", with: "','"))')"
         return """
 
         AND account.id IN \(inValues)

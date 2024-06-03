@@ -173,7 +173,7 @@ extension TransactionEntry: FetchableRecord, PersistableRecord {
         container[Column.categoryId.rawValue] = categoryId
         container[Column.categoryName.rawValue] = categoryName
         container[Column.transferAccountId.rawValue] = transferAccountId
-        container[Column.transferAccountId.rawValue] = deleted
+        container[Column.deleted.rawValue] = deleted
     }
 
     public init(row: Row) {

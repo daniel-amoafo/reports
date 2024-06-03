@@ -76,13 +76,13 @@ private extension SelectAccountsView {
                 }
                 .padding(.trailing, .Spacing.pt12)
                 .buttonStyle(.plain)
-                .foregroundStyle(Color.Button.secondary)
+                .foregroundStyle(Color.Button.primary)
             }
             .padding(.horizontal)
 
             SelectListView(
                 items: store.activeAccounts,
-                selectedItems: $store.displaySelectedIds,
+                selectedItems: $store.selectedIds,
                 noSelectionAllowed: true,
                 typography: .headlineEmphasized,
                 showDoneButton: false
@@ -108,13 +108,13 @@ private extension SelectAccountsView {
                 }
                 .padding(.trailing, .Spacing.pt12)
                 .buttonStyle(.plain)
-                .foregroundStyle(Color.Button.secondary)
+                .foregroundStyle(Color.Button.primary)
             }
             .padding(.horizontal)
 
             SelectListView(
                 items: store.closedAccounts,
-                selectedItems: $store.displaySelectedIds,
+                selectedItems: $store.selectedIds,
                 noSelectionAllowed: true,
                 typography: .headlineEmphasized,
                 showDoneButton: false

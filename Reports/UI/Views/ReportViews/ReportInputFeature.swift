@@ -14,28 +14,31 @@ struct ReportInputFeature {
         var showChartMoreInfo = false
         var fromDate: Date
         var toDate: Date
-        var selectedAccountIdsSet: Set<String>
+        @Shared var selectedAccountIdsSet: Set<String>
         @Presents var selectedAccounts: SelectAccountsFeature.State?
         var popoverFromDate = false
         var popoverToDate = false
 
-        private let accounts: IdentifiedArrayOf<Account>
+        private let loadedAccounts: IdentifiedArrayOf<Account>
+        private let loadedAccountIds: Set<String>
 
         private let logger = LogFactory.create(Self.self)
 
         init(
             chart: ReportChart,
             budgetId: String,
-            fromDate: Date = .now.advanceMonths(by: -1, strategy: .firstDay), // first day, last month
-            toDate: Date = .now.advanceMonths(by: 0, strategy: .lastDay), // last day, current month
+            fromDate: Date = Date.firstDayOfLastMonth,
+            toDate: Date = Date.lastDayOfThisMonth,
             selectedAccountIds: String? = nil
         ) {
             self.chart = chart
             self.budgetId = budgetId
             self.fromDate = fromDate
             self.toDate = toDate
-            self.selectedAccountIdsSet = Self.setSelectedAccountIds(selectedAccountIds)
-            self.accounts = Self.fetchAccounts(budgetId: budgetId)
+            self._selectedAccountIdsSet = Shared(Self.setSelectedAccountIds(selectedAccountIds))
+            let accounts = Self.fetchAccounts(budgetId: budgetId)
+            self.loadedAccountIds = Set(accounts.ids)
+            self.loadedAccounts = accounts
         }
 
         static func setSelectedAccountIds(_ ids: String?) -> Set<String> {
@@ -64,14 +67,23 @@ struct ReportInputFeature {
 
         var selectedAccountNames: String? {
             guard selectedAccountIdsSet.isNotEmpty else { return nil }
-            let names = accounts.filter {
+            if selectedAccountIdsSet.count == loadedAccountIds.count {
+                return AppStrings.allAccountsName
+            }
+            guard selectedAccountIdsSet.count < 3 else {
+                return AppStrings.someAccountsName
+            }
+            let names = loadedAccounts.filter {
                 selectedAccountIdsSet.contains($0.id)
             }.map(\.name).joined(separator: ", ")
             return names
         }
 
+        var isAccountSelected: Bool {
+            selectedAccountIds != nil
+        }
         var isRunReportDisabled: Bool {
-            false // probably no longer needed due to All Accounts changes
+            !isAccountSelected
         }
 
         var fromDateFormatted: String { Date.iso8601local.string(from: fromDate) }
@@ -142,7 +154,7 @@ struct ReportInputFeature {
 
             case .selectAccountRowTapped:
                 state.selectedAccounts = .init(
-                    budgetId: state.budgetId, selectedIds: Shared(state.selectedAccountIdsSet)
+                    budgetId: state.budgetId, selectedIds: state.$selectedAccountIdsSet
                 )
 
                 return .none
@@ -161,5 +173,18 @@ struct ReportInputFeature {
         .ifLet(\.$selectedAccounts, action: \.selectAccounts) {
             SelectAccountsFeature()
         }
+    }
+}
+
+// MARK: - Date
+
+private extension Date {
+
+    static var firstDayOfLastMonth: Self {
+        .now.advanceMonths(by: -1, strategy: .firstDay)
+    }
+
+    static var lastDayOfThisMonth: Self {
+        .now.advanceMonths(by: 0, strategy: .lastDay)
     }
 }

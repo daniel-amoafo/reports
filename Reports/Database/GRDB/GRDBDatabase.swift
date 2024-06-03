@@ -195,7 +195,7 @@ private extension GRDBDatabase {
                 t.column("categoryId", .text)
                 t.column("categoryName", .text)
                 t.column("transferAccountId", .text)
-                t.column("deleted", .boolean)
+                t.column("deleted", .boolean).notNull()
                 t.belongsTo("budgetSummary", onDelete: .cascade).notNull()
             }
 

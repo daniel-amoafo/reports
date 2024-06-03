@@ -35,7 +35,7 @@
       "comment" : "description text of the income expense chart"
     },
     "All Accounts" : {
-      "comment" : "A special account instance indicating all available accounts should be selected for the report."
+      "comment" : "A label indicating all available accounts will be selected for the report."
     },
     "All Categories" : {
       "comment" : "The collective name for top level category groups"
@@ -148,6 +148,9 @@
     "Outline Compact" : {
 
     },
+    "Please select an account for the report" : {
+      "comment" : "the account for which the transactions the report will be based on"
+    },
     "Primary" : {
 
     },
@@ -210,6 +213,9 @@
     },
     "Size Categories" : {
 
+    },
+    "Some Accounts" : {
+      "comment" : "A label indicating a few accounts have been selected for the report."
     },
     "Spending Total" : {
       "comment" : "The title for a chart displaying spending totals by category"

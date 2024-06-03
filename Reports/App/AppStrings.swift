@@ -18,6 +18,12 @@ enum AppStrings {
     )
     static let allAccountsName = String(
         localized: "All Accounts",
-        comment: "A special account instance indicating all available accounts should be selected for the report."
+        comment: "A label indicating all available accounts will be selected for the report."
     )
+
+    static let someAccountsName = String(
+        localized: "Some Accounts",
+        comment: "A label indicating a few accounts have been selected for the report."
+    )
+
 }

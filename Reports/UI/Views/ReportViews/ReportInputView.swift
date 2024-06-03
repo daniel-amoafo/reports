@@ -195,8 +195,12 @@ struct ReportInputView: View {
                                     computeValue: { dimension in dimension[VerticalAlignment.center] }
                                 )
 
-                            Text("\(store.selectedAccountNames ?? AppStrings.allAccountsName)")
-                                .foregroundStyle(Color.Text.primary)
+                            Text("\(store.selectedAccountNames ?? Strings.selectAccountPlaceholder)")
+                                .typography(accountNameTypography)
+                                .foregroundStyle(
+                                    store.isAccountSelected ?
+                                    Color.Text.primary : Color.Text.secondary
+                                )
                         }
                         Spacer()
                     }
@@ -229,6 +233,16 @@ struct ReportInputView: View {
         .listRowBottom()
     }
 
+    var accountNameTypography: Typography {
+        switch store.selectedAccountIdsSet.count {
+        case 0:
+            return .bodyItalic
+        case 1...2:
+            return .body
+        default:
+            return .bodyEmphasized
+        }
+    }
 }
 
 // MARK: - Strings
@@ -245,6 +259,10 @@ private enum Strings {
     static let selectAccountTitle = String(
         localized: "Select Account",
         comment: "title for selecting the bank account to run report from"
+    )
+    static let selectAccountPlaceholder = String(
+        localized: "Please select an account for the report",
+        comment: "the account for which the transactions the report will be based on"
     )
 }
 
