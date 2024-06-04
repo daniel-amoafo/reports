@@ -5,55 +5,109 @@ import ComposableArchitecture
 @testable import Reports
 import XCTest
 
-final class ReportFeatureTests: XCTestCase {
+ final class ReportFeatureTests: XCTestCase {
 
     var store: TestStoreOf<ReportFeature>!
 
+     @MainActor
+     override func setUp() async throws {
+         // pre load the workspace with account info,
+         // Account infomation is access in mutliple areas, hot loading in workspace
+         // instead of fetch db frequently.
+         @Shared(.wsValues) var workspaceValues
+         workspaceValues.accountsOnBudgetNames = Factory.accountIdAndName
+     }
+
+     override func tearDown() async throws {
+         try? store.dependencies.database.swiftData.delete(model: SavedReport.self)
+     }
+
     @MainActor
     func testSavingNewReport() async throws {
-        store = createStoreWithNewReport()
+        store = Factory.createTestStore(sourceData: Factory.newSourceData)
 
+        XCTAssertTrue(store.state.inputFields.isRunReportDisabled)
+
+        // select accounts for report
+        store.state.inputFields.workspaceValues
+            .updateSelectedAccountIds(ids: "account3ID,account1ID")
+        XCTAssertFalse(store.state.inputFields.isRunReportDisabled)
+
+        // dont check the chartGraph value
         store.exhaustivity = .off
-        // perform transaction fetch
-//        await store.send(\.inputFields.delegate.fetchedTransactions, .mocksTwo)
-        await store.receive(\.chartDisplayed)
+        // initiate report run from inputFields delegate,
+        await store.send(\.inputFields.delegate.reportReadyToRun)
+        await store.receive(\.chartDisplayed) {
+            $0.scrollToId = "GraphChartContainer"
+        }
 
         store.exhaustivity = .on
         await store.send(.doneButtonTapped) {
-            $0.confirmationDialog = Self.expectedNewConfirmationDialog
-            $0.scrollToId = "GraphChartContainer"
+            // prompts save
+            $0.confirmationDialog = Factory.expectedNewConfirmationDialog
         }
 
         await store.send(.confirmationDialog(.presented(.saveNewReport))) {
             $0.confirmationDialog = nil
             $0.showSavedReportNameAlert = true
-            $0.savedReportName = "1 May 2024 - 23 May 2024"
+            $0.savedReportName = "2024 Jan - Mar, First Account, Third Account"
         }
 
         let savedReportQuery = store.dependencies.savedReportQuery
-        let initialSavedReportCount = try savedReportQuery.fetchCount(.init())
+        let savedReportCount = try savedReportQuery.fetchCount(.init())
+        XCTAssertEqual(savedReportCount, 0)
+
         await store.send(.savedReportName(shouldSave: true)) {
             $0.showSavedReportNameAlert = false
         }
 
         // Verify new report successfully persisted
         let updatedSavedReportCount = try savedReportQuery.fetchCount(.init())
-        XCTAssertEqual(initialSavedReportCount + 1, updatedSavedReportCount)
+        XCTAssertEqual(updatedSavedReportCount, 1)
     }
 
     @MainActor
     func testUpdatingSavedReport() async throws {
-        let savedReport = createSavedReport()
-        store = try createStoreWithSavedReport(savedReport)
+        let savedReport = Factory.createSavedReport()
+        store = Factory.createTestStore(sourceData: .existing(savedReport))
 
-        // Make a change to inputfield values. This indicates saved report needs updating
+        // verify saved report was persisted
+        let savedReportQuery = store.dependencies.savedReportQuery
+        let savedReports = try savedReportQuery.fetchAll()
+        XCTAssertEqual(savedReports.count, 1)
+        XCTAssertEqual(try XCTUnwrap(savedReports.first?.id), savedReport.id)
+
+        // verify all input fields are valid and report can run
+        XCTAssertFalse(store.state.inputFields.isRunReportDisabled)
+
+        await store.send(.onAppear) {
+            $0.inputFields
+                .workspaceValues
+                .selectedAccountIdsSet = Set(["account2ID", "account3ID"])
+        }
+        await store.receive(\.reportReadyToRun) {
+            $0.chartGraph = .spendingByTotal(
+                .init(
+                    title: "Spending Total",
+                    budgetId: savedReport.budgetId,
+                    startDate: Date.local.date(from: savedReport.fromDate)!,
+                    finishDate: Date.local.date(from: savedReport.toDate)!,
+                    accountIds: self.store.state.inputFields.selectedAccountIds
+                )
+            )
+        }
+        await store.receive(\.chartDisplayed) {
+            $0.scrollToId = "GraphChartContainer"
+        }
+
+        // Make a change to input field values. This indicates saved report needs updating
         let toDate = Date.now.advanced(by: 3600)
         await store.send(\.inputFields.updateToDateTapped, toDate) {
             $0.inputFields.toDate = toDate
         }
 
         await store.send(.doneButtonTapped) {
-            $0.confirmationDialog = Self.expectedUpdateExistingConfirmationDialog
+            $0.confirmationDialog = Factory.expectedUpdateExistingConfirmationDialog
         }
 
         await store.send(.confirmationDialog(.presented(.updateExistingReport))) {
@@ -71,113 +125,84 @@ final class ReportFeatureTests: XCTestCase {
         XCTAssertNotEqual(initialToDate, savedReport.toDate)
     }
 
-    @MainActor
-    func testFetchedTransactionsDisplaySelectedGraph() async throws {
-        store = createStoreWithNewReport()
-
-        // only interested in state changes made in this feature and ignore
-        // the  transactions values set in the state object for ChartGraph.spendingByTotal
-        store.exhaustivity = .off
-
-        // When a input fields view returns fetched transactions.
-        // The delegate updates the Reports view accordingly with the selected report type.
-        XCTAssertNil(store.state.chartGraph)
-//        await store.send(\.inputFields.delegate.fetchedTransactions, .mocksTwo) {
-//            $0.scrollToId = nil
-//        }
-        XCTAssertNotNil(store.state.chartGraph)
-        guard case .spendingByTotal = store.state.chartGraph else {
-            XCTFail("Expected \(ChartType.spendingByTotal) but got \(String(describing: store.state.chartGraph))")
-            return
-        }
-        await store.receive(\.chartDisplayed) {
-            $0.scrollToId = "GraphChartContainer"
-        }
-    }
-
-    @MainActor
-    func testTransactionHistoryUpdatedDestination() async throws {
-        store = Factory.createStoreWithNewReport()
-
-        // Given
-        store.exhaustivity = .off
-//        await store.send(\.inputFields.delegate.fetchedTransactions, .mocksTwo)
-        await store.receive(\.chartDisplayed)
-
-        // When
-        store.exhaustivity = .on
-        await store.send(\.chartGraph.spendingByTotal.delegate.categoryTapped, .mocksTwo) {
-            $0.destination = .transactionHistory(.init(transactions: .mocksTwo, title: "Taxi / Uber"))
-        }
-    }
-
 }
 
+/// Extract to make tests call sites code more readable with verbose data structures given
+/// descriptive names below
 private enum Factory {
 
-    // assume first entry is the .spendingByTotal chart type.
-    static let chart = ReportChart.firstChart
-    static let fromDate = Date.dateFormatter.date(from: "2024/05/01")!
-    static let toDate = Date.dateFormatter.date(from: "2024/05/23")!
+    typealias SourceData = ReportFeature.State.SourceData
+    typealias ChartGraph = ReportFeature.ChartGraph
+    typealias Action = ReportFeature.Action
+    typealias Destination = ReportFeature.Destination
 
-    static var budgetId: String {
-        IdentifiedArrayOf<BudgetSummary>.mocks[0].id
+    static let budgetId = "budget1ID"
+    static let fromDate = Date.local.date(from: "2024-01-01")!
+    static let toDate = Date.local.date(from: "2024-03-31")!
+
+    static var mocksTwo: [TransactionEntry] {
+        IdentifiedArrayOf<TransactionEntry>.mocksTwo.elements
     }
 
-    static func createStoreWithNewReport() -> TestStoreOf<ReportFeature> {
+    static var newSourceData: SourceData {
+        .new(
+            .init(
+                chart: .firstChart,
+                budgetId: budgetId,
+                fromDate: fromDate,
+                toDate: toDate
+            )
+        )
+    }
+
+    static let accountIdAndName = [
+        "account1ID": "First Account",
+        "account2ID": "Second Account",
+        "account3ID": "Third Account",
+    ]
+
+    static func createTestStore(
+        sourceData: SourceData,
+        chartGraph: ChartGraph.State? = nil,
+        confirmationDialog: ConfirmationDialogState<Action.ConfirmationDialog>? = nil,
+        destination: Destination.State? = nil,
+        scrollToId: String? = nil,
+        showSavedReportNameAlert: Bool = false
+    ) -> TestStoreOf<ReportFeature> {
         TestStore(
-            initialState: try! .init(
-                sourceData: .new(
-                    .init(
-                        chart: chart,
-                        budgetId: budgetId,
-                        fromDate: fromDate,
-                        toDate: toDate
-                    )
-                )
+            initialState: try! ReportFeature.State(
+                sourceData: sourceData,
+                chartGraph: chartGraph,
+                confirmationDialog: confirmationDialog,
+                destination: destination,
+                scrollToId: scrollToId,
+                showSavedReportNameAlert: showSavedReportNameAlert
             )
         ) {
             ReportFeature()
         } withDependencies: {
-            $0.savedReportQuery = .liveValue
+            $0.continuousClock = ImmediateClock()
+
+            // persist a savedReport into SwiftData if one is provided
+            if case let .existing(savedReport) = sourceData {
+                try! $0.savedReportQuery.add(savedReport)
+            }
         }
     }
 
-    static func createStoreWithSavedReport(_ savedReport: SavedReport) throws -> TestStoreOf<ReportFeature> {
-        @Dependency(\.database) var database
-        let ctx = database.swiftData
-        ctx.insert(savedReport)
-        try ctx.save()
-
-        return TestStore(
-            initialState: try! .init(sourceData: .existing(savedReport))
-        ) {
-            ReportFeature()
-
-        } withDependencies: {
-            $0.savedReportQuery = .liveValue
-        }
-    }
-
-    func createSavedReport() -> SavedReport {
+    static func createSavedReport() -> SavedReport {
         .init(
             name: "My First Report",
             fromDate: "2024-01-01",
             toDate: "2024-01-30",
-            chartId: "spendingTotal",
-            lastModified: Date.dateFormatter.date(from: "2024-02-02")!
+            chartId: ReportChart.firstChart.id,
+            budgetId: budgetId,
+            selectedAccountIds: "account2ID,account3ID",
+            lastModified: Date.local.date(from: "2024-02-02")!
         )
     }
 
-}
-
-// MARK: - Expected Data Values
-
-// Extract to make tests call sites code more readable with verbose data structures given
-// descriptive names below
-private extension ReportFeatureTests {
-
-    static var expectedNewConfirmationDialog: ConfirmationDialogState<ReportFeature.Action.ConfirmationDialog> {
+    static var expectedNewConfirmationDialog: ConfirmationDialogState<Action.ConfirmationDialog> {
         .init {
             TextState("")
         } actions: {
@@ -195,8 +220,7 @@ private extension ReportFeatureTests {
         }
     }
 
-    static var expectedUpdateExistingConfirmationDialog:
-    ConfirmationDialogState<ReportFeature.Action.ConfirmationDialog> {
+    static var expectedUpdateExistingConfirmationDialog: ConfirmationDialogState<Action.ConfirmationDialog> {
         .init {
             TextState("")
         } actions: {
@@ -213,11 +237,5 @@ private extension ReportFeatureTests {
             TextState("Update Saved Report?")
         }
     }
-}
 
-private extension Array where Element == TransactionEntry {
-
-    static let mocksTwo: Self = {
-        IdentifiedArrayOf<TransactionEntry>.mocksTwo.elements
-    }()
 }

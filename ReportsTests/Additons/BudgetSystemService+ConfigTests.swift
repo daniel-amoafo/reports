@@ -42,11 +42,15 @@ final class BudgetSystemServiceConfigTests: XCTestCase {
         try await withMainSerialExecutor {
             // when
             XCTAssertTrue(env.client.budgetSummaries.isEmpty)
-            _ = try await env.client.fetchBudgetSummaries()
-            await Task.megaYield()
-            // then
-            XCTAssertTrue(env.client === BudgetClient.notAuthorizedClient)
-            XCTAssertTrue(env.client.budgetSummaries.isEmpty)
+            await assertThrowsAsyncError(
+                try await env.client.fetchBudgetSummaries()
+            ) { error in
+                guard let budgetClientError = error as? BudgetClientError else {
+                    XCTFail("Expected a \(String(describing: BudgetClientError.self)) error")
+                    return
+                }
+                XCTAssertEqual(budgetClientError.code, "401")
+            }
         }
     }
 }

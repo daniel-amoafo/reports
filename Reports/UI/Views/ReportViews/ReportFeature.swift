@@ -8,7 +8,7 @@ import Foundation
 struct ReportFeature {
 
     @ObservableState
-    struct State {
+    struct State: Equatable {
 
         enum SourceData {
             case new(ReportInputFeature.State)
@@ -53,7 +53,7 @@ struct ReportFeature {
 
         var hasUnsavedChanges: Bool {
             if let savedReport {
-                // compare if saved report input fields are equal to current input field values.
+                // compare if saved report fields are equal to current input field values.
                 // if not, there are unsaved changes
                 return !inputFields.isEqual(to: savedReport)
             }
@@ -209,11 +209,10 @@ struct ReportFeature {
                 if state.hasUnsavedChanges {
                     state.confirmationDialog = makeConfirmDialog(isNew: state.savedReport == nil)
                     return .none
-                } else {
-                    return .run { _ in
-                        if isPresented {
-                            await dismiss()
-                        }
+                }
+                return .run { _ in
+                    if isPresented {
+                        await dismiss()
                     }
                 }
 

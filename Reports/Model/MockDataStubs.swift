@@ -5,6 +5,7 @@ import Foundation
 import GRDB
 import IdentifiedCollections
 import MoneyCommon
+import SwiftData
 
 private typealias Category = BudgetSystemService.Category
 /**
@@ -37,7 +38,16 @@ enum MockData {
 
         try grdb.save(records: records)
 
-        debugPrint("inserted mock records into db (\(records.count))")
+        debugPrint("inserted mock records into grdb (\(records.count))")
+    }
+
+     static func insertSavedReport(_ context: ModelContext) throws {
+         for report in SavedReport.mocks {
+             context.insert(report)
+         }
+         try context.save()
+
+         debugPrint("inserted mock records into modelContext (\(SavedReport.mocks.count))")
     }
 
     static func insertConfigData(_ config: ConfigProvider) {

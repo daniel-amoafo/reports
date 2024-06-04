@@ -24,7 +24,7 @@ struct SavedReportsFeature {
                 )
                 return ""
             }
-            return workspaceValues.accountNames(for: ids) ?? ""
+            return workspaceValues.accountOnBudgetNames(for: ids) ?? ""
         }
 
         static func loadAccountNames(for maybeBudgetId: String?) -> [String: String] {

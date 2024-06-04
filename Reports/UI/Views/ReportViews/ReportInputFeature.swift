@@ -30,7 +30,7 @@ struct ReportInputFeature {
             self.budgetId = budgetId
             self.fromDate = fromDate
             self.toDate = toDate
-            self.workspaceValues.updateSelecteAccountIds(ids: selectedAccountIds)
+            self.workspaceValues.updateSelectedAccountIds(ids: selectedAccountIds)
         }
 
         var selectedAccountIds: String? {

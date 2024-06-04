@@ -12,20 +12,19 @@ enum ModelContextFactory {
         return ModelContext(container)
     }
 
-    static func makeMock() throws -> ModelContext {
+    static func makeMock(insertSampleData: Bool) throws -> ModelContext {
         let savedReport = ModelConfiguration(for: SavedReport.self, isStoredInMemoryOnly: true)
 
         let container = try ModelContainer(for: schema, configurations: savedReport)
         let context = ModelContext(container)
-        for report in SavedReport.mocks {
-            context.insert(report)
+        if insertSampleData {
+            do {
+                try MockData.insertSavedReport(context)
+            } catch {
+                debugPrint(error)
+            }
         }
-        do {
-            try context.save()
-        } catch {
-            debugPrint("\(error.toString())")
-        }
-        return ModelContext(container)
+        return context
     }
 
     private static var schema: Schema {

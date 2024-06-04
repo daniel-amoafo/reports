@@ -8,7 +8,11 @@ import Foundation
 /// To be used with the `@Shared` TCA  fixture.
 struct WorkspaceValues: Equatable {
 
+    /// Dictionary of Account Id as key and Name as value
     var accountsOnBudgetNames = [String: String]()
+
+    /// scratch area for screen to set the selected account ids.
+    /// Used by the `ReportInputFeature` and `SelectAccountsFeature` to communicate which  account ids are selected
     var selectedAccountIdsSet = Set<String>()
 }
 
@@ -24,16 +28,16 @@ extension WorkspaceValues {
     }
 
     var selectedAccountOnBudgetIdNames: String? {
-        accountNames(for: selectedAccountIdsSet)
+        accountOnBugetNames(for: selectedAccountIdsSet)
     }
 
-    func accountNames(for ids: String?) -> String? {
+    func accountOnBudgetNames(for ids: String?) -> String? {
         guard let ids else { return nil }
         let set = makeSet(for: ids)
-        return accountNames(for: set)
+        return accountOnBugetNames(for: set)
     }
 
-    func accountNames(for ids: Set<String>) -> String? {
+    func accountOnBugetNames(for ids: Set<String>) -> String? {
         let accounts = accountsOnBudgetNames
         guard ids.isNotEmpty else { return nil }
         if ids.count == accounts.count {
@@ -45,11 +49,12 @@ extension WorkspaceValues {
         let names = accounts
             .filter { ids.contains($0.key) }
             .map(\.value)
+            .sorted()
             .joined(separator: ", ")
         return names
     }
 
-    mutating func updateSelecteAccountIds(ids: String?) {
+    mutating func updateSelectedAccountIds(ids: String?) {
         guard let ids else {
             selectedAccountIdsSet = .init()
             return

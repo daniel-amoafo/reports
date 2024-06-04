@@ -28,12 +28,12 @@ extension Database: DependencyKey {
     )
 
     static let testValue = Self(
-        swiftData: { try ModelContextFactory.makeMock() },
+        swiftData: { try ModelContextFactory.makeMock(insertSampleData: false) },
         grdb: { try GRDBDatabase.makeMock(insertSampleData: false) }
     )
 
     static let previewValue = Self(
-        swiftData: { try ModelContextFactory.makeMock() },
+        swiftData: { try ModelContextFactory.makeMock(insertSampleData: true) },
         grdb: { try GRDBDatabase.makeMock(insertSampleData: true) }
     )
 

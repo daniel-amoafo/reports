@@ -1,7 +1,7 @@
 // Created by Daniel Amoafo on 9/5/2024.
 
 import BudgetSystemService
-import Dependencies
+import ComposableArchitecture
 import Foundation
 
 // Due to a Swift bug not allowing extensions to be defined on objects that have macro annotations.
@@ -30,11 +30,11 @@ enum ReportFeatureSourceLoader {
                     "\(String(describing: SavedReport.self)) chart id (\(report.chartId)) not found."
                 )
             }
-            guard let fromDate = Date.iso8601utc.date(from: report.fromDate) else {
+            guard let fromDate = Date.iso8601local.date(from: report.fromDate) else {
                 logger.error("\(String(describing: SavedReport.self)) fromDate parsing error (\(report.fromDate)).")
                 throw LoadError.invalidDateFormat(String(format: Strings.invalidDate, "(\(report.fromDate)"))
             }
-            guard let toDate = Date.iso8601utc.date(from: report.toDate) else {
+            guard let toDate = Date.iso8601local.date(from: report.toDate) else {
                 logger.debug("\(String(describing: SavedReport.self)) toDate parsing error (\(report.toDate)).")
                 throw LoadError.invalidDateFormat(Strings.invalidDate)
             }
@@ -42,12 +42,13 @@ enum ReportFeatureSourceLoader {
             let selectedAcountIds: String?
             do {
                 if case let accountIdsString = report.selectedAccountIds, accountIdsString.isNotEmpty {
-                    let allAccounts = try Account.fetchAll(budgetId: budgetId).map(\.id)
+                    @Shared(.wsValues) var workspaceValues
+                    let accountNames = workspaceValues.accountsOnBudgetNames
                     let accountIds = accountIdsString
                         .split(separator: ",")
                         .map { String($0) }
 
-                    guard accountIds.allSatisfy({ allAccounts.contains($0) }) else {
+                    guard accountIds.allSatisfy({ accountNames.keys.contains($0) }) else {
                         logger.error(
                             "\(String(describing: SavedReport.self)) - invalid account id(s) in (\(accountIdsString))."
                         )

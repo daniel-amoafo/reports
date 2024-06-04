@@ -22,18 +22,11 @@ struct SavedReportQuery {
 
 extension SavedReportQuery: DependencyKey {
 
-    static let liveValue = Self.live
+    static let liveValue = Self.impl
 
-    static let testValue = Self(
-        fetchAll: unimplemented("\(Self.self).fetch"),
-        fetch: unimplemented("\(Self.self).fetchDescriptor"),
-        fetchCount: unimplemented("\(Self.self).fetchCountDescriptor"),
-        add: unimplemented("\(Self.self).add"),
-        delete: unimplemented("\(Self.self).delete")
-    )
-
-    // Previews use an in memory modelContext so data is not written to a persistent database.
-    static var previewValue = Self.live
+    // tests & previews use an in memory modelContext so data is not written to a persistent database.
+    static let testValue = Self.impl
+    static var previewValue = Self.impl
 }
 
 private extension SavedReportQuery {
@@ -45,7 +38,7 @@ private extension SavedReportQuery {
         return context
     }
 
-    private static let live = Self {
+    private static let impl = Self {
         do {
             let descriptor = FetchDescriptor<SavedReport>(
                 sortBy: [SortDescriptor(\.lastModifield, order: .reverse)]

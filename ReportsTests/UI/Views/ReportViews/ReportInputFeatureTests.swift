@@ -5,99 +5,119 @@ import ComposableArchitecture
 @testable import Reports
 import XCTest
 
-// final class ReportInputFeatureTests: XCTestCase {
-//
-//    var store: TestStoreOf<ReportInputFeature>!
-//    let chart = ReportChart.firstChart
-//    let startDate = Date.dateFormatter.date(from: "2024/01/01")!
-//    let endDate = Date.dateFormatter.date(from: "2025/05/31")!
-//
-//    @MainActor
-//    override func setUp() async throws {
-//        store = TestStore(
-//            initialState: .init(
-//                chart: chart,
-//                fromDate: startDate,
-//                toDate: endDate
-//            )
-//        ) {
-//            ReportInputFeature()
-//        }
-//    }
+final class ReportInputFeatureTests: XCTestCase {
 
-//    func testDateChangesLogic() async throws {
-//
-//        XCTAssertEqual(store.state.fromDate, startDate)
-//        let newFromDate = Date.dateFormatter.date(from: "2025/01/01")!
-//        await store.send(.updateFromDateTapped(newFromDate)) {
-//            $0.fromDate = Date.dateFormatter.date(from: "2025/01/01")!
-//        }
-//
-//        XCTAssertEqual(store.state.toDate, endDate)
-//        let newToDate = Date.dateFormatter.date(from: "2025/03/30")!
-//        await store.send(.updateToDateTapped(newToDate)) {
-//            $0.toDate = Date.dateFormatter.date(from: "2025/03/30")!
-//        }
-//
-//        // following date changes ensure dates cannot have invalid range
-//        // i.e.where endDate is before start date
-//        let fromDateAfterPreviousToDate = Date.dateFormatter.date(from: "2025/06/01")!
-//        await store.send(.updateFromDateTapped(fromDateAfterPreviousToDate)) {
-//            $0.fromDate = Date.dateFormatter.date(from: "2025/06/01")!
-//            // toDate is updated to last day in the same month as fromDate
-//            $0.toDate =  Date.dateFormatter.date(from: "2025/06/01")!.lastDayInMonth()
-//        }
-//
-//        let afromDate = Date.dateFormatter.date(from: "2023/10/01")!
-//        await store.send(.updateFromDateTapped(afromDate)) {
-//            $0.fromDate = Date.dateFormatter.date(from: "2023/10/01")!
-//        }
-//
-//        let beforeFromDate = Date.dateFormatter.date(from: "2022/07/01")!
-//        await store.send(.updateToDateTapped(beforeFromDate)) {
-//            $0.toDate = afromDate.lastDayInMonth()
-//        }
-//    }
+    var store: TestStoreOf<ReportInputFeature>!
 
-//    func testStateChangeUpdates() async throws {
-//        await store.send(.chartMoreInfoTapped) {
-//            $0.showChartMoreInfo = true
-//        }
-//
-//        XCTAssertEqual(store.state.showAccountList, false)
-//        await store.send(.selectAccountRowTapped(true)) {
-//            $0.showAccountList = true
-//        }
-//
-//        // selected account values
-//        XCTAssertNil(store.state.selectedAccountId)
-//        XCTAssertNil(store.state.selectedAccountName)
-//        XCTAssertFalse(store.state.isAccountSelected)
-//        XCTAssertTrue(store.state.isRunReportDisabled)
-//        await store.send(.didSelectAccountId("MyUpdatedAccountId")) {
-//            $0.selectedAccountId = "MyUpdatedAccountId"
-//        }
-//        XCTAssertTrue(store.state.isAccountSelected)
-//        XCTAssertFalse(store.state.isRunReportDisabled)
-//
-//        XCTAssertNil(store.state.accounts)
-//        let expectedAllAccount = Account(
-//            id: "CW_ALL_ACCOUNTS",
-//            budgetId: "",
-//            name: "All Accounts",
-//            onBudget: true,
-//            closed: false,
-//            deleted: false
-//        )
-//        var expectedAccounts = IdentifiedArrayOf<Account>.mocks
-//        // The buget client service populates accounts. An All Account entry will be added in the onAppear
-//        // logic if state.account is not initialized with an account list.
-//        expectedAccounts.insert(expectedAllAccount, at: 0)
-//        await store.send(.onAppear) {
-//            $0.selectedAccountId = expectedAllAccount.id
-//            $0.accounts = expectedAccounts
-//        }
-//        XCTAssertEqual(store.state.selectedAccountName, expectedAllAccount.name)
-//    }
-//
-// }
+    @MainActor
+    override func setUp() async throws {
+        @Shared(.wsValues) var workspaceValues
+        workspaceValues.accountsOnBudgetNames = Factory.accountIdAndName
+
+        store = Factory.createTestStore()
+    }
+
+    @MainActor
+    func testChartMoreInfoTapped() async throws {
+        await store.send(.chartMoreInfoTapped) {
+            $0.showChartMoreInfo = true
+        }
+    }
+
+    @MainActor
+    func testDateRangeIsNotInversed() async throws {
+        XCTAssertEqual(store.state.fromDate, Factory.startDate)
+        let newFromDate = Date.local.date(from: "2025/01/01")!
+        await store.send(.updateFromDateTapped(newFromDate)) {
+            $0.fromDate = Date.local.date(from: "2025/01/01")!
+        }
+
+        XCTAssertEqual(store.state.toDate, Factory.endDate)
+        let newToDate = Date.local.date(from: "2025/03/30")!
+        await store.send(.updateToDateTapped(newToDate)) {
+            $0.toDate = Date.local.date(from: "2025/03/30")!
+        }
+
+        // following date changes ensure dates cannot have invalid range
+        // i.e. where endDate is before start date
+        let fromDateIsAfterToDate = Date.local.date(from: "2025/06/01")!
+        await store.send(.updateFromDateTapped(fromDateIsAfterToDate)) {
+            $0.fromDate = Date.local.date(from: "2025/06/01")!
+            // toDate is updated to last day in the same month as fromDate
+            $0.toDate = Date.local.date(from: "2025/06/01")!.lastDayInMonth()
+        }
+
+        let afromDate = Date.local.date(from: "2023/10/01")!
+        await store.send(.updateFromDateTapped(afromDate)) {
+            $0.fromDate = Date.local.date(from: "2023/10/01")!
+        }
+
+        let beforeFromDate = Date.local.date(from: "2022/07/01")!
+        await store.send(.updateToDateTapped(beforeFromDate)) {
+            $0.toDate = afromDate.lastDayInMonth()
+        }
+    }
+
+    @MainActor
+    func testSelectAccounts() async throws {
+        // Given
+
+        await store.send(.selectAccountRowTapped) {
+            $0.selectedAccounts = .init(budgetId: Factory.budgetId)
+        }
+
+        // selected account values
+        XCTAssertNil(store.state.selectedAccountIds)
+        XCTAssertTrue(store.state.selectedAccountIdsSet.isEmpty)
+        XCTAssertFalse(store.state.isAccountSelected)
+        XCTAssertTrue(store.state.isRunReportDisabled)
+
+        // WHEN
+        // update the shared workspace selected Account ids. This should be reflected back in state model
+        store.state.workspaceValues.updateSelectedAccountIds(ids: "account2ID,account1ID")
+
+        // verify
+        XCTAssertNotNil(store.state.selectedAccountIds)
+        XCTAssertEqual(store.state.selectedAccountIdsSet.count, 2)
+        XCTAssertTrue(store.state.isAccountSelected)
+        XCTAssertFalse(store.state.isRunReportDisabled)
+        XCTAssertEqual(store.state.selectedAccountNames, "First Account, Second Account")
+    }
+
+ }
+
+// MARK: - Factory
+
+private enum Factory {
+
+    static let chart = ReportChart.firstChart
+    static let startDate = Date.local.date(from: "2024/01/01")!
+    static let endDate = Date.local.date(from: "2025/05/31")!
+    static let budgetId = "Budget1ID"
+    static let accountIdAndName = [
+        "account1ID": "First Account",
+        "account2ID": "Second Account",
+        "account3ID": "Third Account",
+    ]
+
+    static func createTestStore(
+        chart: ReportChart = Factory.chart,
+        budgetId: String = Factory.budgetId,
+        fromDate: Date = Factory.startDate,
+        toDate: Date = Factory.endDate,
+        selectedAccountIds: String? = nil
+    ) -> TestStoreOf<ReportInputFeature> {
+        TestStore(
+            initialState: .init(
+                chart: Factory.chart,
+                budgetId: Factory.budgetId,
+                fromDate: Factory.startDate,
+                toDate: Factory.endDate,
+                selectedAccountIds: selectedAccountIds
+            )
+        ) {
+            ReportInputFeature()
+        }
+    }
+
+}
