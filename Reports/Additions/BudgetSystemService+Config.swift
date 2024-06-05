@@ -50,7 +50,7 @@ extension BudgetClient {
 extension BudgetClient: DependencyKey {
 
     public static var liveValue: BudgetClient {
-        if case .loggedIn = _liveValue.authorizationStatus {
+        if _liveValue.authorizationStatus == .loggedIn {
             // use the cached client if logged in.
             return _liveValue
         }

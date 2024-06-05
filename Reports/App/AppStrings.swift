@@ -26,4 +26,8 @@ enum AppStrings {
         comment: "A label indicating a few accounts have been selected for the report."
     )
 
+    static let allCategoriesTitle = String(
+        localized: "All Categories",
+        comment: "The collective name for top level category groups"
+    )
 }

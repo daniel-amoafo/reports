@@ -32,7 +32,7 @@ enum ReportFeatureSourceLoader {
             }
             guard let fromDate = Date.iso8601local.date(from: report.fromDate) else {
                 logger.error("\(String(describing: SavedReport.self)) fromDate parsing error (\(report.fromDate)).")
-                throw LoadError.invalidDateFormat(String(format: Strings.invalidDate, "(\(report.fromDate)"))
+                throw LoadError.invalidDateFormat(String(format: Strings.invalidDate, "(\(report.fromDate))."))
             }
             guard let toDate = Date.iso8601local.date(from: report.toDate) else {
                 logger.debug("\(String(describing: SavedReport.self)) toDate parsing error (\(report.toDate)).")

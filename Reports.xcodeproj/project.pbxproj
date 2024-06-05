@@ -77,6 +77,7 @@
 		18A514C92BD5001300B072DE /* SpendingTotalChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A514C82BD5001300B072DE /* SpendingTotalChartView.swift */; };
 		18BC9F402C0DE62C003B1E3D /* WorkspaceValues.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18BC9F3F2C0DE62C003B1E3D /* WorkspaceValues.swift */; };
 		18BC9F422C0F52C4003B1E3D /* AsynchronousTestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18BC9F412C0F52C4003B1E3D /* AsynchronousTestHelpers.swift */; };
+		18BC9F442C100D16003B1E3D /* SpendingTotalChartFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18BC9F432C100D16003B1E3D /* SpendingTotalChartFeature.swift */; };
 		18C3BFB02B81874000E444C8 /* AppIntroLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C3BFAF2B81874000E444C8 /* AppIntroLoginView.swift */; };
 		18C3BFB22B820AEA00E444C8 /* SFSafariView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C3BFB12B820AEA00E444C8 /* SFSafariView.swift */; };
 		18C3BFB72B820DD000E444C8 /* Binding+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C3BFB62B820DD000E444C8 /* Binding+Additions.swift */; };
@@ -199,6 +200,7 @@
 		18A514C82BD5001300B072DE /* SpendingTotalChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendingTotalChartView.swift; sourceTree = "<group>"; };
 		18BC9F3F2C0DE62C003B1E3D /* WorkspaceValues.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceValues.swift; sourceTree = "<group>"; };
 		18BC9F412C0F52C4003B1E3D /* AsynchronousTestHelpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AsynchronousTestHelpers.swift; sourceTree = "<group>"; };
+		18BC9F432C100D16003B1E3D /* SpendingTotalChartFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendingTotalChartFeature.swift; sourceTree = "<group>"; };
 		18C3BFAE2B806A7500E444C8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		18C3BFAF2B81874000E444C8 /* AppIntroLoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIntroLoginView.swift; sourceTree = "<group>"; };
 		18C3BFB12B820AEA00E444C8 /* SFSafariView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SFSafariView.swift; sourceTree = "<group>"; };
@@ -469,6 +471,7 @@
 			isa = PBXGroup;
 			children = (
 				18A514C82BD5001300B072DE /* SpendingTotalChartView.swift */,
+				18BC9F432C100D16003B1E3D /* SpendingTotalChartFeature.swift */,
 				188A8E3F2BF21D1E00938B81 /* SpendingTrendChartView.swift */,
 			);
 			path = Graphs;
@@ -802,6 +805,7 @@
 				188A8E402BF21D1E00938B81 /* SpendingTrendChartView.swift in Sources */,
 				18A514C92BD5001300B072DE /* SpendingTotalChartView.swift in Sources */,
 				188AA90A2BF8807D0032F170 /* Models+GRDB.swift in Sources */,
+				18BC9F442C100D16003B1E3D /* SpendingTotalChartFeature.swift in Sources */,
 				189641BE2B9D675900716258 /* SettingsView.swift in Sources */,
 				183ECBC72B70E5DD006C45B2 /* SecureKeyValueStore.swift in Sources */,
 				186A80F52BCC013F0015FFC7 /* BottomShadowViewModifier.swift in Sources */,

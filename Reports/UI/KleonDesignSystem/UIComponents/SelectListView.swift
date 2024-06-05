@@ -89,7 +89,7 @@ struct SelectListView<Element: Identifiable & CustomStringConvertible>: View {
                         }
                     }
                     .backgroundShadow()
-                    .padding(.horizontal)
+                    .padding()
                     .toolbar {
                         if showDoneButton {
                             Button(AppStrings.doneButtonTitle) {
