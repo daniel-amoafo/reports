@@ -5,6 +5,11 @@ import ComposableArchitecture
 import Foundation
 import MoneyCommon
 
+enum CategoryType: Equatable {
+    case group
+    case subCategories
+}
+
 @Reducer
 struct SpendingTotalChartFeature {
 
@@ -14,12 +19,12 @@ struct SpendingTotalChartFeature {
         let startDate: Date
         let finishDate: Date
         let accountIds: String?
-        var contentType: SpendingTotalChartFeature.ContentType = .categoryGroup
+        var contentType: CategoryType = .group
 
         var rawSelectedGraphValue: Decimal?
         var selectedGraphItem: CategoryRecord?
 
-        fileprivate var categoryGroups: [CategoryRecord] = []
+        fileprivate let categoryGroups: [CategoryRecord]
 
         // Categories for a given categoryGroup.
         // Updated when user selects a categoryGroup to inspect
@@ -45,18 +50,18 @@ struct SpendingTotalChartFeature {
 
         var selectedContent: [CategoryRecord] {
             switch contentType {
-            case .categoryGroup:
+            case .group:
                 return categoryGroups
-            case .categoriesByCategoryGroup:
+            case .subCategories:
                 return catgoriesForCategoryGroup
             }
         }
 
         var totalName: String {
             switch contentType {
-            case .categoryGroup:
+            case .group:
                 return AppStrings.allCategoriesTitle
-            case .categoriesByCategoryGroup:
+            case .subCategories:
                 return String(format: Strings.categoryNameTotal, (catgoriesForCategoryGroupName ?? ""))
             }
         }
@@ -73,20 +78,20 @@ struct SpendingTotalChartFeature {
 
         var listSubTitle: String {
             switch contentType {
-            case .categoryGroup, .categoriesByCategoryGroup:
+            case .group, .subCategories:
                 return AppStrings.allCategoriesTitle
             }
         }
 
         var isDisplayingSubCategory: Bool {
-            contentType == .categoriesByCategoryGroup
+            contentType == .subCategories
         }
 
         var maybeCategoryName: String? {
             switch contentType {
-            case .categoryGroup:
+            case .group:
                 return nil
-            case .categoriesByCategoryGroup:
+            case .subCategories:
                 return catgoriesForCategoryGroupName
             }
         }
@@ -105,14 +110,6 @@ struct SpendingTotalChartFeature {
             case categoryTapped(IdentifiedArrayOf<TransactionEntry>)
         }
     }
-
-    enum ContentType: Equatable {
-        case categoryGroup
-        case categoriesByCategoryGroup
-    }
-
-    @Dependency(\.budgetClient) var budgetClient
-    @Dependency(\.database.grdb) var grdb
 
     let logger = LogFactory.create(Self.self)
 
@@ -145,13 +142,13 @@ struct SpendingTotalChartFeature {
             case let .catgoriesForCategoryGroupFetched(records, categoryGroupName):
                 state.catgoriesForCategoryGroup = records
                 state.catgoriesForCategoryGroupName = categoryGroupName
-                state.contentType = .categoriesByCategoryGroup
+                state.contentType = .subCategories
                 state.selectedGraphItem = nil
                 return .none
 
             case let .listRowTapped(id):
                 switch state.contentType {
-                case .categoryGroup:
+                case .group:
                     let (records, groupName) = SpendingTotalQueries.fetchCategoryTotals(
                         categoryGroupId: id,
                         startDate: state.startDate,
@@ -160,7 +157,7 @@ struct SpendingTotalChartFeature {
                     )
                     return .send(.catgoriesForCategoryGroupFetched(records, groupName), animation: .smooth)
 
-                case .categoriesByCategoryGroup:
+                case .subCategories:
                     let transactions = SpendingTotalQueries.fetchTransactionEntries(
                         for: id,
                         startDate: state.startDate,
@@ -171,7 +168,7 @@ struct SpendingTotalChartFeature {
                 }
 
             case .subTitleTapped:
-                state.contentType = .categoryGroup
+                state.contentType = .group
                 state.catgoriesForCategoryGroup = []
                 state.catgoriesForCategoryGroupName = nil
                 state.selectedGraphItem = nil
@@ -271,7 +268,7 @@ private enum Strings {
 
     static let categoryNameTotal = String(
         localized: "%@ Total",
-        comment: "A category total. %@ = The selected category "
+        comment: "A category total. %@ = The selected category"
     )
 
 }

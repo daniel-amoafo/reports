@@ -2,17 +2,24 @@
 
 import ComposableArchitecture
 import Foundation
+import MoneyCommon
 
 /// Shared State Object that allows data values used in multiple screens to access
 /// or updated.
-/// To be used with the `@Shared` TCA  fixture.
+/// To be used with the `@Shared` TCA  property wrapper.
 struct WorkspaceValues: Equatable {
 
     /// Dictionary of Account Id as key and Name as value
     var accountsOnBudgetNames = [String: String]()
 
+    /// The currency associated to the selected budget.
+    /// The default value will be overwritten when a budget is selected
+    /// during onboarding see the `AppFeature` syncWorkspaceValues.
+    var budgetCurrency: Currency = Currency.XCD
+
     /// scratch area for screen to set the selected account ids.
-    /// Used by the `ReportInputFeature` and `SelectAccountsFeature` to communicate which  account ids are selected
+    /// Used by the `ReportInputFeature` and `SelectAccountsFeature`
+    /// to communicate which  account ids are selected
     var selectedAccountIdsSet = Set<String>()
 }
 

@@ -111,6 +111,7 @@ struct ReportFeature {
     @Reducer(state: .equatable)
     enum ChartGraph {
         case spendingByTotal(SpendingTotalChartFeature)
+        case spendingByTrend(SpendingTrendChartFeature)
     }
 
     @Reducer(state: .equatable)
@@ -169,12 +170,13 @@ struct ReportFeature {
                     }
                 }
 
-            case .reportReadyToRun, .inputFields(.delegate(.reportReadyToRun)):
+            case .reportReadyToRun,
+                    .inputFields(.delegate(.reportReadyToRun)):
                 let chartTitle = state.inputFields.chart.name
                 switch state.inputFields.chart.type {
                 case .spendingByTotal:
                     state.chartGraph = .spendingByTotal(
-                        .init(
+                        SpendingTotalChartFeature.State(
                             title: chartTitle,
                             budgetId: state.budgetId,
                             startDate: state.inputFields.fromDate,
@@ -183,7 +185,15 @@ struct ReportFeature {
                         )
                     )
                 case .spendingByTrend:
-                    break
+                    state.chartGraph = .spendingByTrend(
+                        SpendingTrendChartFeature.State(
+                            title: chartTitle,
+                            budgetId: state.budgetId,
+                            fromDate: state.inputFields.fromDate,
+                            toDate: state.inputFields.toDate,
+                            accountIds: state.inputFields.selectedAccountIds
+                        )
+                    )
                 case .incomeExpensesTable:
                     break
                 case .line:
@@ -223,8 +233,12 @@ struct ReportFeature {
                 }
                 return .none
 
-            case .inputFields, .chartGraph, .binding,
-                .destination, .confirmationDialog, .showSavedReportNameAlert:
+            case .inputFields,
+                    .chartGraph,
+                    .binding,
+                    .destination,
+                    .confirmationDialog,
+                    .showSavedReportNameAlert:
                 return .none
             }
         }

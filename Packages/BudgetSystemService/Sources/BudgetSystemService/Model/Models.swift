@@ -4,31 +4,6 @@
 import Foundation
 import MoneyCommon
 
-public struct Account: Identifiable, Equatable, Codable, CustomStringConvertible, CustomDebugStringConvertible {
-
-    public var id: String
-    public var budgetId: String
-    public var name: String
-    public var onBudget: Bool
-    public var closed: Bool
-    public var deleted: Bool
-    public var description: String { name }
-
-    public init(id: String, budgetId: String, name: String, onBudget: Bool, closed: Bool, deleted: Bool) {
-        self.id = id
-        self.budgetId = budgetId
-        self.name = name
-        self.onBudget = onBudget
-        self.closed = closed
-        self.deleted = deleted
-    }
-
-
-    public var debugDescription: String {
-        "name: \(name), onBudget: \(onBudget), closed: \(closed), deleted: \(deleted), id: \(id), budgetId: \(budgetId)"
-    }
-}
-
 public struct BudgetSummary: Identifiable, Equatable, Codable, CustomStringConvertible {
     /// Budget id
     public let id: String
@@ -91,6 +66,31 @@ public struct BudgetSummary: Identifiable, Equatable, Codable, CustomStringConve
             currency: currency,
             accounts: []
         )
+    }
+}
+
+public struct Account: Identifiable, Equatable, Codable, CustomStringConvertible, CustomDebugStringConvertible {
+
+    public var id: String
+    public var budgetId: String
+    public var name: String
+    public var onBudget: Bool
+    public var closed: Bool
+    public var deleted: Bool
+    public var description: String { name }
+
+    public init(id: String, budgetId: String, name: String, onBudget: Bool, closed: Bool, deleted: Bool) {
+        self.id = id
+        self.budgetId = budgetId
+        self.name = name
+        self.onBudget = onBudget
+        self.closed = closed
+        self.deleted = deleted
+    }
+
+
+    public var debugDescription: String {
+        "name: \(name), onBudget: \(onBudget), closed: \(closed), deleted: \(deleted), id: \(id), budgetId: \(budgetId)"
     }
 }
 
@@ -228,7 +228,7 @@ public struct TransactionEntry: Identifiable, Equatable, Codable, CustomStringCo
     }
 
     public var dateFormated: String {
-        Date.iso8601utc.string(from: date)
+        Date.iso8601local.string(from: date)
     }
 
     public var dateFormatedLong: String {

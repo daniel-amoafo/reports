@@ -195,15 +195,15 @@ private enum Strings {
         SpendingTotalChartView(
             store: .init(
                 initialState:
-                    .init(
-                        title: "My Chart Name",
-                        budgetId: "Budget1",
-                        startDate: .now.firstDayInMonth(),
-                        finishDate: .now.lastDayInMonth(),
-                        accountIds: nil
-                    )
+                        .init(
+                            title: "My Chart Name",
+                            budgetId: "Budget1",
+                            startDate: Date.distantPast.firstDayInMonth(),
+                            finishDate: .now.lastDayInMonth(),
+                            accountIds: "A1,A2,A3"
+                        )
             ) {
-                 SpendingTotalChartFeature()
+                SpendingTotalChartFeature()
             }
         )
     }

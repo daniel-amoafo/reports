@@ -73,7 +73,8 @@ public class BudgetClient {
     }
 
     @discardableResult
-    public func fetchCategoryValues(budgetId: String, lastServerKnowledge: Int?) async -> ([CategoryGroup], [Category], Int) {
+    public func fetchCategoryValues(budgetId: String, lastServerKnowledge: Int?) async
+    -> (group: [CategoryGroup], categories: [Category], serverKnowledge: Int) {
         logger.debug("fetching category values ...")
         guard isAuthenticated else { return ([], [], 0) }
         do {

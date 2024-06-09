@@ -3,6 +3,7 @@
 import BudgetSystemService
 import Combine
 import ComposableArchitecture
+import MoneyCommon
 import SwiftData
 import SwiftUI
 
@@ -157,7 +158,16 @@ private extension AppFeature {
     /// This reduces database I/O fetches
     func syncWorkspaceValues() throws {
 
-        guard let budgetId = configProvider.selectedBudgetId else { return }
+        guard let budgetId = configProvider.selectedBudgetId else {
+            logger.warning("\(#function) - halted. budgetId not found")
+            return
+        }
+
+        guard let budget = try BudgetSummary.fetch(id: budgetId) else {
+            logger.error("\(#function) - halted. a budget record could not be found for (\(budgetId)")
+            return
+        }
+
         let accounts = try Account.fetchAll(budgetId: budgetId)
 
         let accountNames = accounts.reduce(into: [String: String]()) {
@@ -165,6 +175,7 @@ private extension AppFeature {
         }
         @Shared(.wsValues) var workspaceValues
         workspaceValues.accountsOnBudgetNames = accountNames
+        workspaceValues.budgetCurrency = budget.currency
         logger.debug("Synced workspace values")
     }
 

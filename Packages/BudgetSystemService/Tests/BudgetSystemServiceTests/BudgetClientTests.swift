@@ -20,19 +20,18 @@ final class BudgetClientTests: XCTestCase {
 
     func testFetchCategoryValues() async throws {
         // Given
+        let budgetId = "Budget1"
         let budgetProvider = Factory.createBudgetProvider()
-        sut = BudgetClient(provider: budgetProvider, selectedBudgetId: "Budget1")
+        sut = BudgetClient(provider: budgetProvider, selectedBudgetId: budgetId)
 
-        XCTAssertTrue(sut.categoryGroups.isEmpty)
-        XCTAssertTrue(sut.categories.isEmpty)
 
         _ = try await sut.fetchBudgetSummaries()
 
         // when
-        await sut.fetchCategoryValues()
+        let result = await sut.fetchCategoryValues(budgetId: budgetId, lastServerKnowledge: nil)
         await Task.megaYield()
-        XCTAssertEqual(sut.categoryGroups.elements, Factory.categoryGroup)
-        XCTAssertEqual(sut.categories.elements, Factory.categories)
+        XCTAssertEqual(result.group, Factory.categoryGroup)
+        XCTAssertEqual(result.categories, Factory.categories)
     }
 
     func testUpdateSelectedAccountSuccess() async throws {
@@ -90,13 +89,13 @@ private enum Factory {
     static func createBudgetProvider(
         budgetSummaries: [BudgetSummary]? = nil,
         accounts: [Account]? = nil,
-        categoryValues: ([CategoryGroup],[BudgetSystemService.Category])? = nil,
+        categoryValues: ([CategoryGroup],[BudgetSystemService.Category], Int)? = nil,
         transactions: [TransactionEntry]? = nil
     ) -> BudgetProvider {
         .init {
             budgetSummaries ?? Self.budgetSummaries
         } fetchCategoryValues: { params in
-            categoryValues ?? (categoryGroup, categories)
+            categoryValues ?? (categoryGroup, categories, 100)
         } fetchTransactions: { params in
             transactions ?? Self.transactions
         } fetchAllTransactions: { _ in
@@ -106,23 +105,23 @@ private enum Factory {
 
     static var budgetSummaries: [BudgetSummary] {
         [
-            .init(id: "Budget1", name: "Summary One", lastModifiedOn: "Yesterday", firstMonth: "March", lastMonth: "May", currency: .AUD, accounts: []),
+            .init(id: "Budget1", name: "Summary One", lastModifiedOn: "Yesterday", firstMonth: "March", lastMonth: "May", currency: .AUD, accounts: accounts),
             .init(id: "Budget2", name: "Summary Two", lastModifiedOn: "Days ago", firstMonth: "April", lastMonth: "Jun", currency: .AUD, accounts: [])
         ]
     }
 
     static var accounts: [Account] {
         [
-            .init(id: "01", budgetId: "Budget1", name: "First", onBudget: true, deleted: false),
-            .init(id: "02", budgetId: "Budget1", name: "Second", onBudget: true, deleted: false),
-            .init(id: "03", budgetId: "Budget1", name: "Third", onBudget: true, deleted: false),
+            .init(id: "01", budgetId: "Budget1", name: "First", onBudget: true, closed: false, deleted: false),
+            .init(id: "02", budgetId: "Budget1", name: "Second", onBudget: true, closed: false, deleted: false),
+            .init(id: "03", budgetId: "Budget1", name: "Third", onBudget: true, closed: false, deleted: false),
         ]
     }
 
     static var categoryGroup: [CategoryGroup] {
         [
-            .init(id: "CG1", name: "Fixed Expenses", hidden: false, deleted: false, categoryIds: ["CAT1"]),
-            .init(id: "CG2", name: "Transportation", hidden: false, deleted: false, categoryIds: ["CAT2","CAT3"])
+            .init(id: "CG1", name: "Fixed Expenses", hidden: false, deleted: false, budgetId: "Budget1"),
+            .init(id: "CG2", name: "Transportation", hidden: false, deleted: false, budgetId: "Budget1")
         ]
     }
 
@@ -133,27 +132,24 @@ private enum Factory {
                 categoryGroupId: "GC1",
                 name: "Rent",
                 hidden: false,
-                note: nil,
-                balance: Money(123.45, currency: .AUD),
-                deleted: false
+                deleted: false,
+                budgetId: "Budget1"
             ),
             .init(
                 id: "CAT2",
                 categoryGroupId: "GC2",
                 name: "Train Ticket",
                 hidden: false,
-                note: nil,
-                balance: Money(40.50, currency: .AUD),
-                deleted: false
+                deleted: false,
+                budgetId: "Budget1"
             ),
             .init(
                 id: "CAT3",
                 categoryGroupId: "GC2",
                 name: "Taxi / Uber",
                 hidden: false,
-                note: nil,
-                balance: Money(20.00, currency: .AUD),
-                deleted: false
+                deleted: false,
+                budgetId: "Budget1"
             )
         ]
     }
@@ -171,8 +167,6 @@ private enum Factory {
                 accountName: "Account First",
                 categoryId: "C1",
                 categoryName: "Groceries",
-                categoryGroupId: "CG01",
-                categoryGroupName: "Acme",
                 transferAccountId: nil,
                 deleted: false
             ),
@@ -187,8 +181,6 @@ private enum Factory {
                 accountName: "Account First",
                 categoryId: "C2",
                 categoryName: "Electricity Bill",
-                categoryGroupId: "CG02",
-                categoryGroupName: "Bills",
                 transferAccountId: nil,
                 deleted: false
             ),
@@ -203,8 +195,6 @@ private enum Factory {
                 accountName: "Account Second",
                 categoryId: "C3",
                 categoryName: "Rent",
-                categoryGroupId: "CG03",
-                categoryGroupName: "Home Expenses",
                 transferAccountId: nil,
                 deleted: false
             )

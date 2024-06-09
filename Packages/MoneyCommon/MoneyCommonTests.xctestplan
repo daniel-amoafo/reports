@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "78924F9C-A9F1-445C-A53A-8F55444514B6",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "MoneyCommonTests",
+        "name" : "MoneyCommonTests"
+      }
+    }
+  ],
+  "version" : 1
+}

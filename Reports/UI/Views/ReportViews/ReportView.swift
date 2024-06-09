@@ -74,10 +74,16 @@ private extension ReportView {
 
     var chartGraphView: some View {
         VStack {
-            if let store = self.store.scope(
+            if let store = store.scope(
                 state: \.chartGraph?.spendingByTotal, action: \.chartGraph.spendingByTotal
             ) {
                 SpendingTotalChartView(store: store)
+
+            } else if let store = store.scope(
+                state: \.chartGraph?.spendingByTrend, action:
+                    \.chartGraph.spendingByTrend
+            ) {
+                SpendingTrendChartView(store: store)
             }
         }
         .id(store.chartContainerId)

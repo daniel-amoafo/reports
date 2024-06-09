@@ -5,21 +5,52 @@ import Foundation
 public struct Money: Equatable, Hashable {
 
     /// The amount of money.
-    public let amount: Decimal
+    public let centsAmount: Int
     public let currency: Currency
 
-    /// Creates an amount of money with a given decimal number.
-    public init(_ amount: Decimal, currency: Currency) {
-        self.amount = amount
+    public var amount: Decimal {
+        toMajorUnitAmount as Decimal
+    }
+
+    public init(minorUnitAmount: Int, currency: Currency) {
+        self.centsAmount = minorUnitAmount
         self.currency = currency
     }
 
+    /// Throws an error if <dollarAmount> isn't representable as an exact dollars + cents amount.
+    public init(majorUnitAmount: Decimal, currency: Currency) {
+        let dollarAmount = majorUnitAmount as NSDecimalNumber
+        guard Money.isValid(dollarAmount: dollarAmount) else {
+            fatalError(Money.Error.invalidDollarAmount(dollarAmount).description)
+        }
+
+        let unroundedCentsAmount = currency.minorUnitAmount(fromMajorUnitAmount: dollarAmount)
+        let roundedCentsAmount = unroundedCentsAmount.rounding(accordingToBehavior: NSDecimalNumberHandler.roundPlain)
+
+        guard roundedCentsAmount.isEqual(to: unroundedCentsAmount) else {
+            fatalError(Money.Error.unroundedAmount(currency, dollarAmount).description)
+        }
+
+        guard let centsInt = Int(exactly: roundedCentsAmount) else {
+            fatalError(Money.Error.centsAmountIntOverflow.description)
+        }
+
+        self.init(minorUnitAmount: centsInt, currency: currency)
+    }
+
+    public init(majorUnitAmount: Int, currency: Currency) {
+        self.init(
+            minorUnitAmount: currency
+                .minorUnitAmount(fromMajorUnitAmount: .init(integerLiteral: majorUnitAmount)).intValue,
+            currency: currency
+        )
+    }
     /**
         A monetary amount rounded to
         the number of places of the minor currency unit.
      */
     public var rounded: Money {
-        return Money(amount.rounded(for: currency), currency: currency)
+        return Money(majorUnitAmount: amount.rounded(for: currency), currency: currency)
     }
 }
 
@@ -27,15 +58,20 @@ public struct Money: Equatable, Hashable {
 
 public extension Money {
 
-    /// Converts to minor unit amount  e.g. dollars to cents, 1.00 -> 100 for USD.
-    var toMinorUnitAmount: NSDecimalNumber {
-        return (amount as NSDecimalNumber).multiplying(byPowerOf10: Int16(currency.minorUnit))
-    }
-
     /// Converts to major unit amount e.g. cents to dollars, e.g. 100 -> 1.00 for USD.
     var toMajorUnitAmount: NSDecimalNumber {
-        return (amount as NSDecimalNumber).multiplying(byPowerOf10: Int16(-currency.minorUnit))
+        currency.majorUnitAmount(fromMinorUnitAmount: .init(integerLiteral: centsAmount))
     }
+
+    /// Returns true if the amount (or currency itself) doesn't have cents, e.g. $25 and ¥3, but not $22.10.
+    var isWholeDollarAmount: Bool {
+        guard currency.minorUnit > 0 else {
+            return true
+        }
+
+        return ((abs(self.centsAmount) % currency.centsPerDollar) == 0)
+    }
+
 }
 
 // MARK: - Formatting
@@ -43,8 +79,11 @@ public extension Money {
 public extension Money {
     
     var amountFormatted: String {
-        let formatter = CurrencyFormatter.formatter(for: currency)
-        return formatter.string(for: toMajorUnitAmount) ?? ""
+        localizedStringValue(formatter: .standard, locale: .current)
+    }
+
+    func amountFormatted(formatter: MoneyFormatter, for locale: Locale) -> String {
+        formatter.stringValue(for: self, locale: locale)
     }
 }
 
@@ -60,7 +99,7 @@ extension Money {
     /// The sum of two monetary amounts.
     public static func + (lhs: Money, rhs: Money) -> Money {
         precondition(lhs.currency == rhs.currency)
-        return Money(lhs.amount + rhs.amount, currency: lhs.currency)
+        return Money(minorUnitAmount: lhs.centsAmount + rhs.centsAmount, currency: lhs.currency)
     }
 
     /// Adds one monetary amount to another.
@@ -72,7 +111,7 @@ extension Money {
     /// The difference between two monetary amounts.
     public static func - (lhs: Money, rhs: Money) -> Money {
         precondition(lhs.currency == rhs.currency)
-        return Money(lhs.amount - rhs.amount, currency: lhs.currency)
+        return Money(minorUnitAmount: lhs.centsAmount - rhs.centsAmount, currency: lhs.currency)
     }
 
     /// Subtracts one monetary amount from another.
@@ -85,18 +124,19 @@ extension Money {
 extension Money {
     /// Negates the monetary amount.
     public static prefix func - (value: Money) -> Money {
-        return Money(-value.amount, currency: value.currency)
+        return Money(minorUnitAmount: -value.centsAmount, currency: value.currency)
     }
 
     public static func zero(_ currency: Currency) -> Money {
-        .init(.zero, currency: currency)
+        .init(minorUnitAmount: 0, currency: currency)
     }
 }
 
 extension Money {
     /// The product of a monetary amount and a scalar value.
     public static func * (lhs: Money, rhs: Decimal) -> Money {
-        return Money(lhs.amount * rhs, currency: lhs.currency)
+        let newValue = (Decimal(lhs.centsAmount) * rhs) as NSDecimalNumber
+        return Money(minorUnitAmount: newValue.intValue, currency: lhs.currency)
     }
 
     /**
@@ -142,7 +182,8 @@ extension Money {
 
     /// Multiplies a monetary amount by a scalar value.
     public static func *= (lhs: inout Money, rhs: Decimal) {
-        lhs = Money(lhs.amount * rhs, currency: lhs.currency)
+        let newValue = (Decimal(lhs.centsAmount) * rhs) as NSDecimalNumber
+        lhs = Money(minorUnitAmount: newValue.intValue, currency: lhs.currency)
     }
 
     /// Multiplies a monetary amount by a scalar value.
@@ -156,14 +197,14 @@ extension Money {
                      multiply by a `Decimal` value instead.
      */
     public static func *= (lhs: inout Money, rhs: Double) {
-        let newAmount = (lhs.amount * Decimal(rhs)).rounded(for: lhs.currency)
-        lhs = .init(newAmount, currency: lhs.currency)
+        let newAmount = (Decimal(lhs.centsAmount) * Decimal(rhs)).rounded(for: lhs.currency)
+        lhs = .init(majorUnitAmount: newAmount, currency: lhs.currency)
     }
 
     /// Multiplies a monetary amount by a scalar value.
     public static func *= (lhs: inout Money, rhs: Int) {
-        let newAmount = (lhs.amount * Decimal(rhs)).rounded(for: lhs.currency)
-        lhs = .init(newAmount, currency: lhs.currency)
+        let newAmount = lhs.centsAmount * rhs
+        lhs = .init(minorUnitAmount: newAmount, currency: lhs.currency)
     }
 }
 
@@ -171,7 +212,7 @@ extension Money {
 
 extension Money: CustomStringConvertible {
     public var description: String {
-        return "\(self.amount)"
+        return "\(self.centsAmount)"
     }
 }
 
@@ -182,7 +223,7 @@ extension Money: CustomStringConvertible {
  */
 public enum MoneyCodingKeys: String, CodingKey {
     /// The coding key for the `amount` property.
-    case amount
+    case centsAmount
 
     /// The coding key for the `currencyCode` property
     case currencyCode
@@ -198,16 +239,16 @@ extension Money: Codable {
                 throw DecodingError.typeMismatch(Money.self, context)
             }
 
-            var amount: Decimal?
-            if let string = try? keyedContainer.decode(String.self, forKey: .amount) {
-                amount = Decimal(string: string)
+            var amount: Int?
+            if let string = try? keyedContainer.decode(String.self, forKey: .centsAmount) {
+                amount = Int(string)
             }
 
             if let amount = amount {
-                self.amount = amount
+                self.centsAmount = amount
                 self.currency = currencyValue
             } else {
-                throw DecodingError.dataCorruptedError(forKey: .amount, in: keyedContainer, debugDescription: "Couldn't decode Decimal value for amount")
+                throw DecodingError.dataCorruptedError(forKey: .centsAmount, in: keyedContainer, debugDescription: "Couldn't decode Decimal value for amount")
             }
 
         } else {
@@ -219,9 +260,52 @@ extension Money: Codable {
     public func encode(to encoder: Encoder) throws {
         var keyedContainer = encoder.container(keyedBy: MoneyCodingKeys.self)
         try keyedContainer.encode(currency.code, forKey: .currencyCode)
-        try keyedContainer.encode(self.amount, forKey: .amount)
+        try keyedContainer.encode(self.centsAmount, forKey: .centsAmount)
     }
 }
+
+// MARK:
+
+extension Money {
+
+    public enum Error: Swift.Error, CustomStringConvertible {
+        case unsupportedCurrencyTextCode(String)
+        case unsupportedCurrencyNumericCode(Int)
+        case invalidDollarAmount(NSDecimalNumber)
+        case unroundedAmount(Currency, NSDecimalNumber)
+        case divideByZero
+        case collectionMissingSufficientMoniesToSum
+        case centsAmountIntOverflow
+
+        public var description: String {
+            switch self {
+            case let .unsupportedCurrencyTextCode(code):
+                return "Unsupported currency code \"\(code)\""
+            case let .unsupportedCurrencyNumericCode(code):
+                return "Unsupported currency code \"\(code)\""
+            case let .invalidDollarAmount(amount):
+                return "Invalid dollar amount \"\(amount)\""
+            case let .unroundedAmount(currency, amount):
+                return "Unrounded \(currency.code) amount \"\(amount)\""
+            case .divideByZero:
+                return "Divide by zero"
+            case .collectionMissingSufficientMoniesToSum:
+                return "Collection missing sufficient monies to sum"
+            case .centsAmountIntOverflow:
+                return "Cents amount overflowed when converting to Int"
+            }
+        }
+    }
+
+    private static func isValid(dollarAmount: NSDecimalNumber) -> Bool {
+        return !(
+               dollarAmount.isEqual(to: NSDecimalNumber.notANumber)
+            || dollarAmount.isEqual(to: NSDecimalNumber.maximum)
+            || dollarAmount.isEqual(to: NSDecimalNumber.minimum)
+        )
+    }
+}
+
 
 // MARK: -
 

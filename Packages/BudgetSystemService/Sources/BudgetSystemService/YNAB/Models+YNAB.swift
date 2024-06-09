@@ -77,7 +77,7 @@ extension TransactionEntry {
         self.transferAccountId = ynab.transferAccountId
         self.deleted = ynab.deleted
 
-        guard let date = Date.iso8601utc.date(from: ynab.date) else {
+        guard let date = Date.iso8601local.date(from: ynab.date) else {
             fatalError("Unable to convert ynab transaction date string into a Date instance - \(ynab.date)")
         }
         self.date = date
@@ -114,9 +114,9 @@ extension Money {
         let ynabMilliUnits: Double = 1_000
         let amountConverted = Decimal(Double(amount) / ynabMilliUnits)
         let amountInCurrencyMilliUnits = (amountConverted as NSDecimalNumber)
-            .multiplying(byPowerOf10: Int16(currency.minorUnit), withBehavior: roundingBehavior) as Decimal
+            .multiplying(byPowerOf10: Int16(currency.minorUnit), withBehavior: roundingBehavior)
         
-        return .init(amountInCurrencyMilliUnits, currency: currency)
+        return .init(minorUnitAmount: amountInCurrencyMilliUnits.intValue, currency: currency)
     }
 
     private static var roundingBehavior: NSDecimalNumberHandler {

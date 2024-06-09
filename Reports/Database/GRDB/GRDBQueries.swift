@@ -58,6 +58,11 @@ extension ServerKnowledgeConfig {
 
 extension BudgetSummary {
 
+    static func fetch(id: String) throws -> Self? {
+        let request = BudgetSummary.filter(id: id)
+        return try Shared.grdb.fetchRecord(Self.self, request: request)
+    }
+
     static func save(_ summaries: [BudgetSummary]) throws {
         try Shared.grdb.perform { db in
             for summary in summaries {
@@ -261,23 +266,6 @@ extension CategoryRecord {
         )
     }
 
-}
-
-// MARK: -
-
-private extension String {
-
-    static func andAccountIds(_ accountIds: String?) -> String {
-        guard let accountIds, accountIds.isNotEmpty else { return " " }
-        // expecting a comma , separated list of account ids, convert to a SQL IN expression.
-        // e.g. account.id IN ('SomeUUID','AnotherUUID')
-        let inValues = "('\(accountIds.replacingOccurrences(of: ",", with: "','"))')"
-        return """
-
-        AND account.id IN \(inValues)
-
-        """
-    }
 }
 
 // swiftlint:enable line_length

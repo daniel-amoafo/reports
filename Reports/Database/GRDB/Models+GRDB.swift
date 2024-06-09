@@ -39,7 +39,7 @@ struct ServerKnowledgeConfig: Codable, FetchableRecord, PersistableRecord, Custo
 
 // MARK: - BudgetService
 
-extension BudgetSummary: PersistableRecord {
+extension BudgetSummary: FetchableRecord, PersistableRecord {
 
     static let transactions = hasMany(TransactionEntry.self)
     static let dbAccounts = hasMany(Account.self)
@@ -54,6 +54,20 @@ extension BudgetSummary: PersistableRecord {
         container["currencyCode"] = currencyCode
     }
 
+    enum Column: String, CodingKey, ColumnExpression {
+        case id, name, lastModifiedOn, firstMonth, lastMonth, currencyCode
+    }
+
+    public init(row: Row) throws {
+        self.init(
+            id: row[Column.id.rawValue],
+            name: row[Column.name.rawValue],
+            lastModifiedOn: row[Column.lastModifiedOn],
+            firstMonth: row[Column.firstMonth],
+            lastMonth: row[Column.lastMonth],
+            currencyCode: row[Column.currencyCode]
+        )
+    }
 }
 
 extension Account: FetchableRecord, PersistableRecord {
@@ -198,7 +212,7 @@ extension TransactionEntry: FetchableRecord, PersistableRecord {
 // MARK: - Database Records
 
 /// Represents a `Category` or `CategoryGroup` entry with the aggregated total amounts for transactions belonging to the type
-/// Used to make plotting chart graph data
+/// Used to make plottable chart graph data
 struct CategoryRecord: Identifiable, Equatable, Codable, FetchableRecord {
 
     private let _id: String
@@ -228,4 +242,61 @@ struct CategoryRecord: Identifiable, Equatable, Codable, FetchableRecord {
         )
     }
 
+}
+
+struct TrendRecord: Identifiable, Equatable, Codable, FetchableRecord {
+
+    let date: Date
+    let name: String
+    let total: Money
+    let recordId: String
+    private let dateString: String
+
+    var id: String { "\(dateString)-\(recordId)" }
+
+    enum Column: String, CodingKey, ColumnExpression {
+        case name, total
+        case date = "year_month"
+        case recordId = "id"
+    }
+
+    init(date: Date, name: String, total: Money, recordId: String) {
+        self.date = date
+        self.name = name
+        self.total = total
+        self.recordId = recordId
+        self.dateString = Date.iso8601local.string(from: date)
+    }
+
+    init(row: Row) throws {
+        let currencyCode = row["currencyCode"] as String? ?? ""
+        guard let currency = Currency.iso4217Currency(for: currencyCode) else {
+            fatalError("unable to parse currencyCode: [\(currencyCode)]")
+        }
+        guard let total = row["total"] as Int? else {
+            fatalError("unable to parse total field into Int value")
+        }
+
+        let id: String
+        if row.hasColumn(Column.recordId.rawValue) {
+            id = row[Column.recordId.rawValue]
+        } else {
+            id = ""
+        }
+
+        let name: String
+        if row.hasColumn(Column.name.rawValue) {
+            name = row[Column.name.rawValue]
+        } else {
+            name = ""
+        }
+
+//        print("\(String(describing: row["year_month"])) - \(String(describing: row["name"])) - \(total) ")
+        self.init(
+            date: row[Column.date.rawValue],
+            name: name,
+            total: Money.forYNAB(amount: total, currency: currency),
+            recordId: id
+        )
+    }
 }

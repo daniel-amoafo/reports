@@ -1,6 +1,7 @@
 // Created by Daniel Amoafo on 23/4/2024.
 
 import BudgetSystemService
+import ComposableArchitecture
 import Foundation
 import GRDB
 import IdentifiedCollections
@@ -38,7 +39,12 @@ enum MockData {
 
         try grdb.save(records: records)
 
-        debugPrint("inserted mock records into grdb (\(records.count))")
+        debugPrint("grdb records (\(records.count))")
+
+        updateWorkspaceValues(
+            budgetCurrency: budgets[0].currency,
+            accounts: accounts.elements
+        )
     }
 
      static func insertSavedReport(_ context: ModelContext) throws {
@@ -47,42 +53,27 @@ enum MockData {
          }
          try context.save()
 
-         debugPrint("inserted mock records into modelContext (\(SavedReport.mocks.count))")
+         debugPrint("modelContext records (\(SavedReport.mocks.count))")
     }
 
     static func insertConfigData(_ config: ConfigProvider) {
         config.selectedBudgetId = IdentifiedArrayOf<BudgetSummary>.mocks[0].id
+    }
+
+    static func updateWorkspaceValues(budgetCurrency: Currency, accounts: [Account]) {
+
+        let accountNames = accounts.reduce(into: [String: String]()) {
+            $0[$1.id] = $1.name
+        }
+        @Shared(.wsValues) var workspaceValues
+        workspaceValues.accountsOnBudgetNames = accountNames
+        workspaceValues.budgetCurrency = budgetCurrency
     }
 }
 
 extension ReportChart {
 
     static let mock: ReportChart = Self.firstChart
-}
-
-// MARK: - Account
-
-extension IdentifiedArrayOf where ID == Account.ID, Element == Account {
-
-    static let mocks: Self = [
-        .init(id: "01", budgetId: "Budget1", name: "Everyday Account", onBudget: true, closed: false, deleted: false),
-        .init(id: "02", budgetId: "Budget1", name: "Acme Account", onBudget: true, closed: false, deleted: false),
-        .init(id: "03", budgetId: "Budget1", name: "Appleseed Account", onBudget: true, closed: false, deleted: false),
-        .init(
-            id: "07",
-            budgetId: "Budget2",
-            name: "Budget Twwo Account",
-            onBudget: true,
-            closed: false,
-            deleted: false
-        ),
-    ]
-
-    static let mocksClosed: Self = [
-        .init(id: "04", budgetId: "Budget1", name: "Grandpa Account", onBudget: true, closed: true, deleted: false),
-        .init(id: "05", budgetId: "Budget1", name: "Nona Account", onBudget: true, closed: true, deleted: false),
-        .init(id: "06", budgetId: "Budget1", name: "Jerry Account", onBudget: true, closed: true, deleted: false),
-    ]
 }
 
 // MARK: - BudgetSummary
@@ -108,6 +99,31 @@ extension IdentifiedArrayOf where Element == BudgetSummary, ID == BudgetSummary.
             currency: .AUD,
             accounts: []
         ),
+    ]
+}
+
+// MARK: - Account
+
+extension IdentifiedArrayOf where ID == Account.ID, Element == Account {
+
+    static let mocks: Self = [
+        .init(id: "A1", budgetId: "Budget1", name: "Everyday Account", onBudget: true, closed: false, deleted: false),
+        .init(id: "A2", budgetId: "Budget1", name: "Acme Account", onBudget: true, closed: false, deleted: false),
+        .init(id: "A3", budgetId: "Budget1", name: "Appleseed Account", onBudget: true, closed: false, deleted: false),
+        .init(
+            id: "A7",
+            budgetId: "Budget2",
+            name: "Budget Two Account",
+            onBudget: true,
+            closed: false,
+            deleted: false
+        ),
+    ]
+
+    static let mocksClosed: Self = [
+        .init(id: "A4", budgetId: "Budget1", name: "Grandpa Account", onBudget: true, closed: true, deleted: false),
+        .init(id: "A5", budgetId: "Budget1", name: "Nona Account", onBudget: true, closed: true, deleted: false),
+        .init(id: "A6", budgetId: "Budget1", name: "Jerry Account", onBudget: true, closed: true, deleted: false),
     ]
 }
 
@@ -204,13 +220,13 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
         .init(
             id: "T1",
             budgetId: IdentifiedArrayOf<BudgetSummary>.mocks[0].id,
-            date: Date.iso8601utc.date(from: "2024-02-01")!,
-            rawAmount: -1_00_00,
+            date: Date.iso8601utc.date(from: "2024-01-01")!,
+            rawAmount: -100_00_0,
             currencyCode: Currency.AUD.code,
             payeeName: "Woolworths",
             accountId: "A1",
-            accountName: "Account First",
-            categoryId: "CAT-GROC",
+            accountName: "Everyday Account",
+            categoryId: "CAT-GROCERIES",
             categoryName: "Groceries",
             transferAccountId: nil,
             deleted: false
@@ -219,11 +235,11 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
             id: "T2",
             budgetId: IdentifiedArrayOf<BudgetSummary>.mocks[0].id,
             date: Date.iso8601utc.date(from: "2024-02-01")!,
-            rawAmount: -5_00,
+            rawAmount: -5_00_0,
             currencyCode: Currency.AUD.code,
             payeeName: "Opal",
             accountId: "A1",
-            accountName: "Account First",
+            accountName: "Everyday Account",
             categoryId: "CAT-TRAIN",
             categoryName: "Train Ticket",
             transferAccountId: nil,
@@ -233,11 +249,11 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
             id: "T3",
             budgetId: IdentifiedArrayOf<BudgetSummary>.mocks[0].id,
             date: Date.iso8601utc.date(from: "2024-03-05")!,
-            rawAmount: -99_99,
+            rawAmount: -99_99_0,
             currencyCode: Currency.AUD.code,
             payeeName: "Landlord",
             accountId: "A2",
-            accountName: "Account Second",
+            accountName: "Acme Account",
             categoryId: "CAT-RENT",
             categoryName: "Rent",
             transferAccountId: nil,
@@ -247,11 +263,11 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
             id: "T4",
             budgetId: IdentifiedArrayOf<BudgetSummary>.mocks[0].id,
             date: Date.iso8601utc.date(from: "2024-04-24")!,
-            rawAmount: -37_60,
+            rawAmount: -37_60_0,
             currencyCode: Currency.AUD.code,
             payeeName: "Uber",
             accountId: "A2",
-            accountName: "Account Second",
+            accountName: "Acme Account",
             categoryId: "CAT-TAXI",
             categoryName: "Taxi / Uber",
             transferAccountId: nil,
@@ -261,11 +277,11 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
             id: "T5",
             budgetId: IdentifiedArrayOf<BudgetSummary>.mocks[0].id,
             date: Date.iso8601utc.date(from: "2024-04-28")!,
-            rawAmount: -20_00,
+            rawAmount: -20_00_0,
             currencyCode: Currency.AUD.code,
             payeeName: "IRH Party",
             accountId: "A2",
-            accountName: "Account Second",
+            accountName: "Acme Account",
             categoryId: "CAT-CONCERT",
             categoryName: "Concert",
             transferAccountId: nil,
@@ -275,7 +291,7 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
             id: "T6",
             budgetId: IdentifiedArrayOf<BudgetSummary>.mocks[0].id,
             date: Date.iso8601utc.date(from: "2024-05-02")!,
-            rawAmount: -60_00,
+            rawAmount: -60_00_0,
             currencyCode: Currency.AUD.code,
             payeeName: "The Midnights",
             accountId: "A3",
@@ -289,11 +305,11 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
             id: "T7",
             budgetId: IdentifiedArrayOf<BudgetSummary>.mocks[0].id,
             date: Date.iso8601utc.date(from: "2024-03-11")!,
-            rawAmount: -42_00,
+            rawAmount: -42_00_0,
             currencyCode: Currency.AUD.code,
             payeeName: "Hoyts",
             accountId: "A2",
-            accountName: "Account Second",
+            accountName: "Acme Account",
             categoryId: "CAT-Movies",
             categoryName: "Movies",
             transferAccountId: nil,
@@ -306,7 +322,7 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
             id: "T1",
             budgetId: IdentifiedArrayOf<BudgetSummary>.mocks[0].id,
             date: Date.iso8601utc.date(from: "2024-06-01")!,
-            rawAmount: -5_00,
+            rawAmount: -5_00_0,
             currencyCode: Currency.AUD.code,
             payeeName: "Taxi",
             accountId: "A1",
@@ -320,11 +336,11 @@ extension IdentifiedArray where Element == TransactionEntry, ID == TransactionEn
             id: "T2",
             budgetId: IdentifiedArrayOf<BudgetSummary>.mocks[0].id,
             date: Date.iso8601utc.date(from: "2024-07-15")!,
-            rawAmount: -10_50,
+            rawAmount: -10_50_0,
             currencyCode: Currency.AUD.code,
             payeeName: "Landlord",
             accountId: "A2",
-            accountName: "Account Second",
+            accountName: "Acme Account",
             categoryId: "CAT-RENT",
             categoryName: "Rent",
             transferAccountId: nil,
@@ -365,7 +381,7 @@ extension SavedReport {
                 chartId: ReportChart.firstChart.id,
                 budgetId: MockData.budgetId,
                 selectedAccountIds: MockData.accountId,
-                lastModified: Date.iso8601utc.date(from: "2024-03-30T14:30")!
+                lastModified: Date.iso8601local.date(from: "2024-03-30T14:30")!
             ),
             .init(
                 id: UUID(uuidString: "00000000-0000-0000-0000-000000000012")!,
@@ -375,7 +391,7 @@ extension SavedReport {
                 chartId: ReportChart.firstChart.id,
                 budgetId: MockData.budgetId,
                 selectedAccountIds: MockData.accountId,
-                lastModified: Date.iso8601utc.date(from: "2024-05-12T16:45")!
+                lastModified: Date.iso8601local.date(from: "2024-05-12T16:45")!
             ),
             .init(
                 id: UUID(uuidString: "00000000-0000-0000-0000-000000000013")!,
@@ -385,7 +401,7 @@ extension SavedReport {
                 chartId: ReportChart.firstChart.id,
                 budgetId: MockData.budgetId,
                 selectedAccountIds: MockData.accountId,
-                lastModified: Date.iso8601utc.date(from: "2024-02-12T08:45")!
+                lastModified: Date.iso8601local.date(from: "2024-02-12T08:45")!
             ),
             .init(
                 id: UUID(uuidString: "00000000-0000-0000-0000-000000000014")!,
@@ -395,7 +411,7 @@ extension SavedReport {
                 chartId: ReportChart.firstChart.id,
                 budgetId: MockData.budgetId,
                 selectedAccountIds: MockData.accountId,
-                lastModified: Date.iso8601utc.date(from: "2024-05-08T17:12")!
+                lastModified: Date.iso8601local.date(from: "2024-05-08T17:12")!
             ),
         ]
     }()

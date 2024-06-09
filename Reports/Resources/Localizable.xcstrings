@@ -17,7 +17,7 @@
 
     },
     "%@ Total" : {
-      "comment" : "A category total. %@ = The selected category "
+      "comment" : "A category total. %@ = The selected category"
     },
     "⬅️" : {
 
@@ -41,6 +41,9 @@
       "comment" : "The collective name for top level category groups"
     },
     "Amount" : {
+      "comment" : "label for chart Y axis values"
+    },
+    "Angular" : {
 
     },
     "Aug 23 - Dec 23, Main Budget" : {
@@ -59,7 +62,7 @@
       "comment" : "title for list of categories for the selected data set"
     },
     "Category" : {
-
+      "comment" : "label for series value names"
     },
     "Chart" : {
       "comment" : "the title name for the chart section"
@@ -68,7 +71,7 @@
       "comment" : "Title for accounts that have been closed."
     },
     "Date" : {
-
+      "comment" : "label for chart X axis values"
     },
     "Discard" : {
       "comment" : "Confirmation action to not save changes & exit"
@@ -99,6 +102,9 @@
     },
     "Income v Expense" : {
       "comment" : "The title for a chart displaying income and expenses."
+    },
+    "Linear" : {
+
     },
     "Login into YNAB" : {
 

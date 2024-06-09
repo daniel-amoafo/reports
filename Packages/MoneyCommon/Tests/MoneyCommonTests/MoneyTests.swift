@@ -6,7 +6,7 @@ final class MoneyTests: XCTestCase {
     func testMonetaryCalculations() {
         let prices = [
             2.19, 5.39, 20.99, 2.99, 1.99, 1.99, 0.99
-        ].map { Money(.init($0), currency: .USD) }
+        ].map { Money(majorUnitAmount: Decimal(string: String($0))!, currency: .USD) }
 
         let subtotal = prices.reduce(Money.zero(.USD), +)
         let tax = 0.08 * subtotal
@@ -18,14 +18,14 @@ final class MoneyTests: XCTestCase {
     }
 
 
-    func testFormattedCurrencyAmounts() {
+    func testFormattedStandardCurrencyAmounts() {
 
         // values are represented in milliunits e.g. 100 -> $1 USD, 100 -> ¥100 JPY
         let values = [100, 1500, 1699, 12345, 9_999_99, 100_000_46]
 
         // USD
         let usdValues = values
-            .map { Money(.init($0), currency: .USD).stringFormatted(locale: .init(identifier: "en_US")) }
+            .map { Money(minorUnitAmount: $0, currency: .USD).amountFormatted(formatter: .standard, for: .init(identifier: "en_US")) }
 
         XCTAssertEqual(usdValues[0], "$1.00")
         XCTAssertEqual(usdValues[1], "$15.00")
@@ -36,7 +36,8 @@ final class MoneyTests: XCTestCase {
 
         // JPY
         let jpyValues = values
-            .map { Money(.init($0), currency: .JPY).stringFormatted(locale: .init(identifier: "ja_JP")) }
+            .map { Money(minorUnitAmount: $0, currency: .JPY).amountFormatted(formatter: .standard, for: .init(identifier: "ja_JP")) }
+
         XCTAssertEqual(jpyValues[0], "¥100")
         XCTAssertEqual(jpyValues[1], "¥1,500")
         XCTAssertEqual(jpyValues[2], "¥1,699")
@@ -46,12 +47,13 @@ final class MoneyTests: XCTestCase {
 
         // Euros
         let eurosValues = values
-            .map { Money(.init($0), currency: .EUR).stringFormatted(locale: .init(identifier: "fr_FR")) }
-        XCTAssertEqual(eurosValues[0], "1,00 €")
-        XCTAssertEqual(eurosValues[1], "15,00 €")
-        XCTAssertEqual(eurosValues[2], "16,99 €")
-        XCTAssertEqual(eurosValues[3], "123,45 €")
-        XCTAssertEqual(eurosValues[4], "9 999,99 €")
-        XCTAssertEqual(eurosValues[5], "100 000,46 €")
+            .map { Money(minorUnitAmount: $0, currency: .EUR).amountFormatted(formatter: .standard, for: .init(identifier: "fr_FR")) }
+
+        XCTAssertEqual(eurosValues[0], "€1,00")
+        XCTAssertEqual(eurosValues[1], "€15,00")
+        XCTAssertEqual(eurosValues[2], "€16,99")
+        XCTAssertEqual(eurosValues[3], "€123,45")
+        XCTAssertEqual(eurosValues[4], "€9 999,99")
+        XCTAssertEqual(eurosValues[5], "€100 000,46")
     }
 }
