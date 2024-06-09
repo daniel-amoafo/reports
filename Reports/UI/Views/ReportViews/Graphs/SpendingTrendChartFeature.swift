@@ -70,10 +70,10 @@ struct SpendingTrendChartFeature {
         }
 
         func amountFormatted(for rawAmount: Int) -> String {
-            Money(
-                minorUnitAmount: .init(rawAmount),
+            return Money(
+                majorUnitAmount: .init(rawAmount),
                 currency: workspaceValues.budgetCurrency
-            ).amountFormatted
+            ).amountFormattedAbbreviated
         }
     }
 }

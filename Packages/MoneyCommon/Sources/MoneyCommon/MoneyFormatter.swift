@@ -530,10 +530,9 @@ public final class MoneyFormatter: CustomDebugStringConvertible {
 
 extension Money {
 
-    // Defaults to `en_US` locale until we universally can support other locale formatting of money.
     public func localizedStringValue(
         formatter: MoneyFormatter = .standard,
-        locale: Locale = Locale(identifier: "en_US")
+        locale: Locale
     ) -> String {
         return formatter.stringValue(for: self, locale: locale)
     }

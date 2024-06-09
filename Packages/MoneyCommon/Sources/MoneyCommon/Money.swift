@@ -79,7 +79,11 @@ public extension Money {
 public extension Money {
     
     var amountFormatted: String {
-        localizedStringValue(formatter: .standard, locale: .current)
+        amountFormatted(formatter: .standard, for: .current)
+    }
+
+    var amountFormattedAbbreviated: String {
+        amountFormatted(formatter: .abbreviated(), for: .current)
     }
 
     func amountFormatted(formatter: MoneyFormatter, for locale: Locale) -> String {

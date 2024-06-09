@@ -81,8 +81,7 @@ private extension SpendingTrendChartView {
         .init(
             AxisMarks { _ in
                 AxisValueLabel(
-                    format: .dateTime.year(.twoDigits).month(.twoDigits),
-                    anchor: .center
+                    format: .dateTime.year(.twoDigits).month(.twoDigits)
                 )
             }
         )
