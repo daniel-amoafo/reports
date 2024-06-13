@@ -15,8 +15,9 @@ struct SpendingTrendChartFeature {
         let fromDate: Date
         let toDate: Date
         let accountIds: String?
-
         var contentType: CategoryType = .group
+        var categoryList: CategoryListFeature.State
+        var categoriesForCategoryGroupName: String?
 
         @Shared(.wsValues) var workspaceValues
         fileprivate let categoryGroupsBarData: [TrendRecord]
@@ -35,12 +36,13 @@ struct SpendingTrendChartFeature {
             self.toDate = toDate
             self.accountIds = accountIds
 
-            self.categoryGroupsBarData = SpendingTrendQueries.fetchCategoryGroupTrends(
+            let groupsBarData = SpendingTrendQueries.fetchCategoryGroupTrends(
                 budgetId: budgetId,
                 fromDate: fromDate,
                 toDate: toDate,
                 accountIds: accountIds
             )
+            self.categoryGroupsBarData = groupsBarData
 
             self.categoryGroupsLineData = SpendingTrendQueries.fetchLineMarks(
                 budgetId: budgetId,
@@ -49,6 +51,25 @@ struct SpendingTrendChartFeature {
                 accountIds: accountIds
             )
 
+            // dummy values to satisfy all stored values before
+            self.categoryList = .init(
+                contentType: .group,
+                fromDate: .distantPast,
+                toDate: .distantFuture,
+                listItems: []
+            )
+            self.categoryList = makeCategoryListFeatureState(items: groupsBarData)
+
+        }
+
+        func makeCategoryListFeatureState(items: [TrendRecord])
+        -> CategoryListFeature.State {
+            .init(
+                contentType: contentType,
+                fromDate: fromDate,
+                toDate: toDate,
+                listItems: items.map(AnyCategoryListItem.init)
+            )
         }
 
         var selectedContent: [TrendRecord] {
@@ -74,6 +95,33 @@ struct SpendingTrendChartFeature {
                 majorUnitAmount: .init(rawAmount),
                 currency: workspaceValues.budgetCurrency
             ).amountFormattedAbbreviated
+        }
+    }
+
+    enum Action {
+        case categoryList(CategoryListFeature.Action)
+    }
+
+    var body: some ReducerOf<Self> {
+        Scope(state: \.categoryList, action: \.categoryList) {
+            CategoryListFeature()
+        }
+        Reduce { state, action in
+            switch action {
+            case let .categoryList(.delegate(.categoryGroupTapped(id))):
+                debugPrint(id)
+                return .none
+
+            case .categoryList(.delegate(.subTitleTapped)):
+                state.contentType = .group
+                state.categoriesByCategoryGroupBars = []
+                state.categoriesByCategoryGroupName = nil
+                state.categoryList = state.makeCategoryListFeatureState(items: state.categoryGroupsBarData)
+                return .none
+
+            case .categoryList:
+                return .none
+            }
         }
     }
 }

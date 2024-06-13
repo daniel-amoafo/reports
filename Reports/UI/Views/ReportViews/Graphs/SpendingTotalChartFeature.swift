@@ -9,7 +9,7 @@ enum CategoryType: Equatable {
     case group
     case subCategories
 }
-
+// this is a really long long this is a really long long this is a really long long this is a really long long this is a really long long
 @Reducer
 struct SpendingTotalChartFeature {
 
@@ -184,6 +184,8 @@ struct SpendingTotalChartFeature {
         }
     }
 }
+
+// MARK: -
 
 /// Manages calls to Database queries
 private enum SpendingTotalQueries {

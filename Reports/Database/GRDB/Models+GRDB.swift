@@ -246,13 +246,10 @@ struct CategoryRecord: Identifiable, Equatable, Codable, FetchableRecord {
 
 struct TrendRecord: Identifiable, Equatable, Codable, FetchableRecord {
 
+    let id: String
     let date: Date
     let name: String
     let total: Money
-    let recordId: String
-    private let dateString: String
-
-    var id: String { "\(dateString)-\(recordId)" }
 
     enum Column: String, CodingKey, ColumnExpression {
         case name, total
@@ -264,8 +261,8 @@ struct TrendRecord: Identifiable, Equatable, Codable, FetchableRecord {
         self.date = date
         self.name = name
         self.total = total
-        self.recordId = recordId
-        self.dateString = Date.iso8601local.string(from: date)
+        let dateString = Date.iso8601local.string(from: date)
+        self.id = "\(dateString)-\(recordId)"
     }
 
     init(row: Row) throws {
@@ -277,21 +274,18 @@ struct TrendRecord: Identifiable, Equatable, Codable, FetchableRecord {
             fatalError("unable to parse total field into Int value")
         }
 
-        let id: String
-        if row.hasColumn(Column.recordId.rawValue) {
-            id = row[Column.recordId.rawValue]
+        let id = if row.hasColumn(Column.recordId.rawValue) {
+            row[Column.recordId.rawValue] as String
         } else {
-            id = ""
+            ""
         }
 
-        let name: String
-        if row.hasColumn(Column.name.rawValue) {
-            name = row[Column.name.rawValue]
+        let name = if row.hasColumn(Column.name.rawValue) {
+            row[Column.name.rawValue] as String
         } else {
-            name = ""
+            ""
         }
 
-//        print("\(String(describing: row["year_month"])) - \(String(describing: row["name"])) - \(total) ")
         self.init(
             date: row[Column.date.rawValue],
             name: name,

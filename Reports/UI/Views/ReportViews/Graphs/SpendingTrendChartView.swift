@@ -20,7 +20,7 @@ struct SpendingTrendChartView: View {
 
             Divider()
 
-            Spacer()
+            categoryList
         }
     }
 
@@ -75,6 +75,12 @@ private extension SpendingTrendChartView {
         .chartXAxis { xAxisMark }
         .chartYAxis { yAxisMark }
         .scaledToFit()
+    }
+
+    var categoryList: some View {
+        CategoryListView(
+            store: store.scope(state: \.categoryList, action: \.categoryList)
+        )
     }
 
     var xAxisMark: AnyAxisContent {
