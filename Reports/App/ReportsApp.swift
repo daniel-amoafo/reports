@@ -206,7 +206,7 @@ private extension AppFeature {
         }
 
         logger.debug("Syncing category values to db...")
-        try CategoryRecord.save(
+        try CategoryGroup.save(
             groups: groups,
             categories: categories,
             serverKnowledge: newServerKnowledge

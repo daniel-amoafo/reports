@@ -29,7 +29,7 @@ struct SpendingTotalChartFeature {
         // Categories for a given categoryGroup.
         // Updated when user selects a categoryGroup to inspect
         fileprivate var catgoriesForCategoryGroup: [CategoryRecord] = []
-        fileprivate var catgoriesForCategoryGroupName: String?
+        fileprivate var categoriesForCategoryGroupName: String?
 
         init(
             title: String,
@@ -43,8 +43,11 @@ struct SpendingTotalChartFeature {
             self.finishDate = finishDate
             self.accountIds = accountIds
 
-            self.categoryGroups = SpendingTotalQueries.fetchCategoryGroupTotals(
-                budgetId: budgetId, startDate: startDate, finishDate: finishDate, accountIds: accountIds
+            self.categoryGroups = CategoryListQueries.fetchCategoryGroupTotals(
+                budgetId: budgetId,
+                fromDate: startDate,
+                toDate: finishDate,
+                accountIds: accountIds
             )
         }
 
@@ -62,7 +65,7 @@ struct SpendingTotalChartFeature {
             case .group:
                 return AppStrings.allCategoriesTitle
             case .subCategories:
-                return String(format: Strings.categoryNameTotal, (catgoriesForCategoryGroupName ?? ""))
+                return String(format: Strings.categoryNameTotal, (categoriesForCategoryGroupName ?? ""))
             }
         }
 
@@ -92,7 +95,7 @@ struct SpendingTotalChartFeature {
             case .group:
                 return nil
             case .subCategories:
-                return catgoriesForCategoryGroupName
+                return categoriesForCategoryGroupName
             }
         }
     }
@@ -141,7 +144,7 @@ struct SpendingTotalChartFeature {
 
             case let .catgoriesForCategoryGroupFetched(records, categoryGroupName):
                 state.catgoriesForCategoryGroup = records
-                state.catgoriesForCategoryGroupName = categoryGroupName
+                state.categoriesForCategoryGroupName = categoryGroupName
                 state.contentType = .subCategories
                 state.selectedGraphItem = nil
                 return .none
@@ -170,7 +173,7 @@ struct SpendingTotalChartFeature {
             case .subTitleTapped:
                 state.contentType = .group
                 state.catgoriesForCategoryGroup = []
-                state.catgoriesForCategoryGroupName = nil
+                state.categoriesForCategoryGroupName = nil
                 state.selectedGraphItem = nil
                 return .none
 
@@ -195,28 +198,6 @@ private enum SpendingTotalQueries {
     static var grdb: GRDBDatabase {
         @Dependency(\.database.grdb) var grdb
         return grdb
-    }
-
-    static func fetchCategoryGroupTotals(
-        budgetId: String,
-        startDate: Date,
-        finishDate: Date,
-        accountIds: String?
-    ) -> [CategoryRecord] {
-        do {
-            let categoryGroupBuilder = CategoryRecord
-                .queryTransactionsByCategoryGroupTotals(
-                    budgetId: budgetId,
-                    startDate: startDate,
-                    finishDate: finishDate,
-                    accountIds: accountIds
-                )
-
-            return try grdb.fetchRecords(builder: categoryGroupBuilder)
-        } catch {
-            logger.error("\(String(describing: error))")
-            return []
-        }
     }
 
     static func fetchCategoryTotals(
@@ -261,7 +242,6 @@ private enum SpendingTotalQueries {
             return .init(uniqueElements: [])
         }
     }
-
 }
 
 // MARK: -

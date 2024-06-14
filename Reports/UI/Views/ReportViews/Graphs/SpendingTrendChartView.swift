@@ -33,6 +33,22 @@ private extension SpendingTrendChartView {
             Text(store.title)
                 .typography(.title3Emphasized)
                 .foregroundStyle(Color.Text.secondary)
+            Group {
+                if let categoryName = store.maybeCategoryName {
+                    Button {
+                        store.send(.subTitleTapped, animation: .smooth)
+                    } label: {
+                        HStack {
+                            Text("⬅️")
+                            Text(categoryName)
+                        }
+                    }
+                } else {
+                    Text(AppStrings.allCategoriesTitle)
+                }
+            }
+            .font(Typography.subheadlineEmphasized.font)
+            .foregroundStyle(Color.Text.primary)
         }
     }
 
@@ -52,7 +68,7 @@ private extension SpendingTrendChartView {
                     y: .value(Strings.yAxisLabel, lineRecord.total.amount)
                 )
                 .interpolationMethod(.cardinal(tension: 0.6))
-                .foregroundStyle(Gradient.linear())
+                .foregroundStyle(Color.Line.stroke)
 
                 // Outline
                 PointMark(
@@ -67,7 +83,7 @@ private extension SpendingTrendChartView {
                     x: .value("", lineRecord.date, unit: .month),
                     y: .value("", lineRecord.total.amount)
                 )
-                .foregroundStyle(Gradient.radial())
+                .foregroundStyle(Color.Line.fill)
                 .symbolSize(CGSize(width: 10, height: 10))
 
             }

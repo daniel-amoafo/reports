@@ -16,7 +16,7 @@ struct CategoryListFeature {
         var toDate: Date
         var accountIds: String?
         var listItems: [AnyCategoryListItem]
-        var categoriesForCategoryGroupName: String?
+        var categoryGroupName: String?
 
         var isDisplayingSubCategory: Bool {
             contentType == .subCategories
@@ -27,7 +27,7 @@ struct CategoryListFeature {
             case .group:
                 return nil
             case .subCategories:
-                return categoriesForCategoryGroupName
+                return categoryGroupName
             }
         }
 
@@ -75,37 +75,6 @@ struct CategoryListFeature {
             case .delegate:
                 return .none
             }
-        }
-    }
-}
-
-// MARK: -
-
-/// Manages calls to Database queries
-private enum CategoryListQueries {
-
-    static let logger = LogFactory.create(Self.self)
-
-    static var grdb: GRDBDatabase {
-        @Dependency(\.database.grdb) var grdb
-        return grdb
-    }
-
-    static func fetchTransactionEntries(for categoryId: String, fromDate: Date, toDate: Date, accountIds: String?)
-    -> IdentifiedArrayOf<TransactionEntry> {
-        do {
-            let transactionsBuilder = TransactionEntry.queryTransactionsByCategoryId(
-                categoryId,
-                startDate: fromDate,
-                finishDate: toDate,
-                accountIds: accountIds
-            )
-            let transactions = try Self.grdb.fetchRecords(builder: transactionsBuilder)
-
-            return .init(uniqueElements: transactions)
-        } catch {
-            Self.logger.error("\(error.toString())")
-            return .init(uniqueElements: [])
         }
     }
 }

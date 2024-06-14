@@ -17,7 +17,7 @@ struct SpendingTrendChartFeature {
         let accountIds: String?
         var contentType: CategoryType = .group
         var categoryList: CategoryListFeature.State
-        var categoriesForCategoryGroupName: String?
+        var categoryGroupName: String?
 
         @Shared(.wsValues) var workspaceValues
         fileprivate let categoryGroupsBarData: [TrendRecord]
@@ -36,7 +36,7 @@ struct SpendingTrendChartFeature {
             self.toDate = toDate
             self.accountIds = accountIds
 
-            let groupsBarData = SpendingTrendQueries.fetchCategoryGroupTrends(
+            let groupsBarData = SpendingTrendQueries.fetchTrends(
                 budgetId: budgetId,
                 fromDate: fromDate,
                 toDate: toDate,
@@ -58,17 +58,28 @@ struct SpendingTrendChartFeature {
                 toDate: .distantFuture,
                 listItems: []
             )
-            self.categoryList = makeCategoryListFeatureState(items: groupsBarData)
 
+            let categoryListItems = fetchCategoryListGroupTotals()
+            self.categoryList = makeCategoryListFeatureState(items: categoryListItems)
         }
 
-        func makeCategoryListFeatureState(items: [TrendRecord])
+        func fetchCategoryListGroupTotals() -> [CategoryRecord] {
+            CategoryListQueries.fetchCategoryGroupTotals(
+                budgetId: budgetId,
+                fromDate: fromDate,
+                toDate: toDate,
+                accountIds: accountIds
+            )
+        }
+
+        func makeCategoryListFeatureState(items: [any CategoryListItem])
         -> CategoryListFeature.State {
             .init(
                 contentType: contentType,
                 fromDate: fromDate,
                 toDate: toDate,
-                listItems: items.map(AnyCategoryListItem.init)
+                listItems: items.map(AnyCategoryListItem.init),
+                categoryGroupName: categoryGroupName
             )
         }
 
@@ -78,6 +89,15 @@ struct SpendingTrendChartFeature {
                 return categoryGroupsBarData
             case .subCategories:
                 return categoriesByCategoryGroupBars
+            }
+        }
+
+        var maybeCategoryName: String? {
+            switch contentType {
+            case .group:
+                return nil
+            case .subCategories:
+                return categoryGroupName
             }
         }
 
@@ -99,6 +119,7 @@ struct SpendingTrendChartFeature {
     }
 
     enum Action {
+        case subTitleTapped
         case categoryList(CategoryListFeature.Action)
     }
 
@@ -109,14 +130,38 @@ struct SpendingTrendChartFeature {
         Reduce { state, action in
             switch action {
             case let .categoryList(.delegate(.categoryGroupTapped(id))):
-                debugPrint(id)
+                let (records, groupName) = SpendingTrendQueries.fetchTrendsForGroupId(
+                    categoryGroupId: id,
+                    fromDate: state.fromDate,
+                    toDate: state.toDate,
+                    accountIds: state.accountIds
+                )
+                let lineRecords = SpendingTrendQueries.fetchLineMarksForGroupId(
+                    categoryGroupId: id,
+                    fromDate: state.fromDate,
+                    toDate: state.toDate,
+                    accountIds: state.accountIds
+                )
+                let (categoryListItems, _) = CategoryListQueries.fetchCategoryTotals(
+                    categoryGroupId: id,
+                    fromDate: state.fromDate,
+                    toDate: state.toDate,
+                    accountIds: state.accountIds
+                )
+                state.categoriesByCategoryGroupBars = records
+                state.categoryGroupName = groupName
+                state.categoriesByCategoryGroupLines = lineRecords
+                state.contentType = .subCategories
+                state.categoryList = state
+                    .makeCategoryListFeatureState(items: categoryListItems)
                 return .none
 
-            case .categoryList(.delegate(.subTitleTapped)):
+            case .subTitleTapped, .categoryList(.delegate(.subTitleTapped)):
                 state.contentType = .group
                 state.categoriesByCategoryGroupBars = []
                 state.categoriesByCategoryGroupName = nil
-                state.categoryList = state.makeCategoryListFeatureState(items: state.categoryGroupsBarData)
+                let categoryListItems = state.fetchCategoryListGroupTotals()
+                state.categoryList = state.makeCategoryListFeatureState(items: categoryListItems)
                 return .none
 
             case .categoryList:
@@ -138,27 +183,56 @@ private enum SpendingTrendQueries {
         return grdb
     }
 
-    static func fetchCategoryGroupTrends(
+    static func fetchTrends(
         budgetId: String,
         fromDate: Date,
         toDate: Date,
         accountIds: String?
     ) -> [TrendRecord] {
         do {
-            let categoryGroupBuilder = TrendRecord
-                .queryBySpendingTrendsCategoryGroup(
+            let sqlBuilder = TrendRecord
+                .queryBySpendingTrendsBarMarks(
                     budgetId: budgetId,
                     fromDate: fromDate,
                     toDate: toDate,
                     accountIds: accountIds
                 )
 
-            return try grdb.fetchRecords(builder: categoryGroupBuilder)
+            return try grdb.fetchRecords(builder: sqlBuilder)
         } catch {
             logger.error("\(String(describing: error))")
             return []
         }
     }
+
+    static func fetchTrendsForGroupId(
+        categoryGroupId: String,
+        fromDate: Date,
+        toDate: Date,
+        accountIds: String?
+    ) -> ([TrendRecord], String) {
+        do {
+            let sqlBuilder = TrendRecord
+                .queryBySpendingTrendsBarMarks(
+                    categoryGroupId: categoryGroupId,
+                    fromDate: fromDate,
+                    toDate: toDate,
+                    accountIds: accountIds
+                )
+
+            let records = try Self.grdb.fetchRecords(builder: sqlBuilder)
+
+            let groupName = try CategoryGroup.fetch(id: categoryGroupId)?.name ?? ""
+
+            return (records, groupName)
+
+        } catch {
+            logger.error("\(String(describing: error))")
+            return ([], "")
+        }
+    }
+
+    // MARK: - Line Marks Data
 
     static func fetchLineMarks(
         budgetId: String,
@@ -180,4 +254,26 @@ private enum SpendingTrendQueries {
             return []
         }
     }
+
+    static func fetchLineMarksForGroupId(
+        categoryGroupId: String,
+        fromDate: Date,
+        toDate: Date,
+        accountIds: String?
+    ) -> [TrendRecord] {
+        do {
+            let sqlBuilder = TrendRecord.queryBySpendingTrendsLineMarks(
+                categoryGroupId: categoryGroupId,
+                fromDate: fromDate,
+                toDate: toDate,
+                accountIds: accountIds
+            )
+
+            return try grdb.fetchRecords(builder: sqlBuilder)
+        } catch {
+            logger.error("\(String(describing: error))")
+            return []
+        }
+    }
+
 }

@@ -206,7 +206,8 @@ struct ReportFeature {
                     await send(.chartDisplayed, animation: .easeInOut)
                 }
 
-            case let .chartGraph(.presented(.spendingByTotal(.delegate(.categoryTapped(transactions))))):
+            case let .chartGraph(.presented(.spendingByTotal(.delegate(.categoryTapped(transactions))))),
+                let .chartGraph(.presented(.spendingByTrend(.categoryList(.delegate(.categoryTapped(transactions)))))):
                 let array = transactions.elements
                 state.destination = .transactionHistory(.init(transactions: array, title: array.first?.categoryName))
                 return .none
