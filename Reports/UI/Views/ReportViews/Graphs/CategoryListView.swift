@@ -66,7 +66,7 @@ struct CategoryListView: View {
                             .typography(.bodyEmphasized)
                             .foregroundStyle(Color.Text.primary)
                         Spacer()
-                        Text(record.total.amountFormatted)
+                        Text(record.total.listFormatted)
                             .typography(.bodyEmphasized)
                             .foregroundStyle(Color.Text.primary)
                     }
@@ -90,6 +90,31 @@ private enum Strings {
     static let categorized = String(
         localized: "Categories",
         comment: "title for list of categories for the selected data set"
+    )
+}
+
+private extension Money {
+
+    var listFormatted: String {
+        amountFormatted(formatter: .categoryList, for: .current)
+    }
+}
+
+private extension MoneyFormatter {
+
+    /// Typical display of dollars and cents, e.g. "$25.00" or "¥1,000"
+    static let categoryList = MoneyFormatter(
+        options: Options(
+            numberFormat: .localized,
+            currencyRepresentationOption: .symbol,
+            denominationOption: .dollar(
+                omitsCentsIfPossible: false,
+                reduceCentsToMinimumSignificantDigits: false,
+                showsAsCentsIfPossible: false
+            ),
+            signOption: .none,
+            zeroBiasOption: .none
+        )
     )
 }
 

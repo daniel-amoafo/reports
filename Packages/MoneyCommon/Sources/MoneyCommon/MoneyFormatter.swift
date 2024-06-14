@@ -352,11 +352,13 @@ public final class MoneyFormatter: CustomDebugStringConvertible {
 
     /// Display of abbreviated dollars rounded with the given rounding mode,  with cents ommitted,
     /// eg. "$5", "$1.1K" or "$1.5M".
+    /// - parameter signOption: Indicate if number is prefixed with positive +, negative - or no symbol. Deatuls to `.standard`.
     /// - parameter roundingMode: How the number should be rounded, if necessary, in order to be abbreviated.
     ///   Defaults to `.halfEven`.
     /// - parameter fractionDigitsStrategy: The strategy to define number of digits after the decimal separator.
     /// Defaults to the exact number between `minimum: 0` and `maximum: 1`.
     public static func abbreviated(
+        signOption: Options.SignOption = .standard,
         rounding roundingMode: NumberFormatter.RoundingMode = .halfEven,
         fractionDigitsStrategy: FractionDigitsStrategy = .exactNumberBetween(minimum: 0, maximum: 1)
     ) -> MoneyFormatter {
@@ -366,7 +368,7 @@ public final class MoneyFormatter: CustomDebugStringConvertible {
                     roundingMode: roundingMode,
                     fractionDigitsStrategy: fractionDigitsStrategy,
                     unitMagnitudeFormat: .abbreviated,
-                    threshold: 1000
+                    threshold: -1_000_000_000_000
                 ),
                 currencyRepresentationOption: .symbol,
                 denominationOption: .dollar(
@@ -374,7 +376,7 @@ public final class MoneyFormatter: CustomDebugStringConvertible {
                     reduceCentsToMinimumSignificantDigits: false,
                     showsAsCentsIfPossible: false
                 ),
-                signOption: .standard,
+                signOption: signOption,
                 zeroBiasOption: .none
             )
         )
@@ -398,9 +400,6 @@ public final class MoneyFormatter: CustomDebugStringConvertible {
         for amount: Money,
         locale: Locale
     ) -> String {
-        // First, format the numeric value.
-
-//        let absoluteAmount = Money(abs(amount.toMinorUnitAmount as Decimal), currency: amount.currency)
 
         func amountIsBelowOneDollar() -> Bool {
             let oneDollar = Money(majorUnitAmount: 1, currency: amount.currency)
@@ -426,13 +425,6 @@ public final class MoneyFormatter: CustomDebugStringConvertible {
 
         formatter.minimumFractionDigits = fractionDigits
         formatter.maximumFractionDigits = fractionDigits
-
-//        switch options.denominationOption {
-//        case .dollar(_, reduceCentsToMinimumSignificantDigits: true, _):
-//            formatter.minimumFractionDigits = 0
-//        default:
-//            break
-//        }
 
         var formattedString: String
 

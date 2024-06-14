@@ -83,7 +83,7 @@ public extension Money {
     }
 
     var amountFormattedAbbreviated: String {
-        amountFormatted(formatter: .abbreviated(), for: .current)
+        amountFormatted(formatter: .abbreviated(signOption: .none), for: .current)
     }
 
     func amountFormatted(formatter: MoneyFormatter, for locale: Locale) -> String {

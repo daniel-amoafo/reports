@@ -100,6 +100,15 @@ extension NumberFormatter {
                 divisor: 1_000_000_000_000,
                 unitMagnitude: Strings.Trillion.self
             ),
+            // Negative values
+            AbbreviationRule(threshold: -1_000, divisor: 1_000, unitMagnitude: Strings.Thousand.self),
+            AbbreviationRule(threshold: -1_000_000, divisor: 1_000_000, unitMagnitude: Strings.Million.self),
+            AbbreviationRule(threshold: -1_000_000_000, divisor: 1_000_000_000, unitMagnitude: Strings.Billion.self),
+            AbbreviationRule(
+                threshold: -1_000_000_000_000,
+                divisor: 1_000_000_000_000,
+                unitMagnitude: Strings.Trillion.self
+            ),
         ]
     }
 
