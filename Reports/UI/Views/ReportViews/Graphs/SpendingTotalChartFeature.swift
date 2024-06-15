@@ -5,7 +5,7 @@ import ComposableArchitecture
 import Foundation
 import MoneyCommon
 
-enum CategoryType: Equatable {
+enum CategoryType: Equatable, Sendable {
     case group
     case subCategories
 }

@@ -4,6 +4,7 @@ import BudgetSystemService
 import ComposableArchitecture
 import SwiftUI
 
+@MainActor
 struct TransactionHistoryView: View {
 
     var store: StoreOf<TransactionHistoryFeature>

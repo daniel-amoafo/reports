@@ -10,7 +10,7 @@ struct ReportFeature {
     @ObservableState
     struct State: Equatable {
 
-        enum SourceData {
+        enum SourceData: Sendable {
             case new(ReportInputFeature.State)
             case existing(SavedReport)
         }
@@ -87,7 +87,7 @@ struct ReportFeature {
         }
     }
 
-    enum Action: BindableAction {
+    enum Action: BindableAction, Sendable {
         case binding(BindingAction<State>)
         case inputFields(ReportInputFeature.Action)
         case chartGraph(PresentationAction<ChartGraph.Action>)
@@ -100,7 +100,7 @@ struct ReportFeature {
         case doneButtonTapped
         case onAppear
 
-        enum ConfirmationDialog {
+        enum ConfirmationDialog: Sendable {
             case saveNewReport
             case updateExistingReport
             case discard

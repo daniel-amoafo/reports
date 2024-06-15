@@ -5,12 +5,12 @@ import MoneyCommon
 
 // MARK: - BudgetProvider
 
-public struct BudgetProvider {
+public struct BudgetProvider: Sendable {
 
-    let fetchBudgetSummaries: () async throws -> [BudgetSummary]
-    let fetchCategoryValues: (_ params: CategoryGroupParameters) async throws -> ([CategoryGroup], [Category], Int)
-    let fetchTransactions: (_ params: TransactionParameters) async throws -> [TransactionEntry]
-    let fetchAllTransactions: (_ params: TransactionParameters) async throws -> ([TransactionEntry], Int)
+    let fetchBudgetSummaries: @Sendable () async throws -> [BudgetSummary]
+    let fetchCategoryValues: @Sendable (_ params: CategoryGroupParameters) async throws -> ([CategoryGroup], [Category], Int)
+    let fetchTransactions: @Sendable (_ params: TransactionParameters) async throws -> [TransactionEntry]
+    let fetchAllTransactions: @Sendable (_ params: TransactionParameters) async throws -> ([TransactionEntry], Int)
 
     public init(
         fetchBudgetSummaries: @Sendable @escaping () async throws -> [BudgetSummary],
@@ -24,13 +24,13 @@ public struct BudgetProvider {
         self.fetchAllTransactions = fetchAllTransactions
     }
 
-    public struct CategoryGroupParameters {
+    public struct CategoryGroupParameters: Sendable {
         public let budgetId: String
         public let lastServerKnowledge: Int?
     }
 
-    public struct TransactionParameters {
-        public enum FilterByOption {
+    public struct TransactionParameters: Sendable {
+        public enum FilterByOption: Sendable {
             case account(accountId: String)
             case category(categoryId: String)
         }

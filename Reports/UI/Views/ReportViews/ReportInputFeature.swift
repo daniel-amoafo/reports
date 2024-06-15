@@ -8,7 +8,7 @@ import Foundation
 struct ReportInputFeature {
 
     @ObservableState
-    struct State: Equatable {
+    struct State: Equatable, Sendable {
         let chart: ReportChart
         let budgetId: String
         var showChartMoreInfo = false

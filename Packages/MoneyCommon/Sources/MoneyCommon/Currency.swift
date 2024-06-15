@@ -1,7 +1,8 @@
 // This file was automatically generated and should not be edited.
 
 /// A monetary unit.
-public struct Currency: Equatable, Hashable, Codable {
+//@DebugDescription
+public struct Currency: Equatable, Hashable, Codable, Sendable {
     /// The three letter ISO 4217 currency code.
     public let code: String
 
@@ -21,6 +22,10 @@ public struct Currency: Equatable, Hashable, Codable {
         and therefore takes 0 decimal places.
     */
     public let minorUnit: Int
+
+    public var debugDescription: String {
+        "code: \(code), name: \(name), minorUnit: \(minorUnit)"
+    }
 
     /// Returns the ISO 4217 currency associated with a given code.
     ///

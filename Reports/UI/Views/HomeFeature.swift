@@ -6,11 +6,11 @@ import Foundation
 import SwiftData
 
 @Reducer
-struct HomeFeature {
+struct HomeFeature: Sendable {
 
     static let maxDisplayedSavedReports = 3
     @ObservableState
-    struct State: Equatable {
+    struct State: Equatable, Sendable {
         var selectedBudgetId: String?
         var budgetList: IdentifiedArrayOf<BudgetSummary>?
         var charts: [ReportChart] = []
@@ -34,7 +34,7 @@ struct HomeFeature {
         }
     }
 
-    enum Action {
+    enum Action: Sendable {
         case didTapSelectBudgetButton
         case didUpdateSelectedBudgetId(String?)
         case didSelectChart(ReportChart)
@@ -61,10 +61,10 @@ struct HomeFeature {
     @Dependency(\.continuousClock) var clock
     @Dependency(\.modelContextNotifications) var modelContextNotifications
 
-    let logger = LogFactory.create(Self.self)
+    nonisolated(unsafe) static let logger = LogFactory.create(Self.self)
 
     var body: some ReducerOf<Self> {
-        Reduce { state, action in
+        Reduce<State, Action> { state, action in
             switch action {
             case .didTapSelectBudgetButton:
                 state.showSelectBudget = true
@@ -77,10 +77,10 @@ struct HomeFeature {
             case let .didUpdateSelectedBudgetId(selectedBudgetId):
                 guard state.selectedBudgetId != selectedBudgetId else { return .none }
                 state.selectedBudgetId = selectedBudgetId
-                logger.debug("selectedBudgetId updated to: \(selectedBudgetId ?? "[nil]")")
+                Self.logger.debug("selectedBudgetId updated to: \(selectedBudgetId ?? "[nil]")")
                 return .run { _ in
                     guard let selectedBudgetId else { return }
-                    updateBudgetClientSelectedBudgetId(selectedBudgetId)
+                    await updateBudgetClientSelectedBudgetId(selectedBudgetId)
                 }
 
             case let .didSelectChart(chart):
@@ -104,8 +104,10 @@ struct HomeFeature {
                 return .send(.delegate(.navigate(to: .reports)))
 
             case .onAppear:
-                state.budgetList = budgetClient.budgetSummaries
-                state.selectedBudgetId = budgetClient.selectedBudgetId
+                MainActor.assumeIsolated {
+                    state.budgetList = budgetClient.budgetSummaries
+                }
+                state.selectedBudgetId = configProvider.selectedBudgetId
                 state.charts = configProvider.charts
                 return .run { send in
                     await send(.didUpdateSavedReports)
@@ -128,13 +130,14 @@ struct HomeFeature {
 
 private extension HomeFeature {
 
+    @MainActor
     func updateBudgetClientSelectedBudgetId(_ selectedBudgetId: String) {
         do {
             try budgetClient.updateSelectedBudgetId(selectedBudgetId)
             configProvider.selectedBudgetId = selectedBudgetId
 
         } catch {
-            logger.error("Error attempting to update selectedBudgetId: \(error.toString())")
+            Self.logger.error("Error attempting to update selectedBudgetId: \(error.toString())")
         }
     }
 
@@ -150,7 +153,7 @@ private extension HomeFeature {
             let total = try savedReportQuery.fetchCount(FetchDescriptor<SavedReport>())
             return (savedReports, total)
         } catch {
-            logger.error("\(error.toString())")
+            Self.logger.error("\(error.toString())")
             return ([], 0)
         }
     }

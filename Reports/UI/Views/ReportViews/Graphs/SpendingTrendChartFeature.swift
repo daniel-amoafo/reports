@@ -114,7 +114,10 @@ struct SpendingTrendChartFeature {
             return Money(
                 majorUnitAmount: .init(rawAmount),
                 currency: workspaceValues.budgetCurrency
-            ).amountFormattedAbbreviated
+            ).amountFormatted(
+                formatter: .abbreviated(signOption: .none, threshold: -1_000_000_000_000),
+                for: .current
+            )
         }
     }
 

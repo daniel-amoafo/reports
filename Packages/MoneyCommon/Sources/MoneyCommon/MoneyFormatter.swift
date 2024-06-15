@@ -2,15 +2,15 @@
 
 import Foundation
 
-public final class MoneyFormatter: CustomDebugStringConvertible {
+public struct MoneyFormatter: CustomDebugStringConvertible, Sendable {
 
     // MARK: - Types
 
-    public struct Options: CustomDebugStringConvertible {
+    public struct Options: CustomDebugStringConvertible, Sendable {
 
         // MARK: - Types
 
-        public enum CurrencyRepresentationOption {
+        public enum CurrencyRepresentationOption: Sendable {
             /// The currency's symbol, e.g. $ or ¥
             case symbol
 
@@ -24,7 +24,7 @@ public final class MoneyFormatter: CustomDebugStringConvertible {
             case none
         }
 
-        public enum DenominationOption {
+        public enum DenominationOption: Sendable {
             /// Show the money as its cent value
             case cents
 
@@ -43,7 +43,7 @@ public final class MoneyFormatter: CustomDebugStringConvertible {
             )
         }
 
-        public enum SignOption {
+        public enum SignOption: Sendable {
             /// Show a minus sign for negative numbers only
             case standard
 
@@ -60,7 +60,7 @@ public final class MoneyFormatter: CustomDebugStringConvertible {
             case none
         }
 
-        public enum ZeroBiasOption {
+        public enum ZeroBiasOption: Sendable {
             /// Do not show +/- for zero amounts
             case none
 
@@ -71,7 +71,7 @@ public final class MoneyFormatter: CustomDebugStringConvertible {
             case positive
         }
 
-        public enum NumberFormat {
+        public enum NumberFormat: Sendable {
             /// Use the current locale's formatting options for the number (e.g. decimal and grouping separators)
             case localized
 
@@ -95,19 +95,19 @@ public final class MoneyFormatter: CustomDebugStringConvertible {
         // MARK: - Instance Properties/Types
 
         /// Use the current locale's formatting options for the number (e.g. decimal and grouping separators)
-        public var numberFormat: NumberFormat
+        public let numberFormat: NumberFormat
 
         /// Display option for the currency symbol (see enum cases)
-        public var currencyRepresentationOption: CurrencyRepresentationOption
+        public let currencyRepresentationOption: CurrencyRepresentationOption
 
         /// Display option for the denomination representation
-        public var denominationOption: DenominationOption
+        public let denominationOption: DenominationOption
 
         /// Display option for the sign (see enum cases)
-        public var signOption: SignOption
+        public let signOption: SignOption
 
         /// Display option for zero amount sign treatment (see enum cases)
-        public var zeroBiasOption: ZeroBiasOption
+        public let zeroBiasOption: ZeroBiasOption
 
         // MARK: - Static Properties
 
@@ -196,7 +196,7 @@ public final class MoneyFormatter: CustomDebugStringConvertible {
     }
 
     /// Describes how many fraction digits should be present in the abbreviated result.
-    public enum FractionDigitsStrategy {
+    public enum FractionDigitsStrategy: Sendable {
         /// Contains a specified amount of fraction digits.
         /// - parameter minimum: The minimum number of digits after the decimal separator.
         /// Defaults to `0`.
@@ -353,12 +353,14 @@ public final class MoneyFormatter: CustomDebugStringConvertible {
     /// Display of abbreviated dollars rounded with the given rounding mode,  with cents ommitted,
     /// eg. "$5", "$1.1K" or "$1.5M".
     /// - parameter signOption: Indicate if number is prefixed with positive +, negative - or no symbol. Deatuls to `.standard`.
+    /// - parameter threshold:
     /// - parameter roundingMode: How the number should be rounded, if necessary, in order to be abbreviated.
     ///   Defaults to `.halfEven`.
     /// - parameter fractionDigitsStrategy: The strategy to define number of digits after the decimal separator.
     /// Defaults to the exact number between `minimum: 0` and `maximum: 1`.
     public static func abbreviated(
         signOption: Options.SignOption = .standard,
+        threshold: NSDecimalNumber = 1000,
         rounding roundingMode: NumberFormatter.RoundingMode = .halfEven,
         fractionDigitsStrategy: FractionDigitsStrategy = .exactNumberBetween(minimum: 0, maximum: 1)
     ) -> MoneyFormatter {
@@ -368,7 +370,7 @@ public final class MoneyFormatter: CustomDebugStringConvertible {
                     roundingMode: roundingMode,
                     fractionDigitsStrategy: fractionDigitsStrategy,
                     unitMagnitudeFormat: .abbreviated,
-                    threshold: -1_000_000_000_000
+                    threshold: threshold
                 ),
                 currencyRepresentationOption: .symbol,
                 denominationOption: .dollar(

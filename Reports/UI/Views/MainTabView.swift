@@ -6,7 +6,7 @@ import SwiftUI
 @Reducer
 struct MainTab {
 
-    enum Tab { case home, reports, settings }
+    enum Tab: Sendable { case home, reports, settings }
 
     @ObservableState
     struct State {
@@ -17,7 +17,7 @@ struct MainTab {
         @Presents var alert: AlertState<Action.Alert>?
     }
 
-    enum Action {
+    enum Action: Sendable {
         case home(HomeFeature.Action)
         case savedReports(SavedReportsFeature.Action)
         case report(PresentationAction<ReportFeature.Action>)

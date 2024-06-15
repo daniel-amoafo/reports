@@ -4,7 +4,8 @@
 import Foundation
 import MoneyCommon
 
-public struct BudgetSummary: Identifiable, Equatable, Codable, CustomStringConvertible {
+//@DebugDescription
+public struct BudgetSummary: Identifiable, Equatable, Codable, Sendable, CustomStringConvertible {
     /// Budget id
     public let id: String
 
@@ -23,10 +24,6 @@ public struct BudgetSummary: Identifiable, Equatable, Codable, CustomStringConve
     public let currency: Currency
 
     public let accounts: [Account]
-
-    public var description: String { name }
-
-    public var currencyCode: String { currency.code }
 
     public init(
         id: String,
@@ -67,9 +64,18 @@ public struct BudgetSummary: Identifiable, Equatable, Codable, CustomStringConve
             accounts: []
         )
     }
+
+    public var currencyCode: String { currency.code }
+
+    public var description: String { name }
+
+    public var debugDescription: String {
+        "id: \(id), name: \(name), lastModifiedOn: \(lastModifiedOn), currency: \(currency)"
+    }
 }
 
-public struct Account: Identifiable, Equatable, Codable, CustomStringConvertible, CustomDebugStringConvertible {
+//@DebugDescription
+public struct Account: Identifiable, Equatable, Codable, Sendable, CustomStringConvertible, CustomDebugStringConvertible {
 
     public var id: String
     public var budgetId: String
@@ -77,7 +83,6 @@ public struct Account: Identifiable, Equatable, Codable, CustomStringConvertible
     public var onBudget: Bool
     public var closed: Bool
     public var deleted: Bool
-    public var description: String { name }
 
     public init(id: String, budgetId: String, name: String, onBudget: Bool, closed: Bool, deleted: Bool) {
         self.id = id
@@ -88,13 +93,15 @@ public struct Account: Identifiable, Equatable, Codable, CustomStringConvertible
         self.deleted = deleted
     }
 
+    public var description: String { name }
 
     public var debugDescription: String {
         "name: \(name), onBudget: \(onBudget), closed: \(closed), deleted: \(deleted), id: \(id), budgetId: \(budgetId)"
     }
 }
 
-public struct CategoryGroup: Identifiable, Equatable, Codable, CustomStringConvertible {
+//@DebugDescription
+public struct CategoryGroup: Identifiable, Equatable, Codable, Sendable, CustomStringConvertible {
     /// Category group id
     public let id: String
 
@@ -109,8 +116,6 @@ public struct CategoryGroup: Identifiable, Equatable, Codable, CustomStringConve
 
     public let budgetId: String
 
-    public var description: String { name }
-
     public init(
         id: String,
         name: String,
@@ -124,9 +129,16 @@ public struct CategoryGroup: Identifiable, Equatable, Codable, CustomStringConve
         self.deleted = deleted
         self.budgetId = budgetId
     }
+
+    public var description: String { name }
+
+    public var debugDescription: String {
+        "id: \(id), name: \(name), hidden: \(hidden), deleted: \(deleted), budgetId: \(budgetId)"
+    }
 }
 
-public struct Category: Identifiable, Equatable, Codable, CustomStringConvertible {
+//@DebugDescription
+public struct Category: Identifiable, Equatable, Codable, Sendable, CustomStringConvertible {
     /// Category id
     public let id: String
 
@@ -144,8 +156,6 @@ public struct Category: Identifiable, Equatable, Codable, CustomStringConvertibl
 
     public let budgetId: String
 
-    public var description: String { name }
-
     public init(id: String, categoryGroupId: String, name: String, hidden: Bool, deleted: Bool, budgetId: String) {
         self.id = id
         self.categoryGroupId = categoryGroupId
@@ -154,10 +164,16 @@ public struct Category: Identifiable, Equatable, Codable, CustomStringConvertibl
         self.deleted = deleted
         self.budgetId = budgetId
     }
+
+    public var description: String { name }
+
+    public var debugDescription: String {
+        "id: \(id), name: \(name), deleted: \(deleted), categoryGroupId: \(categoryGroupId)"
+    }
 }
 
-
-public struct TransactionEntry: Identifiable, Equatable, Codable, CustomStringConvertible {
+//@DebugDescription
+public struct TransactionEntry: Identifiable, Equatable, Codable, Sendable, CustomStringConvertible {
 
     public let id: String
 
@@ -186,14 +202,6 @@ public struct TransactionEntry: Identifiable, Equatable, Codable, CustomStringCo
     public let transferAccountId: String?
 
     public let deleted: Bool
-
-    public var description: String { 
-        "\(id), \(dateFormated), \(amountFormatted)"
-    }
-
-    public var money: Money {
-        Money.forYNAB(amount: rawAmount, currency: currency)
-    }
 
     public init(
         id: String,
@@ -237,5 +245,17 @@ public struct TransactionEntry: Identifiable, Equatable, Codable, CustomStringCo
 
     public var amountFormatted: String {
         return  money.amountFormatted
+    }
+
+    public var money: Money {
+        Money.forYNAB(amount: rawAmount, currency: currency)
+    }
+
+    public var description: String {
+        "\(id), \(dateFormated), \(amountFormatted)"
+    }
+
+    public var debugDescription: String {
+        "id: \(id), rawAmount: \(rawAmount), payeeName: \(String(describing: payeeName)), date: \(date)"
     }
 }

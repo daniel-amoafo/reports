@@ -3,8 +3,9 @@ import Foundation
 import IdentifiedCollections
 import OSLog
 
+@MainActor
 public class BudgetClient {
-    
+
     public private(set) var provider: BudgetProvider
 
     @Published public private(set) var budgetSummaries: IdentifiedArrayOf<BudgetSummary> = []

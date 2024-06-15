@@ -4,7 +4,7 @@ import Foundation
 import SwiftData
 
 @Model
-final class SavedReport: Identifiable, Equatable {
+final class SavedReport: Identifiable, Equatable, Sendable {
 
     @Attribute(.unique) let id: UUID
     var name: String

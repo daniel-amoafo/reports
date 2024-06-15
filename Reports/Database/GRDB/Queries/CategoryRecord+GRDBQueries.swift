@@ -4,6 +4,8 @@ import Foundation
 
 extension CategoryRecord {
 
+    // swiftlint:disable line_length
+
     /// Creates `CategoryGroup` total amounts  for a given date range.
     /// The record entry values can be used directly to plot data in a chart.
     static func queryTransactionsByCategoryGroupTotals(budgetId: String, startDate: Date, finishDate: Date, accountIds: String?)
@@ -74,5 +76,5 @@ extension CategoryRecord {
             ]
         )
     }
-
+    // swiftlint:enable line_length
 }

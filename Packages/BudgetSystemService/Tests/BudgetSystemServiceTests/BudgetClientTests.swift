@@ -7,6 +7,7 @@ final class BudgetClientTests: XCTestCase {
 
     var sut: BudgetClient!
     
+    @MainActor
     func testFetchBudgetSummaries() async throws {
         let budgetProvider = Factory.createBudgetProvider()
         sut = BudgetClient(provider: budgetProvider)
@@ -18,6 +19,7 @@ final class BudgetClientTests: XCTestCase {
         XCTAssertEqual(budgetSummaries[0].accounts, Factory.accounts)
     }
 
+    @MainActor
     func testFetchCategoryValues() async throws {
         // Given
         let budgetId = "Budget1"
@@ -34,6 +36,7 @@ final class BudgetClientTests: XCTestCase {
         XCTAssertEqual(result.categories, Factory.categories)
     }
 
+    @MainActor
     func testUpdateSelectedAccountSuccess() async throws {
         // given
         let budgetProvider = Factory.createBudgetProvider()
@@ -50,6 +53,7 @@ final class BudgetClientTests: XCTestCase {
         XCTAssertEqual(sut.selectedBudgetId, "Budget2")
     }
 
+    @MainActor
     func testUpdateSelectedAccountThrowsError() async throws {
         // given
         let budgetProvider = Factory.createBudgetProvider()
@@ -74,6 +78,7 @@ final class BudgetClientTests: XCTestCase {
 
 private enum Factory {
 
+    @MainActor
     static func createBudgetClientWithSelectBudgetId(_ budgetId: String) async throws -> BudgetClient {
         let provider = createBudgetProvider()
         let client = BudgetClient(provider: provider)

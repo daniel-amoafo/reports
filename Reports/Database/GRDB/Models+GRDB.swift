@@ -213,7 +213,7 @@ extension TransactionEntry: FetchableRecord, PersistableRecord {
 
 /// Represents a `Category` or `CategoryGroup` entry with the aggregated total amounts for transactions belonging to the type
 /// Used to make plottable chart graph data
-struct CategoryRecord: Identifiable, Equatable, Codable, FetchableRecord {
+struct CategoryRecord: Identifiable, Equatable, Codable, FetchableRecord, Sendable {
 
     private let _id: String
     let name: String

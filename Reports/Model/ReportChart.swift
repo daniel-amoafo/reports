@@ -4,7 +4,7 @@ import BudgetSystemService
 import IdentifiedCollections
 import SwiftUI
 
-struct ReportChart: Identifiable, Equatable {
+struct ReportChart: Identifiable, Equatable, Sendable {
     let type: ChartType
     let name: String
     let description: String
@@ -36,7 +36,7 @@ struct ReportChart: Identifiable, Equatable {
     }
 }
 
-enum ChartType: Equatable {
+enum ChartType: Equatable, Sendable {
     case spendingByTotal
     case spendingByTrend
     case incomeExpensesTable

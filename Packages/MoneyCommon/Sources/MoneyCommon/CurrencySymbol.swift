@@ -21,7 +21,7 @@ struct CurrencySymbol {
    }
 
    // Global constants and variables are always computed lazily, in a similar manner to Lazy Stored Properties.
-   static fileprivate var cache: [String: CurrencySymbol] = { () -> [String: CurrencySymbol] in
+   static fileprivate let cache: [String: CurrencySymbol] = { () -> [String: CurrencySymbol] in
       var mapCurrencyCode2Symbols: [String: Set<String>] = [:]
       let currencyCodes = Set(Locale.commonISOCurrencyCodes)
 

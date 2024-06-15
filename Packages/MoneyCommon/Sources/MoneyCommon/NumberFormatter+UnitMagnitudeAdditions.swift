@@ -28,7 +28,7 @@ extension NumberFormatter {
     // MARK: - Public Types
 
     /// The format of unit magnitude string to apply at the end of the abbreviated string for a given number.
-    public enum UnitMagnitudeFormat {
+    public enum UnitMagnitudeFormat: Sendable {
         /// An abbreviated version of the unit magnitude to apply when formatting, ie. the "M" in "10.5M"
         case abbreviated
 
@@ -39,7 +39,7 @@ extension NumberFormatter {
     // MARK: - Private Types
 
     /// A rule type used in determining when/how to abbreviate values. See numberAbbreviationRules below for an example.
-    private struct AbbreviationRule {
+    private struct AbbreviationRule: Sendable {
         /// Rule can apply if a value is greater than this threshold.
         var threshold: Double
 

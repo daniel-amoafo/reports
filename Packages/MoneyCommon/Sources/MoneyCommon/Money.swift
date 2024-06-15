@@ -2,7 +2,7 @@
 import Foundation
 
 /// An amount of money in a given currency.
-public struct Money: Equatable, Hashable {
+public struct Money: Equatable, Hashable, Sendable {
 
     /// The amount of money.
     public let centsAmount: Int

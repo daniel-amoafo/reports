@@ -8,7 +8,7 @@ import SwiftData
 import SwiftUI
 
 @Reducer
-struct AppFeature {
+struct AppFeature: Sendable {
 
     @ObservableState
     struct State {
@@ -19,7 +19,7 @@ struct AppFeature {
         let connectionCheckTimeout: Double = 10.0
     }
 
-    enum Action {
+    enum Action: Sendable {
         case onOpenURL(URL)
         case appIntroLogin(AppIntroLogin.Action)
         case mainTab(MainTab.Action)
@@ -101,13 +101,13 @@ private extension AppFeature {
 
         switch host {
         case "oauth":
-            if let accessToken = url.fragmentItems?["access_token"], accessToken.isNotEmpty {
-                budgetClient.updateYnabProvider(accessToken)
-                state.appIntroLogin.showSafariBrowser = nil
-                logger.info("oauth url path handled, updated budget client with new access token.")
-                Task {
-                    await syncBudgetData()
-                }
+                if let accessToken = url.fragmentItems?["access_token"], accessToken.isNotEmpty {
+                    state.appIntroLogin.showSafariBrowser = nil
+                    logger.info("oauth url path handled, updated budget client with new access token.")
+                    Task { @MainActor in
+                        budgetClient.updateYnabProvider(accessToken)
+                        await syncBudgetData()
+                    }
             }
         default:
             break
@@ -121,7 +121,7 @@ private extension AppFeature {
     /// Spawns unstructured Async Task to monitor for budgetClient changes.
     func startAsyncListeners(send: Send<AppFeature.Action>) async {
 
-        Task {
+        Task { @MainActor in
             // Monitor when the budgetId changes and sync db values for the new selectedBudgetId
             for await _ in budgetClient.$selectedBudgetId.stream {
 //                await syncBudgetData()
@@ -130,10 +130,10 @@ private extension AppFeature {
 
         // await the last task to keep the run effect from completing.
         // A Reducer run effect cannot complete if send actions will be emitted.
-        await Task {
+        await Task { @MainActor in
             // Monitor authorization satus updates
             for await status in budgetClient.$authorizationStatus.stream {
-                await send(.didUpdateAuthStatus(status))
+                send(.didUpdateAuthStatus(status))
             }
         }.value
     }

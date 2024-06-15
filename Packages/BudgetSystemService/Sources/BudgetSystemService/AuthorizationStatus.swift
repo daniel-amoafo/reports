@@ -2,7 +2,7 @@
 
 import Foundation
 
-public enum AuthorizationStatus: Equatable {
+public enum AuthorizationStatus: Equatable, Sendable {
     case loggedIn
     case loggedOut
     case unknown
