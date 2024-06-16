@@ -7,22 +7,12 @@ import Foundation
 public enum BudgetClientError: LocalizedError {
 
     case http(code: String, message: String?)
-    case selectedBudgetIdInvalid
     case unknown
-
-    private enum Strings {
-        static let selectedBudgetError = String(
-            localized: "The selected budget is not valid or could not be found.",
-            comment: "The selected budget id is not available for selection"
-        )
-    }
 
     public var errorDescription: String? {
         switch self {
         case let .http(_, message):
             return message
-        case .selectedBudgetIdInvalid:
-            return Strings.selectedBudgetError
         case .unknown:
             return nil
         }
@@ -32,7 +22,7 @@ public enum BudgetClientError: LocalizedError {
         switch self {
         case let .http(code, _):
             return code
-        case .unknown, .selectedBudgetIdInvalid:
+        case .unknown:
             return nil
         }
     }

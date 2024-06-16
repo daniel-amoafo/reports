@@ -3,7 +3,7 @@
 import Dependencies
 import Foundation
 
-class ConfigProvider {
+final class ConfigProvider: Sendable {
 
     private let defaultStore: KeyValueStore
     private let secureStore: KeyValueStore
@@ -15,7 +15,10 @@ class ConfigProvider {
         case selectedBudgetId = "selected-Budget-Id"
     }
 
-    init(defaultStore: KeyValueStore = UserDefaults.standard, secureStore: KeyValueStore = SecureKeyValueStore()) {
+    init(
+        defaultStore: KeyValueStore = UserDefaults.standard,
+        secureStore: KeyValueStore = SecureKeyValueStore()
+    ) {
         self.defaultStore = defaultStore
         self.secureStore = secureStore
         self.charts = ReportChart.defaultCharts.elements

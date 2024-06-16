@@ -2,10 +2,10 @@ import Foundation
 
 // A protocol that mimics the API of NSUserDefaults so that we can decouple
 // ourselves from that implementation.
-public protocol KeyValueStore: AnyObject {
+public protocol KeyValueStore: Sendable {
 
     var count: Int { get }
-    var keys: any Collection<String> { get }
+    var keys: [String] { get }
 
     func bool(forKey: String) -> Bool?
     func integer(forKey: String) -> Int?
@@ -34,7 +34,7 @@ public protocol KeyValueStore: AnyObject {
 
 // MARK: - KeyValueStoreValue
 
-public protocol KeyValueStoreValue: Codable, Equatable {}
+public protocol KeyValueStoreValue: Codable, Equatable, Sendable {}
 
 extension String: KeyValueStoreValue {}
 extension Date: KeyValueStoreValue {}
@@ -48,14 +48,14 @@ extension Dictionary: KeyValueStoreValue where Key == String, Value: KeyValueSto
 
 // MARK: - UserDefaults
 
-extension UserDefaults: KeyValueStore {
+extension UserDefaults: KeyValueStore, @unchecked @retroactive Sendable {
 
     public var count: Int {
         return dictionaryRepresentation().count
     }
 
-    public var keys: any Collection<String> {
-        return dictionaryRepresentation().keys
+    public var keys: [String] {
+        return dictionaryRepresentation().keys.compactMap({ $0 as String })
     }
 
     public func bool(forKey key: String) -> Bool? {

@@ -10,34 +10,33 @@ final class BudgetSystemServiceConfigTests: XCTestCase {
 
     let accessTokenKey =  "ynab-access-token"
 
-    func testStoreAccessToken() {
+    @MainActor
+    func testStoreAccessToken() async {
         let store = InMemoryKeyValueStore()
         let token = "this is the token value"
         BudgetClient.storeAccessToken(accessToken: token, store: store)
 
-        XCTAssertEqual(store.string(forKey: accessTokenKey), token)
+        let actual = await store.string(forKey: accessTokenKey)
+        XCTAssertEqual(actual, token)
     }
 
     func testMakeClientSuccess() async throws {
         // given
-        let env = Factory.createBudgetClient(accessToken: "someAccessToken")
+        let env = await Factory.createBudgetClient(accessToken: "someAccessToken")
         XCTAssertEqual(env.store.string(forKey: accessTokenKey), "someAccessToken")
 
         try await withMainSerialExecutor {
             // when
-            _ = try await env.client.fetchBudgetSummaries()
+            let summaries = try await env.client.fetchBudgetSummaries()
 
-            // when
-            XCTAssertTrue(env.client.accounts.isEmpty)
-            try env.client.updateSelectedBudgetId("2")
             // then
-
+            XCTAssertEqual(summaries, .mocks)
         }
     }
 
     func testMakeClientWithNoToken() async throws {
         // given
-        let env = Factory.createBudgetClient()
+        let env = await Factory.createBudgetClient()
 
         try await withMainSerialExecutor {
             // when
@@ -66,10 +65,11 @@ private enum Factory {
 
     /// Helper method to construct a `BudgetClient` and provide references to dependencies
     /// via the `Env` struct  used in construction
+    @MainActor
     static func createBudgetClient(accessToken: String? = nil) -> Env {
         let budgetProvider = mockBudgetProvider
         let store: KeyValueStore = InMemoryKeyValueStore()
-        let client = BudgetClient.makeClient(
+        let client = BudgetClient.makeLiveClient(
             accessToken: accessToken,
             bugdetProvider: budgetProvider,
             store: store

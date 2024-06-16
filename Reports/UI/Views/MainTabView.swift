@@ -30,6 +30,7 @@ struct MainTab {
     }
 
     let logger = LogFactory.create(Self.self)
+    @Dependency(\.savedReportQuery) var savedReportQuery
 
     var body: some ReducerOf<Self> {
         Scope(state: \.home, action: \.home) {
@@ -53,8 +54,9 @@ struct MainTab {
                 }
                 return .none
 
-            case let .savedReports(.delegate(.rowTapped(savedReport))):
+            case let .savedReports(.delegate(.rowTapped(reportId))):
                 do {
+                    let savedReport = try savedReportQuery.fetchOne(reportId)
                     state.report = try .init(sourceData: .existing(savedReport))
                 } catch {
                     logger.error("\(error.toString())")

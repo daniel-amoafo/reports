@@ -2,52 +2,51 @@
 
 import Foundation
 
-public final class InMemoryKeyValueStore {
+public actor InMemoryKeyValueStore {
 
     // MARK: - Private Properties
 
-    @Atomic
-    private var storage: [String: Any]
+    private var storage: [String: any KeyValueStoreValue] = [:]
 
-    public init(storage: [String: Any] = [:]) {
+    public init(storage: [String: any KeyValueStoreValue] = [:]) {
         self.storage = storage
     }
 }
 
-extension InMemoryKeyValueStore: KeyValueStore {
+extension InMemoryKeyValueStore: @preconcurrency KeyValueStore {
 
     // MARK: - KeyValueStore
 
     public var count: Int {
-        return storage.count
+        storage.count
     }
 
-    public var keys: any Collection<String> {
-        return storage.keys
+    public var keys: [String] {
+        storage.keys.compactMap { $0 as String }
     }
 
     public func bool(forKey key: String) -> Bool? {
-        return storage[key] as? Bool
+        storage[key] as? Bool
     }
 
     public func integer(forKey key: String) -> Int? {
-        return storage[key] as? Int
+        storage[key] as? Int
     }
 
     public func double(forKey key: String) -> Double? {
-        return storage[key] as? Double
+        storage[key] as? Double
     }
 
     public func string(forKey key: String) -> String? {
-        return storage[key] as? String
+        storage[key] as? String
     }
 
     public func data(forKey key: String) -> Data? {
-        return storage[key] as? Data
+        storage[key] as? Data
     }
 
     public func date(forKey key: String) -> Date? {
-        return storage[key] as? Date
+        storage[key] as? Date
     }
 
     public func url(forKey key: String) -> URL? {
@@ -56,11 +55,11 @@ extension InMemoryKeyValueStore: KeyValueStore {
     }
 
     public func array<T: KeyValueStoreValue>(forKey key: String) -> [T]? {
-        return storage[key] as? [T]
+        storage[key] as? [T]
     }
 
     public func dictionary<T: KeyValueStoreValue>(forKey key: String) -> [String: T]? {
-        return storage[key] as? [String: T]
+        storage[key] as? [String: T]
     }
 
     public func set(_ value: Bool?, forKey key: String) {

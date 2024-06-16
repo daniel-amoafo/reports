@@ -3,7 +3,6 @@
 import BudgetSystemService
 import Dependencies
 
-private var _liveValue: BudgetClient = .notAuthorizedClient
 private let _accessTokenKey = "ynab-access-token"
 
 extension BudgetClient {
@@ -19,7 +18,7 @@ extension BudgetClient {
         authorizationStatus = .loggedOut
     }
 
-    static func makeClient(
+    static func makeLiveClient(
         accessToken: String? = nil,
         bugdetProvider: BudgetProvider? = nil,
         store: KeyValueStore = SecureKeyValueStore()
@@ -33,9 +32,7 @@ extension BudgetClient {
         // use the supplied budgetProvider otherwise default to ynab budget provider
         let provider: BudgetProvider = bugdetProvider ?? .ynab(accessToken: accessToken)
 
-        @Dependency(\.configProvider) var configProvider
-        let selectedBudgetId = configProvider.selectedBudgetId
-        return .init(provider: provider, selectedBudgetId: selectedBudgetId)
+        return .init(provider: provider)
     }
 
     static func storeAccessToken(accessToken: String?, store: KeyValueStore = SecureKeyValueStore()) {
@@ -47,31 +44,18 @@ extension BudgetClient {
     }
 }
 
-extension BudgetClient: DependencyKey {
+extension BudgetClient: @retroactive DependencyKey {
 
-    public static var liveValue: BudgetClient {
-        if _liveValue.authorizationStatus == .loggedIn {
-            // use the cached client if logged in.
-            return _liveValue
-        }
+    nonisolated(unsafe) public static let liveValue = BudgetClient.makeLiveClient()
 
-        _liveValue = makeClient()
+    nonisolated(unsafe) public static let testValue: BudgetClient = BudgetClient.testsAndPreviews
 
-        return _liveValue
-    }
+    nonisolated(unsafe) public static let previewValue = BudgetClient.testsAndPreviews
 
-    public static let previewValue: BudgetClient = {
-        .testsAndPreviews
-    }()
-}
-
-extension BudgetClient: TestDependencyKey {
-    public static let testValue: BudgetClient = {
-        .testsAndPreviews
-    }()
 }
 
 extension DependencyValues {
+
     var budgetClient: BudgetClient {
         get { self[BudgetClient.self] }
         set { self[BudgetClient.self] = newValue }

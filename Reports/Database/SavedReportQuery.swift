@@ -6,10 +6,13 @@ import Foundation
 import OSLog
 import SwiftData
 
+typealias PersistentId = PersistentIdentifier
+
 /// Provides Database CRUD operations for the `SavedReport` data model object.
 struct SavedReportQuery {
     var fetchAll: @Sendable () throws -> [SavedReport] // fix fetch only a budgetId
     var fetch: @Sendable (FetchDescriptor<SavedReport>) throws -> [SavedReport]
+    var fetchOne: @Sendable (PersistentId) throws -> SavedReport
     var fetchCount: @Sendable (FetchDescriptor<SavedReport>) throws -> Int
     var add: @Sendable (SavedReport) throws -> Void
     var delete: @Sendable (SavedReport) throws -> Void
@@ -17,16 +20,17 @@ struct SavedReportQuery {
     enum SavedReportQueryError: Error {
         case add(String)
         case delete(String)
+        case notFound(String)
     }
 }
 
 extension SavedReportQuery: DependencyKey {
 
-    static let liveValue = Self.impl
+    nonisolated(unsafe) static let liveValue = Self.impl
 
     // tests & previews use an in memory modelContext so data is not written to a persistent database.
-    static let testValue = Self.impl
-    static var previewValue = Self.impl
+    nonisolated(unsafe) static let testValue = Self.impl
+    nonisolated(unsafe) static var previewValue = Self.impl
 }
 
 private extension SavedReportQuery {
@@ -55,6 +59,15 @@ private extension SavedReportQuery {
             logger.error("\(error.toString())")
             return []
         }
+    } fetchOne: { identifier in
+
+        guard let savedReport = modelContext.model(for: identifier) as? SavedReport else {
+            let msg = "Unable to find savedReport with id: \(identifier)"
+            logger.error("\(msg)")
+            throw SavedReportQueryError.notFound(msg)
+        }
+        return savedReport
+
     } fetchCount: { descriptor in
         do {
             return try modelContext.fetchCount(descriptor)

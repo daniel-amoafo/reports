@@ -4,11 +4,11 @@ import Foundation
 import SwiftUI
 
 struct IdentifiableIndices<Base: RandomAccessCollection>
-    where Base.Element: Identifiable {
+where Base.Element: Identifiable, Base.Index: Sendable, Base.Element.ID: Sendable {
 
     typealias Index = Base.Index
 
-    struct Element: Identifiable {
+    struct Element: Identifiable, Sendable {
         let id: Base.Element.ID
         let rawValue: Index
     }
@@ -65,7 +65,8 @@ extension IdentifiableIndices: RandomAccessCollection {
     }
 }
 
-extension RandomAccessCollection where Element: Identifiable {
+extension RandomAccessCollection
+where Element: Identifiable, Element.ID: Sendable, Index: Sendable {
     var identifiableIndices: IdentifiableIndices<Self> {
         IdentifiableIndices(base: self)
     }

@@ -4,8 +4,8 @@ import Dependencies
 import Foundation
 import SwiftData
 
-struct Database {
-    var swiftData: ModelContext
+struct Database: Sendable {
+    nonisolated(unsafe) var swiftData: ModelContext
     var grdb: GRDBDatabase
 
     init(swiftData: @escaping () throws -> ModelContext, grdb: @escaping () throws -> GRDBDatabase) {

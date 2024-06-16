@@ -85,12 +85,6 @@
     "From" : {
       "comment" : "the start date field title"
     },
-    "Hello" : {
-
-    },
-    "Hello World" : {
-
-    },
     "Hmm, something went wrong.\nPlease try again" : {
       "comment" : "text displayed when unable to load screen into a valid state. Ask the user to retry"
     },
@@ -110,9 +104,6 @@
 
     },
     "Logout" : {
-
-    },
-    "Main Budget" : {
 
     },
     "Mode" : {
@@ -148,20 +139,8 @@
     "Opps, there was an unexpected error loading the saved report." : {
       "comment" : "A generic error message displauyed when unable to load a saved report for an unknown reason"
     },
-    "Outline" : {
-
-    },
-    "Outline Compact" : {
-
-    },
     "Please select an account for the report" : {
       "comment" : "the account for which the transactions the report will be based on"
-    },
-    "Primary" : {
-
-    },
-    "Primary Disabled" : {
-
     },
     "Reconnect" : {
       "comment" : "Button title when unable to load app to a valid state"
@@ -186,9 +165,6 @@
     },
     "Saved Reports" : {
       "comment" : "List Title for Saved Reports\nThe saved reports screen main title"
-    },
-    "Secondary" : {
-
     },
     "Select a budget" : {
       "comment" : "Placeholder text if no budget has been set."
@@ -217,9 +193,6 @@
     "Single" : {
 
     },
-    "Size Categories" : {
-
-    },
     "Some Accounts" : {
       "comment" : "A label indicating a few accounts have been selected for the report."
     },
@@ -231,15 +204,6 @@
     },
     "The Saved Report Account could not be found." : {
       "comment" : "Error displayed when the account id wasn't found in database"
-    },
-    "This is a bottom row" : {
-
-    },
-    "This is a middle row" : {
-
-    },
-    "This is a top row" : {
-
     },
     "To" : {
       "comment" : "the end date field title"

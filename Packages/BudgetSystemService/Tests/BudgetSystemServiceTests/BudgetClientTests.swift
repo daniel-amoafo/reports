@@ -24,8 +24,7 @@ final class BudgetClientTests: XCTestCase {
         // Given
         let budgetId = "Budget1"
         let budgetProvider = Factory.createBudgetProvider()
-        sut = BudgetClient(provider: budgetProvider, selectedBudgetId: budgetId)
-
+        sut = BudgetClient(provider: budgetProvider)
 
         _ = try await sut.fetchBudgetSummaries()
 
@@ -36,60 +35,9 @@ final class BudgetClientTests: XCTestCase {
         XCTAssertEqual(result.categories, Factory.categories)
     }
 
-    @MainActor
-    func testUpdateSelectedAccountSuccess() async throws {
-        // given
-        let budgetProvider = Factory.createBudgetProvider()
-        sut = BudgetClient(provider: budgetProvider)
-
-        _ = try await sut.fetchBudgetSummaries()
-        await Task.megaYield()
-        XCTAssertNil(sut.selectedBudgetId)
-
-        // when
-        try sut.updateSelectedBudgetId("Budget2")
-
-        // then
-        XCTAssertEqual(sut.selectedBudgetId, "Budget2")
-    }
-
-    @MainActor
-    func testUpdateSelectedAccountThrowsError() async throws {
-        // given
-        let budgetProvider = Factory.createBudgetProvider()
-        sut = BudgetClient(provider: budgetProvider)
-
-        _ = try await sut.fetchBudgetSummaries()
-        await Task.megaYield()
-        XCTAssertNil(sut.selectedBudgetId)
-
-        do {
-            // when
-            try sut.updateSelectedBudgetId("BudgetIdDoesNotExists")
-
-        } catch {
-            // then
-            XCTAssertTrue(error is BudgetClientError)
-            XCTAssertEqual(error.localizedDescription, "The selected budget is not valid or could not be found.")
-        }
-    }
-
 }
 
 private enum Factory {
-
-    @MainActor
-    static func createBudgetClientWithSelectBudgetId(_ budgetId: String) async throws -> BudgetClient {
-        let provider = createBudgetProvider()
-        let client = BudgetClient(provider: provider)
-
-        _ = try await client.fetchBudgetSummaries()
-        await Task.megaYield()
-        XCTAssertNil(client.selectedBudgetId)
-        try client.updateSelectedBudgetId(budgetId)
-
-        return client
-    }
 
     static func createBudgetProvider(
         budgetSummaries: [BudgetSummary]? = nil,

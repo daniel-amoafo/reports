@@ -1,6 +1,6 @@
 // Created by Daniel Amoafo on 17/5/2024.
 
-import Combine
+@preconcurrency import Combine
 import Foundation
 
 /// AsyncPublisher vends a .value property however does not reliably emit values

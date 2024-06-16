@@ -49,7 +49,7 @@ struct SavedReportsFeature {
         }
     }
 
-    enum Action {
+    enum Action: Sendable {
         case didUpdateSavedReports
         case delete(atOffsets: IndexSet)
         case delegate(Delegate)
@@ -58,8 +58,8 @@ struct SavedReportsFeature {
     }
 
     @CasePathable
-    enum Delegate {
-        case rowTapped(report: SavedReport)
+    enum Delegate: Sendable {
+        case rowTapped(id: PersistentId)
     }
 
     // MARK: Dependencies

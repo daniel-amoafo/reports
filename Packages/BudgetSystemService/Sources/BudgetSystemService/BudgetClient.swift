@@ -4,24 +4,22 @@ import IdentifiedCollections
 import OSLog
 
 @MainActor
-public class BudgetClient {
+public final class BudgetClient {
 
     public private(set) var provider: BudgetProvider
 
     @Published public private(set) var budgetSummaries: IdentifiedArrayOf<BudgetSummary> = []
-    @Published public private(set) var accounts: IdentifiedArrayOf<Account> = []
-    @Published public var authorizationStatus: AuthorizationStatus
-    @Published public private(set) var selectedBudgetId: String?
+    @Published public var authorizationStatus: AuthorizationStatus = .unknown
 
     private let logger = Logger(subsystem: "BudgetSystemService", category: "BudgetClient")
 
     public init(
         provider: BudgetProvider,
-        selectedBudgetId: String? = nil,
+        budgetSummaries: IdentifiedArrayOf<BudgetSummary> = [],
         authorizationStatus: AuthorizationStatus = .unknown
     ) {
         self.provider = provider
-        self.selectedBudgetId = selectedBudgetId
+        self.budgetSummaries = budgetSummaries
         self.authorizationStatus = authorizationStatus
     }
 
@@ -29,46 +27,20 @@ public class BudgetClient {
         authorizationStatus == .loggedIn
     }
 
-    public var selectedBudget: BudgetSummary? {
-        guard let selectedBudgetId else { return nil }
-        return budgetSummaries[id: selectedBudgetId]
-    }
-
     public func updateProvider(_ provider: BudgetProvider) {
         self.provider = provider
     }
-
-    public func updateSelectedBudgetId(_ selectedId: String) throws {
-        guard budgetSummaries.map(\.id).contains(selectedId) else {
-            throw BudgetClientError.selectedBudgetIdInvalid
-        }
-        guard selectedId != selectedBudgetId else {
-            logger.debug("Selected budgetId is already set to: \(selectedId). No action taken.")
-            return
-        }
-        selectedBudgetId = selectedId
-        logger.debug("BudgetClient selectedBudgetId updated to: \(selectedId)")
-    }
-
 
     public func fetchBudgetSummaries() async throws -> [BudgetSummary] {
         do {
             logger.debug("fetching budget summaries ...")
             let budgetSummaries = try await provider.fetchBudgetSummaries()
             logger.debug("budgetSummaries count(\(budgetSummaries.count))")
-            await Task { @MainActor in
-                self.budgetSummaries = IdentifiedArray(uniqueElements: budgetSummaries)
-                self.authorizationStatus = .loggedIn
-                // If set, ensure the selected budget id is in the updated budget summaries
-                if let selectedBudgetId = self.selectedBudgetId,
-                   !budgetSummaries.map(\.id).contains(selectedBudgetId) {
-                    self.selectedBudgetId = nil
-                    logger.debug("selectedBudgetId set to nil")
-                }
-            }.value
+            self.budgetSummaries = IdentifiedArray(uniqueElements: budgetSummaries)
+            self.authorizationStatus = .loggedIn
             return budgetSummaries
         } catch {
-            logoutIfNeeded(error)
+            await logoutIfNeeded(error)
             throw error
         }
     }
@@ -84,7 +56,7 @@ public class BudgetClient {
             )
             return (result.0, result.1, result.2)
         } catch {
-            logoutIfNeeded(error)
+            await logoutIfNeeded(error)
             return ([], [], 0)
         }
     }
@@ -106,7 +78,7 @@ public class BudgetClient {
         )
     }
 
-    func logoutIfNeeded(_ error: Error) {
+    func logoutIfNeeded(_ error: Error) async {
         if let budgetClientError = error as? BudgetClientError,
            budgetClientError.isNotAuthorized {
             self.authorizationStatus = .loggedOut
@@ -118,14 +90,13 @@ public class BudgetClient {
 
 }
 
-// MARK: - Previews Initializer
+// MARK: - Initializer for Previews
 
 extension BudgetClient {
     
     /// Only for Preview Usage. Sets the published properties with their values for previews
     public convenience init(
         budgetSummaries: IdentifiedArrayOf<BudgetSummary>,
-        accounts: IdentifiedArrayOf<Account>,
         categoryGroups: IdentifiedArrayOf<CategoryGroup>,
         categories: IdentifiedArrayOf<Category>,
         transactions: IdentifiedArrayOf<TransactionEntry>,
@@ -141,13 +112,8 @@ extension BudgetClient {
         } fetchAllTransactions: { _ in
             (transactions.elements, 0)
         }
-        self.init(provider: provider)
-
         // set the published values so previews work and not dependent on async routines
-        self.budgetSummaries = budgetSummaries
-        self.accounts = accounts
-        self.authorizationStatus = authorizationStatus
-        self.selectedBudgetId = selectedBudgetId
+        self.init(provider: provider, budgetSummaries: budgetSummaries, authorizationStatus: authorizationStatus)
     }
 }
 

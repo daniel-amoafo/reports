@@ -53,7 +53,6 @@ enum ReportFeatureSourceLoader {
                             "\(String(describing: SavedReport.self)) - invalid account id(s) in (\(accountIdsString))."
                         )
                         throw LoadError.invalidSelectedAccount(Strings.invalidAccount)
-
                     }
                     selectedAcountIds = accountIdsString
                 } else {

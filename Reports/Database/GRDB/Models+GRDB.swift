@@ -9,9 +9,9 @@ import MoneyCommon
 /// This improves fetch requests & speeds data transfer from YNAB server endpoints
 /// by only getting changed values since the last fetch
 /// see: https://api.ynab.com/#deltas
-struct ServerKnowledgeConfig: Codable, FetchableRecord, PersistableRecord, CustomDebugStringConvertible {
+struct ServerKnowledgeConfig: Codable, FetchableRecord, PersistableRecord, CustomDebugStringConvertible, Sendable {
 
-    static let budgetSummary = belongsTo(BudgetSummary.self)
+    nonisolated(unsafe) static let budgetSummary = belongsTo(BudgetSummary.self)
 
     let budgetId: String
 
@@ -32,7 +32,7 @@ struct ServerKnowledgeConfig: Codable, FetchableRecord, PersistableRecord, Custo
         case transactions
     }
 
-    enum Value {
+    enum Value: Sendable {
         case categories(Int), transactions(Int)
     }
 }
@@ -41,9 +41,9 @@ struct ServerKnowledgeConfig: Codable, FetchableRecord, PersistableRecord, Custo
 
 extension BudgetSummary: FetchableRecord, PersistableRecord {
 
-    static let transactions = hasMany(TransactionEntry.self)
-    static let dbAccounts = hasMany(Account.self)
-    static let categoryGroup = hasMany(CategoryGroup.self)
+    nonisolated(unsafe) static let transactions = hasMany(TransactionEntry.self)
+    nonisolated(unsafe) static let dbAccounts = hasMany(Account.self)
+    nonisolated(unsafe) static let categoryGroup = hasMany(CategoryGroup.self)
 
     public func encode(to container: inout PersistenceContainer) throws {
         container["id"] = id
@@ -72,7 +72,7 @@ extension BudgetSummary: FetchableRecord, PersistableRecord {
 
 extension Account: FetchableRecord, PersistableRecord {
 
-    static let budgetSummary = belongsTo(BudgetSummary.self)
+    nonisolated(unsafe) static let budgetSummary = belongsTo(BudgetSummary.self)
 
     enum Column: String, CodingKey, ColumnExpression {
         case id, name, onBudget, closed, deleted
@@ -102,8 +102,8 @@ extension Account: FetchableRecord, PersistableRecord {
 
 extension CategoryGroup: FetchableRecord, PersistableRecord {
 
-    static let budgetSummary = belongsTo(BudgetSummary.self)
-    static let category = hasMany(Category.self)
+    nonisolated(unsafe) static let budgetSummary = belongsTo(BudgetSummary.self)
+    nonisolated(unsafe) static let category = hasMany(Category.self)
 
     enum Column: String, CodingKey, ColumnExpression {
         case id, name, hidden, deleted
@@ -131,8 +131,8 @@ extension CategoryGroup: FetchableRecord, PersistableRecord {
 
 extension BudgetSystemService.Category: FetchableRecord, PersistableRecord {
 
-    static let budgetSummary = belongsTo(BudgetSummary.self)
-    static let categoryGroup = belongsTo(CategoryGroup.self)
+    nonisolated(unsafe) static let budgetSummary = belongsTo(BudgetSummary.self)
+    nonisolated(unsafe) static let categoryGroup = belongsTo(CategoryGroup.self)
 
     enum Column: String, CodingKey, ColumnExpression {
         case id, name, hidden, deleted, categoryGroupId
@@ -162,7 +162,7 @@ extension BudgetSystemService.Category: FetchableRecord, PersistableRecord {
 
 extension TransactionEntry: FetchableRecord, PersistableRecord {
 
-    static let budgetSummary = belongsTo(BudgetSummary.self)
+    nonisolated(unsafe) static let budgetSummary = belongsTo(BudgetSummary.self)
 
     var budgetSummary: QueryInterfaceRequest<BudgetSummary> {
         request(for: TransactionEntry.budgetSummary)

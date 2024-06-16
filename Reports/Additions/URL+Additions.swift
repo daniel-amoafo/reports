@@ -20,7 +20,7 @@ extension URL {
         }
         // take the array of fragments and store values as a dictionary,
         // each entry will have a string value of key=value format.
-        return array.reduce(into: [String: String]()) { (dict, substring) -> Void in
+        return array.reduce(into: [String: String]()) { (dict, substring) in
             if let index = substring.firstIndex(where: { $0 == "=" }) {
                 let key = String(substring[substring.startIndex..<index])
                 let value = String(substring[substring.index(after: index)..<substring.endIndex])

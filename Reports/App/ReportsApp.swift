@@ -34,7 +34,7 @@ struct AppFeature: Sendable {
     @Dependency(\.configProvider) var configProvider
     @Dependency(\.continuousClock) var clock
 
-    private let logger = LogFactory.create(Self.self)
+    nonisolated(unsafe) private static let logger = LogFactory.create(Self.self)
 
     var body: some ReducerOf<Self> {
         Scope(state: \.appIntroLogin, action: \.appIntroLogin) {
@@ -58,7 +58,7 @@ struct AppFeature: Sendable {
             case let .didUpdateAuthStatus(newStatus):
                 guard newStatus != state.authStatus else { return  .none }
                 let oldStatus = state.authStatus
-                logger.debug("authStatus update new: \(newStatus), old: \(oldStatus)")
+                Self.logger.debug("authStatus update new: \(newStatus), old: \(oldStatus)")
                 state.authStatus = newStatus
                 return .run { _ in
                     if newStatus == .loggedIn, oldStatus == .loggedOut {
@@ -95,7 +95,7 @@ private extension AppFeature {
 
     func handleOpenURL(_ url: URL, state: inout State) {
         guard url.isDeeplink, let host = url.host() else {
-            logger.warning("supplied url was not a known deeplink path. \(url)")
+            Self.logger.warning("supplied url was not a known deeplink path. \(url)")
             return
         }
 
@@ -103,7 +103,7 @@ private extension AppFeature {
         case "oauth":
                 if let accessToken = url.fragmentItems?["access_token"], accessToken.isNotEmpty {
                     state.appIntroLogin.showSafariBrowser = nil
-                    logger.info("oauth url path handled, updated budget client with new access token.")
+                    Self.logger.info("oauth url path handled, updated budget client with new access token.")
                     Task { @MainActor in
                         budgetClient.updateYnabProvider(accessToken)
                         await syncBudgetData()
@@ -120,13 +120,6 @@ private extension AppFeature {
 
     /// Spawns unstructured Async Task to monitor for budgetClient changes.
     func startAsyncListeners(send: Send<AppFeature.Action>) async {
-
-        Task { @MainActor in
-            // Monitor when the budgetId changes and sync db values for the new selectedBudgetId
-            for await _ in budgetClient.$selectedBudgetId.stream {
-//                await syncBudgetData()
-            }
-        }
 
         // await the last task to keep the run effect from completing.
         // A Reducer run effect cannot complete if send actions will be emitted.
@@ -149,7 +142,7 @@ private extension AppFeature {
             try await syncTransactionHistory()
 
         } catch {
-            logger.error("\(String(describing: error))")
+            Self.logger.error("\(String(describing: error))")
             // !! User friendly alert required to flag something important hasn't completed.
         }
     }
@@ -159,12 +152,12 @@ private extension AppFeature {
     func syncWorkspaceValues() throws {
 
         guard let budgetId = configProvider.selectedBudgetId else {
-            logger.warning("\(#function) - halted. budgetId not found")
+            Self.logger.warning("\(#function) - halted. budgetId not found")
             return
         }
 
         guard let budget = try BudgetSummary.fetch(id: budgetId) else {
-            logger.error("\(#function) - halted. a budget record could not be found for (\(budgetId)")
+            Self.logger.error("\(#function) - halted. a budget record could not be found for (\(budgetId)")
             return
         }
 
@@ -176,16 +169,16 @@ private extension AppFeature {
         @Shared(.wsValues) var workspaceValues
         workspaceValues.accountsOnBudgetNames = accountNames
         workspaceValues.budgetCurrency = budget.currency
-        logger.debug("Synced workspace values")
+        Self.logger.debug("Synced workspace values")
     }
 
     func syncBudgetSummaries() async throws -> Bool {
         let summaries = try await budgetClient.fetchBudgetSummaries()
         guard summaries.isNotEmpty else {
-            logger.warning("No budget summaries fetched! Halting db sync.")
+            Self.logger.warning("No budget summaries fetched! Halting db sync.")
             return false
         }
-        logger.debug("Syncing summaries and accounts to db...")
+        Self.logger.debug("Syncing summaries and accounts to db...")
         try BudgetSummary.save(summaries)
 
         return true
@@ -201,11 +194,11 @@ private extension AppFeature {
         )
 
         if groups.isEmpty && categories.isEmpty {
-            logger.debug("No new / updated category values since last sync.")
+            Self.logger.debug("No new / updated category values since last sync.")
             return
         }
 
-        logger.debug("Syncing category values to db...")
+        Self.logger.debug("Syncing category values to db...")
         try CategoryGroup.save(
             groups: groups,
             categories: categories,
@@ -221,11 +214,11 @@ private extension AppFeature {
             .fetchAllTransactions(budgetId: selectedId, lastServerKnowledge: lastServerKnowledge)
 
         guard transactions.isNotEmpty else {
-            logger.debug("No new / updated transactions since last sync.")
+            Self.logger.debug("No new / updated transactions since last sync.")
             return
         }
 
-        logger.debug("Syncing transaction history to db...")
+        Self.logger.debug("Syncing transaction history to db...")
         try TransactionEntry.save(transactions, serverKnowledge: newServerKnowledge)
     }
 

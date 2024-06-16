@@ -3,6 +3,7 @@
 import Dependencies
 import SwiftUI
 
+@MainActor
 struct SettingsView: View {
 
     @Dependency(\.budgetClient) private var budgetClient

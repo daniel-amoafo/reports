@@ -1,7 +1,7 @@
 // Created by Daniel Amoafo on 5/2/2024.
 
 import Foundation
-import KeychainSwift
+@preconcurrency import KeychainSwift
 
 public final class SecureKeyValueStore {
 
@@ -21,7 +21,7 @@ extension SecureKeyValueStore: KeyValueStore {
         return keychain.allKeys.count
     }
 
-    public var keys: any Collection<String> {
+    public var keys: [String] {
         return keychain.allKeys
     }
 

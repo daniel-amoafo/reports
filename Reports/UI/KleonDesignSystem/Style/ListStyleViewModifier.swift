@@ -2,6 +2,7 @@
 
 import SwiftUI
 
+@MainActor
 struct ListStyleViewModifier {
 
     enum RowType {

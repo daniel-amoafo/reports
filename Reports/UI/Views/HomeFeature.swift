@@ -24,9 +24,10 @@ struct HomeFeature: Sendable {
         }
 
         func isReportBottomRow(_ savedReport: SavedReport) -> Bool {
-            // if savedReports.count is equal to max then a final row with a button is displayed.
-            // Dont matter if this is the last savedReport entry.
+            // If savedReports.count is equal to max then a final row with a button will be displayed.
+            // It doesn't matter if this is the last savedReport entry.
             guard displayedSavedReports.count != maxDisplayedSavedReports else { return false }
+
             if let lastReport = displayedSavedReports.last, lastReport.id == savedReport.id {
                 return true
             }
@@ -80,7 +81,7 @@ struct HomeFeature: Sendable {
                 Self.logger.debug("selectedBudgetId updated to: \(selectedBudgetId ?? "[nil]")")
                 return .run { _ in
                     guard let selectedBudgetId else { return }
-                    await updateBudgetClientSelectedBudgetId(selectedBudgetId)
+                    updateBudgetClientSelectedBudgetId(selectedBudgetId)
                 }
 
             case let .didSelectChart(chart):
@@ -130,15 +131,8 @@ struct HomeFeature: Sendable {
 
 private extension HomeFeature {
 
-    @MainActor
     func updateBudgetClientSelectedBudgetId(_ selectedBudgetId: String) {
-        do {
-            try budgetClient.updateSelectedBudgetId(selectedBudgetId)
-            configProvider.selectedBudgetId = selectedBudgetId
-
-        } catch {
-            Self.logger.error("Error attempting to update selectedBudgetId: \(error.toString())")
-        }
+        configProvider.selectedBudgetId = selectedBudgetId
     }
 
     func fetchDisplayedSavedReports() -> ([SavedReport], Int) {

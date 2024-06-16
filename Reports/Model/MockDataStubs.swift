@@ -88,7 +88,7 @@ extension IdentifiedArrayOf where Element == BudgetSummary, ID == BudgetSummary.
             firstMonth: "March",
             lastMonth: "May",
             currency: .AUD,
-            accounts: []
+            accounts: IdentifiedArrayOf<Account>.mocks.elements
         ),
         .init(
             id: "Budget2",
@@ -356,7 +356,6 @@ extension BudgetClient {
     static var testsAndPreviews: BudgetClient {
         .init(
             budgetSummaries: .mocks,
-            accounts: .mocks,
             categoryGroups: .mocks,
             categories: .mocks,
             transactions: .mocks,
@@ -371,7 +370,7 @@ extension BudgetClient {
 
 extension SavedReport {
 
-    static let mocks: [SavedReport] = {
+    nonisolated(unsafe) static let mocks: [SavedReport] = {
         [
             .init(
                 id: UUID(uuidString: "00000000-0000-0000-0000-000000000011")!,

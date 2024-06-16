@@ -11,7 +11,10 @@ import GRDB
 // Helper fixture to access the grdb instance
 private enum Shared {
 
-    @Dependency(\.database.grdb) static var grdb
+    static var grdb: GRDBDatabase {
+        @Dependency(\.database.grdb) var sharedGrdb
+        return sharedGrdb
+    }
 }
 
 extension ServerKnowledgeConfig {

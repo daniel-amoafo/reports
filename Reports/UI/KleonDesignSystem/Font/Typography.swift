@@ -100,7 +100,7 @@ public extension Typography {
 
 private extension Typography {
 
-    static var fontFullNameMapping: [String: String] = [:]
+    nonisolated(unsafe) static var fontFullNameMapping: [String: String] = [:]
 
     func font(size: CGFloat, relativeTo: Font.TextStyle = .body) -> Font {
         _ = Self.registerWeightsOnce

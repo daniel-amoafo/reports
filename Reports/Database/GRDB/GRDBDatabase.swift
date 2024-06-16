@@ -5,7 +5,7 @@ import Foundation
 import GRDB
 import IdentifiedCollections
 
-struct GRDBDatabase {
+struct GRDBDatabase: Sendable {
 
     /// Provides access to the database.
     private let dbWriter: any DatabaseWriter
@@ -20,7 +20,7 @@ struct GRDBDatabase {
 
 extension GRDBDatabase {
 
-    enum ValidationError: LocalizedError {
+    enum ValidationError: LocalizedError, Sendable {
         case missingBudgetId
 
         var errorDescription: String? {
@@ -35,7 +35,8 @@ extension GRDBDatabase {
 // MARK: - Database Configuration
 
 extension GRDBDatabase {
-    private static let logger = LogFactory.create(Self.self)
+
+    nonisolated(unsafe) private static let logger = LogFactory.create(Self.self)
 
     /// Returns a database configuration suited for `PlayerRepository`.
     ///
