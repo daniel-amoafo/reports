@@ -45,3 +45,20 @@ extension SavedReport: CustomDebugStringConvertible {
     }
 
 }
+
+// MARK: -
+
+/// A lightweight immuatable, Sendable version of a SavedReport.
+/// Contains only required fields for displaying content to screen.
+struct DisplaySavedReport: Identifiable, Equatable, Sendable {
+
+    let id: UUID
+    let name: String
+    let chartId: String
+
+    init(_ report: SavedReport) {
+        self.id = report.id
+        self.name = report.name
+        self.chartId = report.chartId
+    }
+}

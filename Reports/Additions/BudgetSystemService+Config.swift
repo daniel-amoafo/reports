@@ -18,7 +18,7 @@ extension BudgetClient {
         authorizationStatus = .loggedOut
     }
 
-    static func makeLiveClient(
+    static func makeClient(
         accessToken: String? = nil,
         bugdetProvider: BudgetProvider? = nil,
         store: KeyValueStore = SecureKeyValueStore()
@@ -46,7 +46,7 @@ extension BudgetClient {
 
 extension BudgetClient: @retroactive @preconcurrency DependencyKey {
 
-    public static let liveValue = BudgetClient.makeLiveClient()
+    public static let liveValue = BudgetClient.makeClient()
 
 }
 

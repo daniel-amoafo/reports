@@ -14,7 +14,7 @@ struct HomeFeature: Sendable {
         var selectedBudgetId: String?
         var budgetList: IdentifiedArrayOf<BudgetSummary>?
         var charts: [ReportChart] = []
-        var displayedSavedReports: [SavedReport] = []
+        var displaySavedReports: [DisplaySavedReport] = []
         var totalSavedReportsCount: Int = 0
         var showSelectBudget = false
 
@@ -23,12 +23,12 @@ struct HomeFeature: Sendable {
             return budgetList?[id: selectedBudgetId]?.name
         }
 
-        func isReportBottomRow(_ savedReport: SavedReport) -> Bool {
+        func isReportBottomRow(_ displayedSavedReport: DisplaySavedReport) -> Bool {
             // If savedReports.count is equal to max then a final row with a button will be displayed.
             // It doesn't matter if this is the last savedReport entry.
-            guard displayedSavedReports.count != maxDisplayedSavedReports else { return false }
+            guard displaySavedReports.count != maxDisplayedSavedReports else { return false }
 
-            if let lastReport = displayedSavedReports.last, lastReport.id == savedReport.id {
+            if let lastReport = displaySavedReports.last, lastReport == displayedSavedReport {
                 return true
             }
             return false
@@ -40,7 +40,7 @@ struct HomeFeature: Sendable {
         case didUpdateSelectedBudgetId(String?)
         case didSelectChart(ReportChart)
         case didUpdateSavedReports
-        case didSelectSavedReport(SavedReport)
+        case didSelectSavedReport(UUID)
         case delegate(Delegate)
         case showSelectBudgetTapped(Bool)
         case viewAllButtonTapped
@@ -62,7 +62,7 @@ struct HomeFeature: Sendable {
     @Dependency(\.continuousClock) var clock
     @Dependency(\.modelContextNotifications) var modelContextNotifications
 
-    nonisolated(unsafe) static let logger = LogFactory.create(Self.self)
+    static let logger = LogFactory.create(Self.self)
 
     var body: some ReducerOf<Self> {
         Reduce<State, Action> { state, action in
@@ -92,13 +92,13 @@ struct HomeFeature: Sendable {
                 return .send(.delegate(.presentReport(sourceData)))
 
             case .didUpdateSavedReports:
-                let (savedReports, total) = fetchDisplayedSavedReports()
-                state.displayedSavedReports = savedReports
+                let (displayedSavedReports, total) = fetchDisplayedSavedReports()
+                state.displaySavedReports = displayedSavedReports
                 state.totalSavedReportsCount = total
                 return .none
 
-            case let .didSelectSavedReport(savedReport):
-                let sourceData = ReportFeature.State.SourceData.existing(savedReport.id)
+            case let .didSelectSavedReport(id):
+                let sourceData = ReportFeature.State.SourceData.existing(id)
                 return .send(.delegate(.presentReport(sourceData)))
 
             case .viewAllButtonTapped:
@@ -135,7 +135,7 @@ private extension HomeFeature {
         configProvider.selectedBudgetId = selectedBudgetId
     }
 
-    func fetchDisplayedSavedReports() -> ([SavedReport], Int) {
+    func fetchDisplayedSavedReports() -> ([DisplaySavedReport], Int) {
         do {
             var descriptor = FetchDescriptor<SavedReport>(
                 sortBy: [
@@ -143,9 +143,9 @@ private extension HomeFeature {
                 ]
             )
             descriptor.fetchLimit = Self.maxDisplayedSavedReports
-            let savedReports = try savedReportQuery.fetch(descriptor)
+            let displayedSavedReports = try savedReportQuery.fetch(descriptor).map(DisplaySavedReport.init)
             let total = try savedReportQuery.fetchCount(FetchDescriptor<SavedReport>())
-            return (savedReports, total)
+            return (displayedSavedReports, total)
         } catch {
             Self.logger.error("\(error.toString())")
             return ([], 0)

@@ -2,7 +2,7 @@
 
 import Foundation
 
-public actor InMemoryKeyValueStore {
+public final class InMemoryKeyValueStore {
 
     // MARK: - Private Properties
 
@@ -13,7 +13,7 @@ public actor InMemoryKeyValueStore {
     }
 }
 
-extension InMemoryKeyValueStore: @preconcurrency KeyValueStore {
+extension InMemoryKeyValueStore: @unchecked Sendable, KeyValueStore {
 
     // MARK: - KeyValueStore
 

@@ -69,7 +69,7 @@ private enum Factory {
     static func createBudgetClient(accessToken: String? = nil) -> Env {
         let budgetProvider = mockBudgetProvider
         let store: KeyValueStore = InMemoryKeyValueStore()
-        let client = BudgetClient.makeLiveClient(
+        let client = BudgetClient.makeClient(
             accessToken: accessToken,
             bugdetProvider: budgetProvider,
             store: store

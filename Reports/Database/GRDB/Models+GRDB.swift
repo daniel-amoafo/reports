@@ -39,7 +39,11 @@ struct ServerKnowledgeConfig: Codable, FetchableRecord, PersistableRecord, Custo
 
 // MARK: - BudgetService
 
-extension BudgetSummary: FetchableRecord, PersistableRecord {
+extension BudgetSummary: @retroactive MutablePersistableRecord {}
+extension BudgetSummary: @retroactive TableRecord {}
+extension BudgetSummary: @retroactive EncodableRecord {}
+extension BudgetSummary: @retroactive PersistableRecord {}
+extension BudgetSummary: @retroactive FetchableRecord {
 
     nonisolated(unsafe) static let transactions = hasMany(TransactionEntry.self)
     nonisolated(unsafe) static let dbAccounts = hasMany(Account.self)
@@ -70,7 +74,11 @@ extension BudgetSummary: FetchableRecord, PersistableRecord {
     }
 }
 
-extension Account: FetchableRecord, PersistableRecord {
+extension Account: @retroactive MutablePersistableRecord {}
+extension Account: @retroactive TableRecord {}
+extension Account: @retroactive EncodableRecord {}
+extension Account: @retroactive PersistableRecord {}
+extension Account: @retroactive FetchableRecord {
 
     nonisolated(unsafe) static let budgetSummary = belongsTo(BudgetSummary.self)
 
@@ -100,7 +108,11 @@ extension Account: FetchableRecord, PersistableRecord {
     }
 }
 
-extension CategoryGroup: FetchableRecord, PersistableRecord {
+extension CategoryGroup: @retroactive MutablePersistableRecord {}
+extension CategoryGroup: @retroactive TableRecord {}
+extension CategoryGroup: @retroactive EncodableRecord {}
+extension CategoryGroup: @retroactive PersistableRecord {}
+extension CategoryGroup: @retroactive FetchableRecord {
 
     nonisolated(unsafe) static let budgetSummary = belongsTo(BudgetSummary.self)
     nonisolated(unsafe) static let category = hasMany(Category.self)
@@ -129,7 +141,13 @@ extension CategoryGroup: FetchableRecord, PersistableRecord {
     }
 }
 
-extension BudgetSystemService.Category: FetchableRecord, PersistableRecord {
+typealias Category = BudgetSystemService.Category
+
+extension Category: @retroactive MutablePersistableRecord {}
+extension Category: @retroactive TableRecord {}
+extension Category: @retroactive EncodableRecord {}
+extension Category: @retroactive PersistableRecord {}
+extension Category: @retroactive FetchableRecord {
 
     nonisolated(unsafe) static let budgetSummary = belongsTo(BudgetSummary.self)
     nonisolated(unsafe) static let categoryGroup = belongsTo(CategoryGroup.self)
@@ -160,7 +178,11 @@ extension BudgetSystemService.Category: FetchableRecord, PersistableRecord {
     }
 }
 
-extension TransactionEntry: FetchableRecord, PersistableRecord {
+extension TransactionEntry: @retroactive MutablePersistableRecord {}
+extension TransactionEntry: @retroactive TableRecord {}
+extension TransactionEntry: @retroactive EncodableRecord {}
+extension TransactionEntry: @retroactive PersistableRecord {}
+extension TransactionEntry: @retroactive FetchableRecord {
 
     nonisolated(unsafe) static let budgetSummary = belongsTo(BudgetSummary.self)
 

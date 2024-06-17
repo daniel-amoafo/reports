@@ -8,7 +8,6 @@ import IdentifiedCollections
 import MoneyCommon
 import SwiftData
 
-private typealias Category = BudgetSystemService.Category
 /**
  Mocked values on this page are used to populate SwiftUI Previews and sample data.
  */

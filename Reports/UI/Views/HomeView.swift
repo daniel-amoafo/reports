@@ -100,7 +100,7 @@ private extension HomeView {
             }
             .listRowTop(showHorizontalRule: false)
 
-            if store.displayedSavedReports.isEmpty {
+            if store.displaySavedReports.isEmpty {
                 Text("[No Reports]") // fix UI
             } else {
                 savedReportsListView
@@ -112,17 +112,17 @@ private extension HomeView {
 
     var savedReportsListView: some View {
         VStack(spacing: 0) {
-            ForEach(store.displayedSavedReports) { savedReport in
-                if let reportType = ReportChart.defaultCharts[id: savedReport.chartId] {
+            ForEach(store.displaySavedReports, id: \.id) { displaySavedReport in
+                if let reportType = ReportChart.defaultCharts[id: displaySavedReport.chartId] {
                     Button(action: {
-                        store.send(.didSelectSavedReport(savedReport))
+                        store.send(.didSelectSavedReport(displaySavedReport.id))
                     }, label: {
                         HStack(spacing: .Spacing.pt12) {
                             reportType.type.image
                                 .resizable()
                                 .frame(width: 42, height: 42)
                             VStack(alignment: .leading) {
-                                Text(savedReport.name)
+                                Text(displaySavedReport.name)
                                     .typography(.headlineEmphasized)
                                     .foregroundStyle(Color.Text.primary)
                                 Text(reportType.name)
@@ -132,13 +132,13 @@ private extension HomeView {
                             Spacer()
                         }
                     })
-                    .buttonStyle(store.state.isReportBottomRow(savedReport) ? .listRowBottom : .listRow)
+                    .buttonStyle(store.state.isReportBottomRow(displaySavedReport) ? .listRowBottom : .listRow)
                 }
             }
 
             // Footer row with View All button if needed
             VStack {
-                if store.totalSavedReportsCount > store.displayedSavedReports.count {
+                if store.totalSavedReportsCount > store.displaySavedReports.count {
                     Button(String(format: Strings.viewAllButtonTitle, arguments: [store.totalSavedReportsCount])) {
                         store.send(.viewAllButtonTapped)
                     }

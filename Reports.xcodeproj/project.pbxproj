@@ -42,7 +42,6 @@
 		1868BACA2BE791B600757E78 /* SavedReportQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1868BAC92BE791B600757E78 /* SavedReportQuery.swift */; };
 		186A80E72BC9F8450015FFC7 /* ChartButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186A80E62BC9F8450015FFC7 /* ChartButtonView.swift */; };
 		186A80EB2BCA57F90015FFC7 /* BackgroundShadowViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186A80EA2BCA57F90015FFC7 /* BackgroundShadowViewModifier.swift */; };
-		186A80F22BCBF4990015FFC7 /* ViewRectReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186A80F12BCBF4990015FFC7 /* ViewRectReader.swift */; };
 		186A80F52BCC013F0015FFC7 /* BottomShadowViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186A80F42BCC013F0015FFC7 /* BottomShadowViewModifier.swift */; };
 		186A80FD2BCCC5DE0015FFC7 /* ReportInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186A80FC2BCCC5DE0015FFC7 /* ReportInputView.swift */; };
 		186E8A1E2B99872F00E65BDE /* ConfigProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186E8A1D2B99872F00E65BDE /* ConfigProvider.swift */; };
@@ -172,7 +171,6 @@
 		1868BAC92BE791B600757E78 /* SavedReportQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedReportQuery.swift; sourceTree = "<group>"; };
 		186A80E62BC9F8450015FFC7 /* ChartButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartButtonView.swift; sourceTree = "<group>"; };
 		186A80EA2BCA57F90015FFC7 /* BackgroundShadowViewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundShadowViewModifier.swift; sourceTree = "<group>"; };
-		186A80F12BCBF4990015FFC7 /* ViewRectReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewRectReader.swift; sourceTree = "<group>"; };
 		186A80F42BCC013F0015FFC7 /* BottomShadowViewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomShadowViewModifier.swift; sourceTree = "<group>"; };
 		186A80FC2BCCC5DE0015FFC7 /* ReportInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportInputView.swift; sourceTree = "<group>"; };
 		186E8A1C2B99631200E65BDE /* BaseConfig.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = BaseConfig.xcconfig; sourceTree = "<group>"; };
@@ -343,7 +341,6 @@
 				186E8A452B9C4BB500E65BDE /* Color+Adjust.swift */,
 				189641AE2B9C72BE00716258 /* AnimationConstants.swift */,
 				186A80EA2BCA57F90015FFC7 /* BackgroundShadowViewModifier.swift */,
-				186A80F12BCBF4990015FFC7 /* ViewRectReader.swift */,
 				186A80F42BCC013F0015FFC7 /* BottomShadowViewModifier.swift */,
 				183F17042BF24186003C1334 /* MonthYearPickerView.swift */,
 			);
@@ -802,7 +799,6 @@
 			files = (
 				189641AF2B9C72BE00716258 /* AnimationConstants.swift in Sources */,
 				1873E19D2C08ADC9003C49CD /* HomeFeature.swift in Sources */,
-				186A80F22BCBF4990015FFC7 /* ViewRectReader.swift in Sources */,
 				18E7BAF92BE1081400C0468E /* EdgeInsets+Additions.swift in Sources */,
 				1800034D2BD6919B003C2804 /* ReportView.swift in Sources */,
 				186E8A442B9C3AD500E65BDE /* KleonButtonStyle.swift in Sources */,
@@ -1080,7 +1076,7 @@
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_STRICT_CONCURRENCY = complete;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -1122,7 +1118,7 @@
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_STRICT_CONCURRENCY = complete;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;

@@ -34,7 +34,7 @@ struct AppFeature: Sendable {
     @Dependency(\.configProvider) var configProvider
     @Dependency(\.continuousClock) var clock
 
-    nonisolated(unsafe) private static let logger = LogFactory.create(Self.self)
+    private static let logger = LogFactory.create(Self.self)
 
     var body: some ReducerOf<Self> {
         Scope(state: \.appIntroLogin, action: \.appIntroLogin) {

@@ -36,7 +36,7 @@ extension GRDBDatabase {
 
 extension GRDBDatabase {
 
-    nonisolated(unsafe) private static let logger = LogFactory.create(Self.self)
+    private static let logger = LogFactory.create(Self.self)
 
     /// Returns a database configuration suited for `PlayerRepository`.
     ///

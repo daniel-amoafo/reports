@@ -7,7 +7,7 @@ import OSLog
 import SwiftData
 
 /// Provides Database CRUD operations for the `SavedReport` data model object.
-struct SavedReportQuery {
+struct SavedReportQuery: Sendable {
     var fetchAll: @Sendable () throws -> [SavedReport] // fix fetch only a budgetId
     var fetch: @Sendable (FetchDescriptor<SavedReport>) throws -> [SavedReport]
     var fetchOne: @Sendable (UUID) throws -> SavedReport
@@ -24,11 +24,11 @@ struct SavedReportQuery {
 
 extension SavedReportQuery: DependencyKey {
 
-    nonisolated(unsafe) static let liveValue = Self.impl
-
+    static let liveValue = Self.impl
     // tests & previews use an in memory modelContext so data is not written to a persistent database.
-    nonisolated(unsafe) static let testValue = Self.impl
-    nonisolated(unsafe) static var previewValue = Self.impl
+    static let testValue = Self.impl
+    static let previewValue = Self.impl
+
 }
 
 private extension SavedReportQuery {
