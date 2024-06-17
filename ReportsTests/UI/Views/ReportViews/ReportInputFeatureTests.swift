@@ -11,9 +11,10 @@ final class ReportInputFeatureTests: XCTestCase {
 
     @MainActor
     override func setUp() async throws {
-        @Shared(.wsValues) var workspaceValues
-        workspaceValues.accountsOnBudgetNames = Factory.accountIdAndName
-
+        @Shared(.workspaceValues) var workspaceValues
+        $workspaceValues.withLock {
+            $0.accountsOnBudgetNames = Factory.accountIdAndName
+        }
         store = Factory.createTestStore()
     }
 
@@ -74,7 +75,9 @@ final class ReportInputFeatureTests: XCTestCase {
 
         // WHEN
         // update the shared workspace selected Account ids. This should be reflected back in state model
-        store.state.workspaceValues.updateSelectedAccountIds(ids: "account2ID,account1ID")
+        store.state.$workspaceValues.withLock {
+            $0.updateSelectedAccountIds(ids: "account2ID,account1ID")
+        }
 
         // verify
         XCTAssertNotNil(store.state.selectedAccountIds)

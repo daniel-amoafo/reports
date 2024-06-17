@@ -14,8 +14,10 @@ import XCTest
          // pre load the workspace with account info,
          // Account infomation is access in mutliple areas, hot loading in workspace
          // instead of fetch db frequently.
-         @Shared(.wsValues) var workspaceValues
-         workspaceValues.accountsOnBudgetNames = Factory.accountIdAndName
+         @Shared(.workspaceValues) var workspaceValues
+         $workspaceValues.withLock {
+             $0.accountsOnBudgetNames = Factory.accountIdAndName
+         }
      }
 
      override func tearDown() async throws {
@@ -29,8 +31,9 @@ import XCTest
         XCTAssertTrue(store.state.inputFields.isRunReportDisabled)
 
         // select accounts for report
-        store.state.inputFields.workspaceValues
-            .updateSelectedAccountIds(ids: "account3ID,account1ID")
+        store.state.inputFields.$workspaceValues.withLock {
+            $0.updateSelectedAccountIds(ids: "account3ID,account1ID")
+        }
         XCTAssertFalse(store.state.inputFields.isRunReportDisabled)
 
         // dont check the chartGraph value
@@ -69,7 +72,10 @@ import XCTest
     @MainActor
     func testUpdatingSavedReport() async throws {
         let savedReport = Factory.createSavedReport()
-        store = Factory.createTestStore(sourceData: .existing(savedReport))
+        store = Factory.createTestStore(
+            sourceData: .existing(savedReport.id),
+            savedReport: savedReport
+        )
 
         // verify saved report was persisted
         let savedReportQuery = store.dependencies.savedReportQuery
@@ -167,7 +173,8 @@ private enum Factory {
         confirmationDialog: ConfirmationDialogState<Action.ConfirmationDialog>? = nil,
         destination: Destination.State? = nil,
         scrollToId: String? = nil,
-        showSavedReportNameAlert: Bool = false
+        showSavedReportNameAlert: Bool = false,
+        savedReport: SavedReport? = nil
     ) -> TestStoreOf<ReportFeature> {
         TestStore(
             initialState: try! ReportFeature.State(
@@ -184,7 +191,7 @@ private enum Factory {
             $0.continuousClock = ImmediateClock()
 
             // persist a savedReport into SwiftData if one is provided
-            if case let .existing(savedReport) = sourceData {
+            if let savedReport {
                 try! $0.savedReportQuery.add(savedReport)
             }
         }

@@ -54,10 +54,9 @@ struct MainTab {
                 }
                 return .none
 
-            case let .savedReports(.delegate(.rowTapped(reportId))):
+            case let .savedReports(.delegate(.rowTapped(id))):
                 do {
-                    let savedReport = try savedReportQuery.fetchOne(reportId)
-                    state.report = try .init(sourceData: .existing(savedReport))
+                    state.report = try .init(sourceData: .existing(id))
                 } catch {
                     logger.error("\(error.toString())")
                     state.alert = .unableToOpenSavedReport

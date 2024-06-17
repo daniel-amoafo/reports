@@ -166,7 +166,7 @@ private extension AppFeature {
         let accountNames = accounts.reduce(into: [String: String]()) {
             $0[$1.id] = $1.name
         }
-        @Shared(.wsValues) var workspaceValues
+        @Shared(.workspaceValues) var workspaceValues
         workspaceValues.accountsOnBudgetNames = accountNames
         workspaceValues.budgetCurrency = budget.currency
         Self.logger.debug("Synced workspace values")

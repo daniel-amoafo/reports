@@ -22,7 +22,15 @@ enum ReportFeatureSourceLoader {
             inputFeatureState = state
             savedReport = nil
 
-        case let .existing(report):
+        case let .existing(id):
+            @Dependency(\.savedReportQuery) var savedReportQuery
+            let report: SavedReport
+            do {
+                report = try savedReportQuery.fetchOne(id)
+            } catch {
+                let msg = "Saved Report could not be loaded from SwiftData. :-/ id: \(id)"
+                throw LoadError.reportNotFounded(msg)
+            }
             savedReport = report
             let budgetId = report.budgetId
             guard let chart = ReportChart.defaultCharts[id: report.chartId] else {
@@ -42,7 +50,7 @@ enum ReportFeatureSourceLoader {
             let selectedAcountIds: String?
             do {
                 if case let accountIdsString = report.selectedAccountIds, accountIdsString.isNotEmpty {
-                    @Shared(.wsValues) var workspaceValues
+                    @Shared(.workspaceValues) var workspaceValues
                     let accountNames = workspaceValues.accountsOnBudgetNames
                     let accountIds = accountIdsString
                         .split(separator: ",")
@@ -83,6 +91,7 @@ extension ReportFeatureSourceLoader {
         case invalidChartId(String)
         case invalidDateFormat(String)
         case invalidSelectedAccount(String)
+        case reportNotFounded(String)
         case unknown(String)
 
         var errorDescription: String? {
@@ -90,6 +99,7 @@ extension ReportFeatureSourceLoader {
             case let .invalidChartId(message),
                 let .invalidDateFormat(message),
                 let .invalidSelectedAccount(message),
+                let .reportNotFounded(message),
                 let .unknown(message):
                 return message
             }

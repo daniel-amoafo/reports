@@ -10,7 +10,7 @@ struct SavedReportsFeature {
     @ObservableState
     struct State: Equatable {
         var savedReports: [SavedReport]
-        @Shared(.wsValues) var workspaceValues
+        @Shared(.workspaceValues) var workspaceValues
 
         init(savedReports: [SavedReport] = []) {
             self.savedReports = savedReports
@@ -59,7 +59,7 @@ struct SavedReportsFeature {
 
     @CasePathable
     enum Delegate: Sendable {
-        case rowTapped(id: PersistentId)
+        case rowTapped(UUID)
     }
 
     // MARK: Dependencies

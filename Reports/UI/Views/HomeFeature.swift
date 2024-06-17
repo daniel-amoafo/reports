@@ -98,7 +98,7 @@ struct HomeFeature: Sendable {
                 return .none
 
             case let .didSelectSavedReport(savedReport):
-                let sourceData = ReportFeature.State.SourceData.existing(savedReport)
+                let sourceData = ReportFeature.State.SourceData.existing(savedReport.id)
                 return .send(.delegate(.presentReport(sourceData)))
 
             case .viewAllButtonTapped:

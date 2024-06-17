@@ -14,7 +14,7 @@ struct ReportInputFeature {
         var showChartMoreInfo = false
         var fromDate: Date
         var toDate: Date
-        @Shared(.wsValues) var workspaceValues
+        @Shared(.workspaceValues) var workspaceValues
         @Presents var selectedAccounts: SelectAccountsFeature.State?
         var popoverFromDate = false
         var popoverToDate = false

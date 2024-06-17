@@ -19,7 +19,7 @@ struct SpendingTrendChartFeature {
         var categoryList: CategoryListFeature.State
         var categoryGroupName: String?
 
-        @Shared(.wsValues) var workspaceValues
+        @Shared(.workspaceValues) var workspaceValues
         fileprivate let categoryGroupsBarData: [TrendRecord]
         fileprivate let categoryGroupsLineData: [TrendRecord]
 

@@ -36,7 +36,7 @@ private extension SavedReportsView {
     var rowViews: some View {
         ForEach(store.savedReports) { savedReport in
             Button {
-                store.send(.delegate(.rowTapped(id: savedReport.persistentModelID)))
+                store.send(.delegate(.rowTapped(savedReport.id)))
             } label: {
                 HStack {
                     if let reportType = ReportChart.defaultCharts[id: savedReport.chartId] {

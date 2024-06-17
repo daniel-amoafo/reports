@@ -15,7 +15,7 @@ struct SelectAccountsFeature {
         var activeAllAccounts: Bool = true
         var closedAllAccounts: Bool = true
         let budgetId: String
-        @Shared(.wsValues) var workspaceValues
+        @Shared(.workspaceValues) var workspaceValues
 
         init(budgetId: String) {
             self.budgetId = budgetId

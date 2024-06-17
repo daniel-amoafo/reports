@@ -6,13 +6,11 @@ import Foundation
 import OSLog
 import SwiftData
 
-typealias PersistentId = PersistentIdentifier
-
 /// Provides Database CRUD operations for the `SavedReport` data model object.
 struct SavedReportQuery {
     var fetchAll: @Sendable () throws -> [SavedReport] // fix fetch only a budgetId
     var fetch: @Sendable (FetchDescriptor<SavedReport>) throws -> [SavedReport]
-    var fetchOne: @Sendable (PersistentId) throws -> SavedReport
+    var fetchOne: @Sendable (UUID) throws -> SavedReport
     var fetchCount: @Sendable (FetchDescriptor<SavedReport>) throws -> Int
     var add: @Sendable (SavedReport) throws -> Void
     var delete: @Sendable (SavedReport) throws -> Void
@@ -59,10 +57,14 @@ private extension SavedReportQuery {
             logger.error("\(error.toString())")
             return []
         }
-    } fetchOne: { identifier in
-
-        guard let savedReport = modelContext.model(for: identifier) as? SavedReport else {
-            let msg = "Unable to find savedReport with id: \(identifier)"
+    } fetchOne: { id in
+        let descriptor = FetchDescriptor<SavedReport>(
+            predicate: #Predicate<SavedReport> { savedReport in
+                savedReport.id == id
+            }
+        )
+        guard let savedReport = try modelContext.fetch(descriptor).first else {
+            let msg = "Unable to find savedReport with id: \(id)"
             logger.error("\(msg)")
             throw SavedReportQueryError.notFound(msg)
         }

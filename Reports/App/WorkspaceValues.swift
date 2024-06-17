@@ -26,7 +26,7 @@ struct WorkspaceValues: Equatable {
 extension WorkspaceValues {
 
     static func clearAll() {
-        @Shared(.wsValues) var workspaceValues = .init()
+        @Shared(.workspaceValues) var workspaceValues = .init()
     }
 
     var selectedAccountIds: String? {
@@ -78,7 +78,7 @@ extension WorkspaceValues {
 }
 
 extension PersistenceReaderKey where Self == PersistenceKeyDefault<InMemoryKey<WorkspaceValues>> {
-  static var wsValues: Self {
+  static var workspaceValues: Self {
       PersistenceKeyDefault(.inMemory("workspaceValues"), .init())
   }
 }

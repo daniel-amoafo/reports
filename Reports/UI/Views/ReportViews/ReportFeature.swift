@@ -12,7 +12,7 @@ struct ReportFeature {
 
         enum SourceData: Sendable {
             case new(ReportInputFeature.State)
-            case existing(SavedReport)
+            case existing(UUID)
         }
 
         var inputFields: ReportInputFeature.State
