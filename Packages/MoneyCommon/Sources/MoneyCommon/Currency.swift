@@ -1,7 +1,7 @@
 // This file was automatically generated and should not be edited.
 
 /// A monetary unit.
-//@DebugDescription
+@DebugDescription
 public struct Currency: Equatable, Hashable, Codable, Sendable {
     /// The three letter ISO 4217 currency code.
     public let code: String

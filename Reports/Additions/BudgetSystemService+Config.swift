@@ -44,14 +44,17 @@ extension BudgetClient {
     }
 }
 
-extension BudgetClient: @retroactive DependencyKey {
+extension BudgetClient: @retroactive @preconcurrency DependencyKey {
 
-    nonisolated(unsafe) public static let liveValue = BudgetClient.makeLiveClient()
+    public static let liveValue = BudgetClient.makeLiveClient()
 
-    nonisolated(unsafe) public static let testValue: BudgetClient = BudgetClient.testsAndPreviews
+}
 
-    nonisolated(unsafe) public static let previewValue = BudgetClient.testsAndPreviews
+extension BudgetClient: @retroactive @preconcurrency TestDependencyKey {
 
+    public static let testValue: BudgetClient = BudgetClient.testsAndPreviews
+
+    public static let previewValue = BudgetClient.testsAndPreviews
 }
 
 extension DependencyValues {

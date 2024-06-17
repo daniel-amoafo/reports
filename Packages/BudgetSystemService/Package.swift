@@ -1,4 +1,4 @@
-// swift-tools-version: 5.10
+// swift-tools-version: 6.0
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -14,10 +14,9 @@ let package = Package(
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
-        // .package(url: "https://github.com/andrebocchini/swiftynab", from: "2.1.0"),
 //        .package(url: "https://github.com/daniel-amoafo/swiftynab/", branch: "serverKnowledge"),
         .package(path: "../../../swiftynab"),
-        .package(url: "https://github.com/pointfreeco/swift-identified-collections", from: "1.0.0"),
+        .package(url: "https://github.com/pointfreeco/swift-identified-collections", from: "1.0.2"),
         .package(url: "https://github.com/pointfreeco/swift-concurrency-extras", from: "1.1.0"),
         .package(path: "../MoneyCommon"),
     ],
@@ -30,10 +29,8 @@ let package = Package(
                 .product(name: "SwiftYNAB", package: "swiftynab"),
                 .product(name: "IdentifiedCollections", package: "swift-identified-collections"),
                 .product(name: "MoneyCommon", package: "MoneyCommon"),
-            ],
-            swiftSettings: [
-                .enableExperimentalFeature("StrictConcurrency")
-            ]),
+            ]
+        ),
         .testTarget(
             name: "BudgetSystemServiceTests",
             dependencies: [

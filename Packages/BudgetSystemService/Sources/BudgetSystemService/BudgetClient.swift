@@ -63,7 +63,7 @@ public final class BudgetClient {
 
     public func fetchAllTransactions(budgetId: String, lastServerKnowledge: Int?)
     async throws -> ([TransactionEntry], serverKnowledge: Int) {
-        guard let currency = budgetSummaries[id: budgetId]?.currency
+        guard let currency = budgetSummaries.first(where: { $0.id == budgetId })?.currency
         else { return ([], 0) }
         logger.debug("fetching all transaction entries...")
         return try await provider.fetchAllTransactions(

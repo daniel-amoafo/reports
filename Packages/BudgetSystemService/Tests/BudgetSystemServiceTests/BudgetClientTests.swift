@@ -41,7 +41,6 @@ private enum Factory {
 
     static func createBudgetProvider(
         budgetSummaries: [BudgetSummary]? = nil,
-        accounts: [Account]? = nil,
         categoryValues: ([CategoryGroup],[BudgetSystemService.Category], Int)? = nil,
         transactions: [TransactionEntry]? = nil
     ) -> BudgetProvider {

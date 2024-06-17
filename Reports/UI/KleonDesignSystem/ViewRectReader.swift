@@ -16,7 +16,7 @@ struct ViewRectReader {
 
 private struct RectPreferenceKey: PreferenceKey {
     typealias Value = CGRect
-    static var defaultValue: Value = .zero
+    nonisolated(unsafe) static var defaultValue: Value = .zero
 
     static func reduce(value _: inout Value, nextValue: () -> Value) {
         _ = nextValue()
