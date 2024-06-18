@@ -12,7 +12,7 @@ struct HomeFeature: Sendable {
     @ObservableState
     struct State: Equatable, Sendable {
         var selectedBudgetId: String?
-        var budgetList: IdentifiedArrayOf<BudgetSummary>?
+        var budgetList: [BudgetSummary]?
         var charts: [ReportChart] = []
         var displaySavedReports: [DisplaySavedReport] = []
         var totalSavedReportsCount: Int = 0
@@ -20,7 +20,7 @@ struct HomeFeature: Sendable {
 
         var selectedBudgetName: String? {
             guard let selectedBudgetId else { return nil }
-            return budgetList?[id: selectedBudgetId]?.name
+            return budgetList?.first(where: { $0.id == selectedBudgetId })?.name
         }
 
         func isReportBottomRow(_ displayedSavedReport: DisplaySavedReport) -> Bool {
@@ -41,6 +41,7 @@ struct HomeFeature: Sendable {
         case didSelectChart(ReportChart)
         case didUpdateSavedReports
         case didSelectSavedReport(UUID)
+        case didUpdateBudgetSummaries([BudgetSummary])
         case delegate(Delegate)
         case showSelectBudgetTapped(Bool)
         case viewAllButtonTapped
@@ -58,7 +59,6 @@ struct HomeFeature: Sendable {
 
     @Dependency(\.budgetClient) var budgetClient
     @Dependency(\.configProvider) var configProvider
-    @Dependency(\.savedReportQuery) var savedReportQuery
     @Dependency(\.continuousClock) var clock
     @Dependency(\.modelContextNotifications) var modelContextNotifications
 
@@ -92,26 +92,27 @@ struct HomeFeature: Sendable {
                 return .send(.delegate(.presentReport(sourceData)))
 
             case .didUpdateSavedReports:
-                let (displayedSavedReports, total) = fetchDisplayedSavedReports()
-                state.displaySavedReports = displayedSavedReports
-                state.totalSavedReportsCount = total
+                state.updateSavedReportValues()
                 return .none
 
             case let .didSelectSavedReport(id):
                 let sourceData = ReportFeature.State.SourceData.existing(id)
                 return .send(.delegate(.presentReport(sourceData)))
 
+            case let .didUpdateBudgetSummaries(budgetSummary):
+                state.budgetList = budgetSummary
+                return .none
+
             case .viewAllButtonTapped:
                 return .send(.delegate(.navigate(to: .reports)))
 
             case .onAppear:
-                MainActor.assumeIsolated {
-                    state.budgetList = budgetClient.budgetSummaries
-                }
                 state.selectedBudgetId = configProvider.selectedBudgetId
                 state.charts = configProvider.charts
+                state.updateSavedReportValues()
                 return .run { send in
-                    await send(.didUpdateSavedReports)
+                    let summaries = await budgetClient.budgetSummaries
+                    await send(.didUpdateBudgetSummaries(summaries))
                 }
 
             case .task:
@@ -135,6 +136,16 @@ private extension HomeFeature {
         configProvider.selectedBudgetId = selectedBudgetId
     }
 
+}
+
+extension HomeFeature.State {
+
+    mutating func updateSavedReportValues() {
+        let (displayedSavedReports, total) = fetchDisplayedSavedReports()
+        displaySavedReports = displayedSavedReports
+        totalSavedReportsCount = total
+    }
+
     func fetchDisplayedSavedReports() -> ([DisplaySavedReport], Int) {
         do {
             var descriptor = FetchDescriptor<SavedReport>(
@@ -142,14 +153,15 @@ private extension HomeFeature {
                     .init(\.lastModifield, order: .reverse)
                 ]
             )
-            descriptor.fetchLimit = Self.maxDisplayedSavedReports
+            descriptor.fetchLimit = HomeFeature.maxDisplayedSavedReports
+            @Dependency(\.savedReportQuery) var savedReportQuery
             let displayedSavedReports = try savedReportQuery.fetch(descriptor).map(DisplaySavedReport.init)
             let total = try savedReportQuery.fetchCount(FetchDescriptor<SavedReport>())
             return (displayedSavedReports, total)
         } catch {
-            Self.logger.error("\(error.toString())")
+            let logger = LogFactory.create(Self.self)
+            logger.error("\(error.toString())")
             return ([], 0)
         }
     }
-
 }

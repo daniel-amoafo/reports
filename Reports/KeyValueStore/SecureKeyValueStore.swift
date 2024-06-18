@@ -3,7 +3,7 @@
 import Foundation
 @preconcurrency import KeychainSwift
 
-public final class SecureKeyValueStore {
+public final class SecureKeyValueStore: Sendable {
 
     // MARK: - Private Properties
     private let keychain: KeychainSwift

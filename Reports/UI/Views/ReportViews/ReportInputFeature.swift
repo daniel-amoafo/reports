@@ -89,7 +89,6 @@ struct ReportInputFeature {
 
     }
 
-    @Dependency(\.budgetClient) var budgetClient
     @Dependency(\.configProvider) var configProvider
 
     let logger = LogFactory.create(Self.self)

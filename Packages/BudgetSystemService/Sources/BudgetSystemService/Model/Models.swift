@@ -4,7 +4,7 @@
 import Foundation
 import MoneyCommon
 
-//@DebugDescription
+@DebugDescription
 public struct BudgetSummary: Identifiable, Equatable, Codable, Sendable, CustomStringConvertible {
     /// Budget id
     public let id: String
@@ -74,8 +74,8 @@ public struct BudgetSummary: Identifiable, Equatable, Codable, Sendable, CustomS
     }
 }
 
-//@DebugDescription
-public struct Account: Identifiable, Equatable, Codable, Sendable, CustomStringConvertible, CustomDebugStringConvertible {
+@DebugDescription
+public struct Account: Identifiable, Equatable, Codable, Sendable, CustomStringConvertible {
 
     public var id: String
     public var budgetId: String
@@ -100,7 +100,7 @@ public struct Account: Identifiable, Equatable, Codable, Sendable, CustomStringC
     }
 }
 
-//@DebugDescription
+@DebugDescription
 public struct CategoryGroup: Identifiable, Equatable, Codable, Sendable, CustomStringConvertible {
     /// Category group id
     public let id: String
@@ -137,7 +137,7 @@ public struct CategoryGroup: Identifiable, Equatable, Codable, Sendable, CustomS
     }
 }
 
-//@DebugDescription
+@DebugDescription
 public struct Category: Identifiable, Equatable, Codable, Sendable, CustomStringConvertible {
     /// Category id
     public let id: String
@@ -172,8 +172,8 @@ public struct Category: Identifiable, Equatable, Codable, Sendable, CustomString
     }
 }
 
-//@DebugDescription
-public struct TransactionEntry: Identifiable, Equatable, Codable, Sendable, CustomStringConvertible {
+public struct TransactionEntry: Identifiable, Equatable, Codable, Sendable,
+                                    CustomStringConvertible, CustomDebugStringConvertible {
 
     public let id: String
 
@@ -256,6 +256,6 @@ public struct TransactionEntry: Identifiable, Equatable, Codable, Sendable, Cust
     }
 
     public var debugDescription: String {
-        "id: \(id), rawAmount: \(rawAmount), payeeName: \(String(describing: payeeName)), date: \(date)"
+        return "id: \(id), rawAmount: \(rawAmount), payeeName: \(payeeName ?? "")), date: \(date)"
     }
 }

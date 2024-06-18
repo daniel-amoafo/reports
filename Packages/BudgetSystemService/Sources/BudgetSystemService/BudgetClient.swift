@@ -3,28 +3,34 @@ import Foundation
 import IdentifiedCollections
 import OSLog
 
-@MainActor
-public final class BudgetClient {
+public actor BudgetClient {
 
     public private(set) var provider: BudgetProvider
 
-    @Published public private(set) var budgetSummaries: IdentifiedArrayOf<BudgetSummary> = []
-    @Published public var authorizationStatus: AuthorizationStatus = .unknown
+    public var budgetSummaries: [BudgetSummary] { _budgetSummaries }
+    private var _budgetSummaries: [BudgetSummary] = []
+
+    public let authorizationStatusStream: AsyncStream<AuthorizationStatus>
+    private let authorizationStatusStreamCont: AsyncStream<AuthorizationStatus>.Continuation
+    private var _authorizationStatus: AuthorizationStatus = .unknown
 
     private let logger = Logger(subsystem: "BudgetSystemService", category: "BudgetClient")
 
     public init(
         provider: BudgetProvider,
-        budgetSummaries: IdentifiedArrayOf<BudgetSummary> = [],
+        budgetSummaries: [BudgetSummary] = [],
         authorizationStatus: AuthorizationStatus = .unknown
     ) {
         self.provider = provider
-        self.budgetSummaries = budgetSummaries
-        self.authorizationStatus = authorizationStatus
+        self._budgetSummaries = budgetSummaries
+        self._authorizationStatus = authorizationStatus
+        let (authStream, authCont) = AsyncStream.makeStream(of: AuthorizationStatus.self)
+        self.authorizationStatusStream = authStream
+        self.authorizationStatusStreamCont = authCont
     }
 
     public var isAuthenticated: Bool {
-        authorizationStatus == .loggedIn
+        _authorizationStatus == .loggedIn
     }
 
     public func updateProvider(_ provider: BudgetProvider) {
@@ -36,8 +42,8 @@ public final class BudgetClient {
             logger.debug("fetching budget summaries ...")
             let budgetSummaries = try await provider.fetchBudgetSummaries()
             logger.debug("budgetSummaries count(\(budgetSummaries.count))")
-            self.budgetSummaries = IdentifiedArray(uniqueElements: budgetSummaries)
-            self.authorizationStatus = .loggedIn
+            self.setBudgetSummaries(to: budgetSummaries)
+            self.setAuthorization(to: .loggedIn)
             return budgetSummaries
         } catch {
             await logoutIfNeeded(error)
@@ -81,13 +87,25 @@ public final class BudgetClient {
     func logoutIfNeeded(_ error: Error) async {
         if let budgetClientError = error as? BudgetClientError,
            budgetClientError.isNotAuthorized {
-            self.authorizationStatus = .loggedOut
+            self.setAuthorization(to: .loggedOut)
             logger.error("Budget Client is not authorized, status updated to logged out")
             return
         }
         logger.error("\(error.localizedDescription)")
     }
 
+    func setBudgetSummaries(to summaries: [BudgetSummary]) {
+        _budgetSummaries = summaries
+    }
+
+    public func setAuthorization(to newStatus: AuthorizationStatus) {
+        _authorizationStatus = newStatus
+        authorizationStatusStreamCont.yield(newStatus)
+    }
+
+    deinit {
+        authorizationStatusStreamCont.finish()
+    }
 }
 
 // MARK: - Initializer for Previews
@@ -95,7 +113,7 @@ public final class BudgetClient {
 extension BudgetClient {
     
     /// Only for Preview Usage. Sets the published properties with their values for previews
-    public convenience init(
+    public init(
         budgetSummaries: IdentifiedArrayOf<BudgetSummary>,
         categoryGroups: IdentifiedArrayOf<CategoryGroup>,
         categories: IdentifiedArrayOf<Category>,
@@ -113,7 +131,7 @@ extension BudgetClient {
             (transactions.elements, 0)
         }
         // set the published values so previews work and not dependent on async routines
-        self.init(provider: provider, budgetSummaries: budgetSummaries, authorizationStatus: authorizationStatus)
+        self.init(provider: provider, budgetSummaries: budgetSummaries.elements, authorizationStatus: authorizationStatus)
     }
 }
 

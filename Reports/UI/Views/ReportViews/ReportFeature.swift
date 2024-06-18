@@ -119,7 +119,6 @@ struct ReportFeature {
       case transactionHistory(TransactionHistoryFeature)
     }
 
-    @Dependency(\.budgetClient) var budgetClient
     @Dependency(\.isPresented) var isPresented
     @Dependency(\.dismiss) var dismiss
     @Dependency(\.savedReportQuery) var savedReportQuery

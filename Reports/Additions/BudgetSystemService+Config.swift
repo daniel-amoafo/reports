@@ -15,13 +15,13 @@ extension BudgetClient {
     func logout(store: KeyValueStore = SecureKeyValueStore()) {
         Self.storeAccessToken(accessToken: nil, store: store)
         updateProvider(.notAuthorized)
-        authorizationStatus = .loggedOut
+        setAuthorization(to: .loggedOut)
     }
 
     static func makeClient(
         accessToken: String? = nil,
         bugdetProvider: BudgetProvider? = nil,
-        store: KeyValueStore = SecureKeyValueStore()
+        store: KeyValueStore
     ) -> BudgetClient {
         guard let accessToken = accessToken ?? store.string(forKey: _accessTokenKey) else {
             return .notAuthorizedClient
@@ -35,7 +35,7 @@ extension BudgetClient {
         return .init(provider: provider)
     }
 
-    static func storeAccessToken(accessToken: String?, store: KeyValueStore = SecureKeyValueStore()) {
+    static func storeAccessToken(accessToken: String?, store: KeyValueStore) {
         guard let accessToken else {
             store.removeValue(forKey: _accessTokenKey)
             return
@@ -44,17 +44,17 @@ extension BudgetClient {
     }
 }
 
-extension BudgetClient: @retroactive @preconcurrency DependencyKey {
+extension BudgetClient: @retroactive DependencyKey {
 
-    public static let liveValue = BudgetClient.makeClient()
+    nonisolated public static let liveValue = BudgetClient.makeClient(store: SecureKeyValueStore())
 
 }
 
-extension BudgetClient: @retroactive @preconcurrency TestDependencyKey {
+extension BudgetClient: @retroactive TestDependencyKey {
 
-    public static let testValue: BudgetClient = BudgetClient.testsAndPreviews
+    public static var testValue = BudgetClient.testsAndPreviews
 
-    public static let previewValue = BudgetClient.testsAndPreviews
+    public static var previewValue = BudgetClient.testsAndPreviews
 }
 
 extension DependencyValues {

@@ -3,7 +3,6 @@
 import Dependencies
 import SwiftUI
 
-@MainActor
 struct SettingsView: View {
 
     @Dependency(\.budgetClient) private var budgetClient
@@ -11,7 +10,9 @@ struct SettingsView: View {
     var body: some View {
 
         Button {
-            budgetClient.logout()
+            Task {
+                await budgetClient.logout()
+            }
         } label: {
             Text("Logout")
         }

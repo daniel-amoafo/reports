@@ -104,8 +104,8 @@ private extension AppFeature {
                 if let accessToken = url.fragmentItems?["access_token"], accessToken.isNotEmpty {
                     state.appIntroLogin.showSafariBrowser = nil
                     Self.logger.info("oauth url path handled, updated budget client with new access token.")
-                    Task { @MainActor in
-                        budgetClient.updateYnabProvider(accessToken)
+                    Task {
+                        await budgetClient.updateYnabProvider(accessToken)
                         await syncBudgetData()
                     }
             }
@@ -125,7 +125,7 @@ private extension AppFeature {
         // A Reducer run effect cannot complete if send actions will be emitted.
         await Task { @MainActor in
             // Monitor authorization satus updates
-            for await status in budgetClient.$authorizationStatus.stream {
+            for await status in await budgetClient.authorizationStatusStream {
                 send(.didUpdateAuthStatus(status))
             }
         }.value

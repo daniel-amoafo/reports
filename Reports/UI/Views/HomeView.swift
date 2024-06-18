@@ -82,7 +82,7 @@ private extension HomeView {
             .popover(isPresented: $store.showSelectBudget.sending(\.showSelectBudgetTapped)) {
                 if let budgetList = store.budgetList {
                     SelectListView<BudgetSummary>(
-                        items: budgetList,
+                        items: IdentifiedArrayOf(uniqueElements: budgetList),
                         selectedItem: $store.selectedBudgetId.sending(\.didUpdateSelectedBudgetId)
                     )
                 }
