@@ -9,7 +9,9 @@ import MoneyCommon
 /// To be used with the `@Shared` TCA  property wrapper.
 struct WorkspaceValues: Equatable {
 
-    /// Dictionary of Account Id as key and Name as value
+    private let displayAccountNamesThreshold = 2
+
+    /// Dictionary of `Account` Id as the key and the account name as the value
     var accountsOnBudgetNames = [String: String]()
 
     /// The currency associated to the selected budget.
@@ -26,7 +28,8 @@ struct WorkspaceValues: Equatable {
 extension WorkspaceValues {
 
     static func clearAll() {
-        @Shared(.workspaceValues) var workspaceValues = .init()
+        @Shared(.workspaceValues) var workspaceValues
+        workspaceValues = .init()
     }
 
     var selectedAccountIds: String? {
@@ -35,22 +38,29 @@ extension WorkspaceValues {
     }
 
     var selectedAccountOnBudgetIdNames: String? {
-        accountOnBugetNames(for: selectedAccountIdsSet)
+        accountOnBudgetNames(for: selectedAccountIdsSet)
     }
 
+    /// Retrieve's the account names for each respective id provided in the given comma separated list of id's
+    /// See `accountOnBudgetNames(for ids: Set<String>)` for logic rules on what name is provided given
+    /// the count of id's to return
     func accountOnBudgetNames(for ids: String?) -> String? {
         guard let ids else { return nil }
         let set = makeSet(for: ids)
-        return accountOnBugetNames(for: set)
+        return accountOnBudgetNames(for: set)
     }
 
-    func accountOnBugetNames(for ids: Set<String>) -> String? {
+    /// Returns a list of budget names for a given set of id's.
+    /// If id's match the available account Names, return "All Accounts" string
+    /// If id's equal to or less than the `displayAccountNamesThreshold` return "some Accounts" string.
+    func accountOnBudgetNames(for ids: Set<String>) -> String? {
         let accounts = accountsOnBudgetNames
         guard ids.isNotEmpty else { return nil }
-        if ids.count == accounts.count {
+        if ids == Set(accounts.keys) {
             return AppStrings.allAccountsName
         }
-        guard ids.count < 3 else {
+
+        guard ids.count <= displayAccountNamesThreshold  else {
             return AppStrings.someAccountsName
         }
         let names = accounts

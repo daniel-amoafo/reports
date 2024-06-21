@@ -150,7 +150,7 @@ private extension AppFeature {
     /// Load account names into memory, it's access by multiple screens
     /// This reduces database I/O fetches
     func syncWorkspaceValues() throws {
-
+        Self.logger.debug("Sync Workspace Values...")
         guard let budgetId = configProvider.selectedBudgetId else {
             Self.logger.warning("\(#function) - halted. budgetId not found")
             return
@@ -169,7 +169,7 @@ private extension AppFeature {
         @Shared(.workspaceValues) var workspaceValues
         workspaceValues.accountsOnBudgetNames = accountNames
         workspaceValues.budgetCurrency = budget.currency
-        Self.logger.debug("Synced workspace values")
+        Self.logger.debug("Workspace values synced.")
     }
 
     func syncBudgetSummaries() async throws -> Bool {

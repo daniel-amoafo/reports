@@ -106,6 +106,7 @@
 		18C3BFE42B8AE9EC00E444C8 /* OpenSans-SemiBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 18C3BFD82B8AE9EC00E444C8 /* OpenSans-SemiBoldItalic.ttf */; };
 		18C3BFE52B8AE9EC00E444C8 /* OpenSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 18C3BFD92B8AE9EC00E444C8 /* OpenSans-Regular.ttf */; };
 		18C3BFE92B8B6FA100E444C8 /* BudgetSystemService+ConfigTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C3BFE82B8B6FA100E444C8 /* BudgetSystemService+ConfigTests.swift */; };
+		18E2E08A2C246E60009ABB52 /* WorkspaceValuesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E2E0892C246E60009ABB52 /* WorkspaceValuesTests.swift */; };
 		18E7BAF52BE0CE6D00C0468E /* ReportFetchError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E7BAF42BE0CE6D00C0468E /* ReportFetchError.swift */; };
 		18E7BAF72BE0E5F300C0468E /* TransactionHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E7BAF62BE0E5F300C0468E /* TransactionHistoryView.swift */; };
 		18E7BAF92BE1081400C0468E /* EdgeInsets+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E7BAF82BE1081400C0468E /* EdgeInsets+Additions.swift */; };
@@ -239,6 +240,7 @@
 		18C3BFD92B8AE9EC00E444C8 /* OpenSans-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "OpenSans-Regular.ttf"; sourceTree = "<group>"; };
 		18C3BFE62B8B5F4E00E444C8 /* BudgetSystemService.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; name = BudgetSystemService.xctestplan; path = Packages/BudgetSystemService/BudgetSystemService.xctestplan; sourceTree = "<group>"; };
 		18C3BFE82B8B6FA100E444C8 /* BudgetSystemService+ConfigTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BudgetSystemService+ConfigTests.swift"; sourceTree = "<group>"; };
+		18E2E0892C246E60009ABB52 /* WorkspaceValuesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceValuesTests.swift; sourceTree = "<group>"; };
 		18E7BAF42BE0CE6D00C0468E /* ReportFetchError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportFetchError.swift; sourceTree = "<group>"; };
 		18E7BAF62BE0E5F300C0468E /* TransactionHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionHistoryView.swift; sourceTree = "<group>"; };
 		18E7BAF82BE1081400C0468E /* EdgeInsets+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EdgeInsets+Additions.swift"; sourceTree = "<group>"; };
@@ -451,6 +453,7 @@
 		184DF0C72B6E1C3F00BA6F21 /* ReportsTests */ = {
 			isa = PBXGroup;
 			children = (
+				18E2E0882C246E43009ABB52 /* App */,
 				186E8A1F2B998C2A00E65BDE /* ConfigProviderTests.swift */,
 				18C3BFE72B8B6F9200E444C8 /* Additons */,
 				183ECBCB2B710FC0006C45B2 /* KeyValueStore */,
@@ -593,6 +596,14 @@
 				18C3BFC22B8399C600E444C8 /* URLTests.swift */,
 			);
 			path = Additons;
+			sourceTree = "<group>";
+		};
+		18E2E0882C246E43009ABB52 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				18E2E0892C246E60009ABB52 /* WorkspaceValuesTests.swift */,
+			);
+			path = App;
 			sourceTree = "<group>";
 		};
 		18E7BAFC2BE21C7800C0468E /* UI */ = {
@@ -889,6 +900,7 @@
 				184DF0C92B6E1C3F00BA6F21 /* ReportsTests.swift in Sources */,
 				18BC9F422C0F52C4003B1E3D /* AsynchronousTestHelpers.swift in Sources */,
 				186E8A202B998C2A00E65BDE /* ConfigProviderTests.swift in Sources */,
+				18E2E08A2C246E60009ABB52 /* WorkspaceValuesTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
