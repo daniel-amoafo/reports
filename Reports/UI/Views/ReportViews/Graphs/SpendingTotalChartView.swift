@@ -16,6 +16,20 @@ struct SpendingTotalChartView: View {
     private let colors = [Color.blue, .green, .orange, .purple, .red, .cyan, .yellow]
 
     var body: some View {
+        Group {
+            if store.hasResults {
+                mainContent
+            } else {
+                NoChartResultsView()
+            }
+        }
+    }
+
+}
+
+private extension SpendingTotalChartView {
+
+    var mainContent: some View {
         VStack(spacing: .Spacing.pt24) {
             titles
 
@@ -25,12 +39,9 @@ struct SpendingTotalChartView: View {
 
             listRows
         }
-        .onAppear {
-            store.send(.onAppear)
-        }
     }
 
-    private var titles: some View {
+    var titles: some View {
         VStack {
             Text(store.title)
                 .typography(.title3Emphasized)
@@ -55,7 +66,7 @@ struct SpendingTotalChartView: View {
         }
     }
 
-    private var chart: some View {
+    var chart: some View {
         VStack(spacing: .Spacing.pt16) {
             Chart(store.selectedContent) { record in
                 let highlight = store.selectedGraphItem == nil || record.id == store.selectedGraphItem?.id
@@ -91,7 +102,7 @@ struct SpendingTotalChartView: View {
         }
     }
 
-    private var listRows: some View {
+    var listRows: some View {
         VStack(spacing: 0) {
             // Header
             VStack(spacing: 0) {
@@ -162,7 +173,7 @@ struct SpendingTotalChartView: View {
     }
 
     // Colors are mapped using Apple chart ordering
-    private func colorFor(_ record: CategoryRecord) -> Color {
+    func colorFor(_ record: CategoryRecord) -> Color {
         let index = store.selectedContent.firstIndex(of: record) ?? 0
         return colors[index % colors.count]
     }
@@ -193,20 +204,47 @@ private enum Strings {
 #Preview {
     ScrollView {
         SpendingTotalChartView(
-            store: .init(
-                initialState:
-                        .init(
-                            title: "My Chart Name",
-                            budgetId: "Budget1",
-                            startDate: Date.distantPast.firstDayInMonth(),
-                            finishDate: .now.lastDayInMonth(),
-                            accountIds: "A1,A2,A3"
-                        )
-            ) {
+            store: .init(initialState: .withEntries) {
                 SpendingTotalChartFeature()
             }
         )
     }
     .contentMargins(.Spacing.pt16)
     .background(Color.Surface.primary)
+}
+
+#Preview("No Results") {
+    ZStack {
+        Color.Surface.primary
+            .ignoresSafeArea()
+        SpendingTotalChartView(
+            store: .init(initialState: .withNoEntries) {
+                SpendingTotalChartFeature()
+            }
+        )
+    }
+}
+
+extension SpendingTotalChartFeature.State {
+
+    static let withEntries: Self = {
+        .init(
+            title: "My Chart Name",
+            budgetId: "Budget1",
+            startDate: Date.distantPast.firstDayInMonth(),
+            finishDate: .now.lastDayInMonth(),
+            accountIds: "A1,A2,A3"
+        )
+    }()
+
+    static let withNoEntries: Self = {
+        .init(
+            title: "",
+            budgetId: "",
+            startDate: Date.distantPast.firstDayInMonth(),
+            finishDate: .now.lastDayInMonth(),
+            accountIds: nil,
+            categoryGroups: [CategoryRecord]()
+        )
+    }()
 }

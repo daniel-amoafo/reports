@@ -10,8 +10,6 @@ struct HomeView: View {
     @State var selectedString: String?
     private let logger = LogFactory.create(Self.self)
 
-    @State private var viewAllFrame: CGRect = .zero
-
     var body: some View {
         ZStack {
             Color.Surface.primary

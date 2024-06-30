@@ -15,7 +15,7 @@ struct HorizontalDivider: View {
         self.init(color: config.color, height: config.height)
     }
 
-    init(color: Color, height: CGFloat) {
+    init(color: Color, height: CGFloat = 0.5) {
         self.color = color
         self.height = height
     }

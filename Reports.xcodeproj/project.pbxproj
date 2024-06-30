@@ -36,6 +36,7 @@
 		1856B68F2C09BAC900F1E0ED /* SelectAccountsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1856B68E2C09BAC900F1E0ED /* SelectAccountsView.swift */; };
 		185D4B202C1684E600020B41 /* CategoryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185D4B1F2C1684E600020B41 /* CategoryListView.swift */; };
 		185D4B222C16855800020B41 /* CategoryListFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185D4B212C16855800020B41 /* CategoryListFeature.swift */; };
+		185FF8952C3057A60065ABD3 /* NoChartResultsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185FF8942C3057A60065ABD3 /* NoChartResultsView.swift */; };
 		1868BAC12BE5260000757E78 /* ReportFeatureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1868BAC02BE5260000757E78 /* ReportFeatureTests.swift */; };
 		1868BAC62BE7881900757E78 /* SavedReport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1868BAC52BE7881900757E78 /* SavedReport.swift */; };
 		1868BAC82BE78C2900757E78 /* Database.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1868BAC72BE78C2900757E78 /* Database.swift */; };
@@ -68,6 +69,7 @@
 		188AA9082BF763A70032F170 /* Publisher+Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = 188AA9072BF763A70032F170 /* Publisher+Async.swift */; };
 		188AA90A2BF8807D0032F170 /* Models+GRDB.swift in Sources */ = {isa = PBXBuildFile; fileRef = 188AA9092BF8807D0032F170 /* Models+GRDB.swift */; };
 		188AA90C2BFC3E7E0032F170 /* GRDBQueries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 188AA90B2BFC3E7E0032F170 /* GRDBQueries.swift */; };
+		188F7B642C258B2A00C0469F /* OnboardingViewFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 188F7B632C258B2A00C0469F /* OnboardingViewFeature.swift */; };
 		1894264B2BDFB6D700C06018 /* AppStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1894264A2BDFB6D700C06018 /* AppStrings.swift */; };
 		189641AF2B9C72BE00716258 /* AnimationConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189641AE2B9C72BE00716258 /* AnimationConstants.swift */; };
 		189641BB2B9C8CFE00716258 /* ReportChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189641BA2B9C8CFD00716258 /* ReportChart.swift */; };
@@ -85,7 +87,7 @@
 		18BC9F462C1046FB003B1E3D /* SpendingTrendChartFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18BC9F452C1046FB003B1E3D /* SpendingTrendChartFeature.swift */; };
 		18BC9F492C119520003B1E3D /* TrendRecord+GRDBQueries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18BC9F482C119520003B1E3D /* TrendRecord+GRDBQueries.swift */; };
 		18BC9F4B2C119560003B1E3D /* String+GRDBQueries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18BC9F4A2C119560003B1E3D /* String+GRDBQueries.swift */; };
-		18BC9F4D2C11CBFD003B1E3D /* Gradient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18BC9F4C2C11CBFD003B1E3D /* Gradient.swift */; };
+		18BC9F4D2C11CBFD003B1E3D /* KleonGradient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18BC9F4C2C11CBFD003B1E3D /* KleonGradient.swift */; };
 		18C3BFB02B81874000E444C8 /* AppIntroLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C3BFAF2B81874000E444C8 /* AppIntroLoginView.swift */; };
 		18C3BFB22B820AEA00E444C8 /* SFSafariView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C3BFB12B820AEA00E444C8 /* SFSafariView.swift */; };
 		18C3BFB72B820DD000E444C8 /* Binding+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C3BFB62B820DD000E444C8 /* Binding+Additions.swift */; };
@@ -107,6 +109,10 @@
 		18C3BFE52B8AE9EC00E444C8 /* OpenSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 18C3BFD92B8AE9EC00E444C8 /* OpenSans-Regular.ttf */; };
 		18C3BFE92B8B6FA100E444C8 /* BudgetSystemService+ConfigTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C3BFE82B8B6FA100E444C8 /* BudgetSystemService+ConfigTests.swift */; };
 		18E2E08A2C246E60009ABB52 /* WorkspaceValuesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E2E0892C246E60009ABB52 /* WorkspaceValuesTests.swift */; };
+		18E2E08C2C256204009ABB52 /* SelectCategoriesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E2E08B2C256204009ABB52 /* SelectCategoriesView.swift */; };
+		18E2E08E2C25634F009ABB52 /* SelectCategoriesFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E2E08D2C25634F009ABB52 /* SelectCategoriesFeature.swift */; };
+		18E2E0902C2584F2009ABB52 /* ReportAppFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E2E08F2C2584EA009ABB52 /* ReportAppFeature.swift */; };
+		18E2E0922C2587FC009ABB52 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E2E0912C2587FC009ABB52 /* OnboardingView.swift */; };
 		18E7BAF52BE0CE6D00C0468E /* ReportFetchError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E7BAF42BE0CE6D00C0468E /* ReportFetchError.swift */; };
 		18E7BAF72BE0E5F300C0468E /* TransactionHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E7BAF62BE0E5F300C0468E /* TransactionHistoryView.swift */; };
 		18E7BAF92BE1081400C0468E /* EdgeInsets+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E7BAF82BE1081400C0468E /* EdgeInsets+Additions.swift */; };
@@ -166,6 +172,7 @@
 		1856B68E2C09BAC900F1E0ED /* SelectAccountsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectAccountsView.swift; sourceTree = "<group>"; };
 		185D4B1F2C1684E600020B41 /* CategoryListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryListView.swift; sourceTree = "<group>"; };
 		185D4B212C16855800020B41 /* CategoryListFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryListFeature.swift; sourceTree = "<group>"; };
+		185FF8942C3057A60065ABD3 /* NoChartResultsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoChartResultsView.swift; sourceTree = "<group>"; };
 		1868BAC02BE5260000757E78 /* ReportFeatureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportFeatureTests.swift; sourceTree = "<group>"; };
 		1868BAC52BE7881900757E78 /* SavedReport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedReport.swift; sourceTree = "<group>"; };
 		1868BAC72BE78C2900757E78 /* Database.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Database.swift; sourceTree = "<group>"; };
@@ -198,6 +205,7 @@
 		188AA9072BF763A70032F170 /* Publisher+Async.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Publisher+Async.swift"; sourceTree = "<group>"; };
 		188AA9092BF8807D0032F170 /* Models+GRDB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models+GRDB.swift"; sourceTree = "<group>"; };
 		188AA90B2BFC3E7E0032F170 /* GRDBQueries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GRDBQueries.swift; sourceTree = "<group>"; };
+		188F7B632C258B2A00C0469F /* OnboardingViewFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewFeature.swift; sourceTree = "<group>"; };
 		1894264A2BDFB6D700C06018 /* AppStrings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStrings.swift; sourceTree = "<group>"; };
 		189641AE2B9C72BE00716258 /* AnimationConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationConstants.swift; sourceTree = "<group>"; };
 		189641BA2B9C8CFD00716258 /* ReportChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportChart.swift; sourceTree = "<group>"; };
@@ -216,7 +224,7 @@
 		18BC9F452C1046FB003B1E3D /* SpendingTrendChartFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendingTrendChartFeature.swift; sourceTree = "<group>"; };
 		18BC9F482C119520003B1E3D /* TrendRecord+GRDBQueries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TrendRecord+GRDBQueries.swift"; sourceTree = "<group>"; };
 		18BC9F4A2C119560003B1E3D /* String+GRDBQueries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+GRDBQueries.swift"; sourceTree = "<group>"; };
-		18BC9F4C2C11CBFD003B1E3D /* Gradient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gradient.swift; sourceTree = "<group>"; };
+		18BC9F4C2C11CBFD003B1E3D /* KleonGradient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KleonGradient.swift; sourceTree = "<group>"; };
 		18BC9F502C1583C4003B1E3D /* MoneyCommonTests.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; name = MoneyCommonTests.xctestplan; path = Packages/MoneyCommon/MoneyCommonTests.xctestplan; sourceTree = "<group>"; };
 		18C3BFAE2B806A7500E444C8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		18C3BFAF2B81874000E444C8 /* AppIntroLoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIntroLoginView.swift; sourceTree = "<group>"; };
@@ -241,6 +249,10 @@
 		18C3BFE62B8B5F4E00E444C8 /* BudgetSystemService.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; name = BudgetSystemService.xctestplan; path = Packages/BudgetSystemService/BudgetSystemService.xctestplan; sourceTree = "<group>"; };
 		18C3BFE82B8B6FA100E444C8 /* BudgetSystemService+ConfigTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BudgetSystemService+ConfigTests.swift"; sourceTree = "<group>"; };
 		18E2E0892C246E60009ABB52 /* WorkspaceValuesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceValuesTests.swift; sourceTree = "<group>"; };
+		18E2E08B2C256204009ABB52 /* SelectCategoriesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectCategoriesView.swift; sourceTree = "<group>"; };
+		18E2E08D2C25634F009ABB52 /* SelectCategoriesFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectCategoriesFeature.swift; sourceTree = "<group>"; };
+		18E2E08F2C2584EA009ABB52 /* ReportAppFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportAppFeature.swift; sourceTree = "<group>"; };
+		18E2E0912C2587FC009ABB52 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		18E7BAF42BE0CE6D00C0468E /* ReportFetchError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportFetchError.swift; sourceTree = "<group>"; };
 		18E7BAF62BE0E5F300C0468E /* TransactionHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionHistoryView.swift; sourceTree = "<group>"; };
 		18E7BAF82BE1081400C0468E /* EdgeInsets+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EdgeInsets+Additions.swift"; sourceTree = "<group>"; };
@@ -316,10 +328,14 @@
 				1873E19C2C08ADC9003C49CD /* HomeFeature.swift */,
 				1856B68E2C09BAC900F1E0ED /* SelectAccountsView.swift */,
 				188A44A12C0AE78B00F21721 /* SelectAccountsFeature.swift */,
+				18E2E08B2C256204009ABB52 /* SelectCategoriesView.swift */,
+				18E2E08D2C25634F009ABB52 /* SelectCategoriesFeature.swift */,
 				189641BD2B9D675900716258 /* SettingsView.swift */,
 				189641C02B9D67CE00716258 /* SavedReportsView.swift */,
 				1873E19A2C08AD6C003C49CD /* SavedReportsFeature.swift */,
 				186A80E62BC9F8450015FFC7 /* ChartButtonView.swift */,
+				18E2E0912C2587FC009ABB52 /* OnboardingView.swift */,
+				188F7B632C258B2A00C0469F /* OnboardingViewFeature.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -365,7 +381,7 @@
 				183ECBD82B747085006C45B2 /* FloatingTitleRow.swift */,
 				183ECBD92B747085006C45B2 /* SelectListView.swift */,
 				183ECBF02B748E90006C45B2 /* HorizontalDivider.swift */,
-				18BC9F4C2C11CBFD003B1E3D /* Gradient.swift */,
+				18BC9F4C2C11CBFD003B1E3D /* KleonGradient.swift */,
 			);
 			path = UIComponents;
 			sourceTree = "<group>";
@@ -534,6 +550,7 @@
 				18E7BAF62BE0E5F300C0468E /* TransactionHistoryView.swift */,
 				1873E1982C08AB81003C49CD /* TransactionHistoryFeature.swift */,
 				18A146B92BECF73B00B4E74F /* ReportFeatureSourceLoader.swift */,
+				185FF8942C3057A60065ABD3 /* NoChartResultsView.swift */,
 			);
 			path = ReportViews;
 			sourceTree = "<group>";
@@ -552,6 +569,7 @@
 			isa = PBXGroup;
 			children = (
 				184DF0B62B6E1C3E00BA6F21 /* ReportsApp.swift */,
+				18E2E08F2C2584EA009ABB52 /* ReportAppFeature.swift */,
 				18C3BFCA2B87522200E444C8 /* Logger.swift */,
 				186E8A1D2B99872F00E65BDE /* ConfigProvider.swift */,
 				1894264A2BDFB6D700C06018 /* AppStrings.swift */,
@@ -821,18 +839,22 @@
 				188A44A22C0AE78B00F21721 /* SelectAccountsFeature.swift in Sources */,
 				18F8A75A2C041F750045CB07 /* Error+Stringify.swift in Sources */,
 				188AA9042BF5EB8A0032F170 /* GRDBDatabase.swift in Sources */,
+				18E2E0922C2587FC009ABB52 /* OnboardingView.swift in Sources */,
 				1873E19B2C08AD6C003C49CD /* SavedReportsFeature.swift in Sources */,
+				18E2E08E2C25634F009ABB52 /* SelectCategoriesFeature.swift in Sources */,
 				1873E1932C070840003C49CD /* ForEach+Additions.swift in Sources */,
 				18C3BFBF2B82370B00E444C8 /* BudgetSystemService+Config.swift in Sources */,
+				18E2E08C2C256204009ABB52 /* SelectCategoriesView.swift in Sources */,
 				189641BB2B9C8CFE00716258 /* ReportChart.swift in Sources */,
 				183ECBE02B747085006C45B2 /* SelectListView.swift in Sources */,
 				18ACA26D2C1BF2B800D007CF /* CategoryRecord+GRDBQueries.swift in Sources */,
 				183ECBC12B70E0B6006C45B2 /* KeyValueStore.swift in Sources */,
 				18A146BA2BECF73B00B4E74F /* ReportFeatureSourceLoader.swift in Sources */,
 				183ECBF12B748E90006C45B2 /* HorizontalDivider.swift in Sources */,
+				185FF8952C3057A60065ABD3 /* NoChartResultsView.swift in Sources */,
 				188AA9062BF73F3C0032F170 /* ModelContextFactory.swift in Sources */,
 				186E8A222B9AEDB100E65BDE /* MainTabView.swift in Sources */,
-				18BC9F4D2C11CBFD003B1E3D /* Gradient.swift in Sources */,
+				18BC9F4D2C11CBFD003B1E3D /* KleonGradient.swift in Sources */,
 				186A80E72BC9F8450015FFC7 /* ChartButtonView.swift in Sources */,
 				1856B68D2C099BFA00F1E0ED /* ModelContextNotifications.swift in Sources */,
 				18482AE12C16FBD8002C354A /* CategoryListItem.swift in Sources */,
@@ -844,6 +866,7 @@
 				186A80FD2BCCC5DE0015FFC7 /* ReportInputView.swift in Sources */,
 				184DF0B72B6E1C3E00BA6F21 /* ReportsApp.swift in Sources */,
 				183ECBEE2B747460006C45B2 /* Array+Safe.swift in Sources */,
+				18E2E0902C2584F2009ABB52 /* ReportAppFeature.swift in Sources */,
 				188AA90C2BFC3E7E0032F170 /* GRDBQueries.swift in Sources */,
 				1873E1992C08AB81003C49CD /* TransactionHistoryFeature.swift in Sources */,
 				18C3BFB72B820DD000E444C8 /* Binding+Additions.swift in Sources */,
@@ -876,6 +899,7 @@
 				188AA9082BF763A70032F170 /* Publisher+Async.swift in Sources */,
 				183ECBDF2B747085006C45B2 /* FloatingTitleRow.swift in Sources */,
 				183ECBEC2B747460006C45B2 /* String+Additions.swift in Sources */,
+				188F7B642C258B2A00C0469F /* OnboardingViewFeature.swift in Sources */,
 				186A80EB2BCA57F90015FFC7 /* BackgroundShadowViewModifier.swift in Sources */,
 				18E7BAF52BE0CE6D00C0468E /* ReportFetchError.swift in Sources */,
 				186E8A242B9AF45200E65BDE /* HomeView.swift in Sources */,
@@ -1090,6 +1114,7 @@
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				_EXPERIMENTAL_SWIFT_EXPLICIT_MODULES = YES;
 			};
 			name = Debug;
 		};
@@ -1132,6 +1157,7 @@
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				_EXPERIMENTAL_SWIFT_EXPLICIT_MODULES = YES;
 			};
 			name = Release;
 		};

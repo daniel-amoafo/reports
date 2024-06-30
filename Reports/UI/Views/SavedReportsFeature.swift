@@ -63,7 +63,6 @@ struct SavedReportsFeature {
     }
 
     // MARK: Dependencies
-    @Dependency(\.savedReportQuery) var savedReportQuery
     @Dependency(\.modelContextNotifications) var modelContextNotifications
 
     let logger = LogFactory.create(Self.self)
@@ -75,22 +74,24 @@ struct SavedReportsFeature {
                 let reportsToDelete = offsets.map { index in
                     state.savedReports[index]
                 }
-                deleteSavedReports(reportsToDelete)
+                state.deleteSavedReports(reportsToDelete)
                 return .none
 
             case .didUpdateSavedReports:
-                return fetchSavedReports(state: &state)
+                state.fetchSavedReports()
+                return .none
 
             case .onAppear:
-                return fetchSavedReports(state: &state)
+                state.fetchSavedReports()
+                return .none
 
             case .onTask:
                 return .run { send in
-                    Task { @MainActor in
+                    await Task { @MainActor in
                         for await _ in await modelContextNotifications.didUpdate(SavedReport.self) {
                             send(.didUpdateSavedReports, animation: .smooth)
                         }
-                    }
+                    }.value
 
                     // mointor when selected budgetId changes and update saved reports
                 }
@@ -102,15 +103,19 @@ struct SavedReportsFeature {
     }
 }
 
-fileprivate extension SavedReportsFeature {
+private extension SavedReportsFeature.State {
 
-    func fetchSavedReports(state: inout State) -> Effect<Action> {
+    var savedReportQuery: SavedReportQuery {
+        @Dependency(\.savedReportQuery) var savedReportQuery
+        return savedReportQuery
+    }
+
+    mutating func fetchSavedReports() {
         do {
-            state.savedReports = try savedReportQuery.fetchAll()
-            return .none
+            savedReports = try savedReportQuery.fetchAll()
         } catch {
+            let logger = LogFactory.create(Self.self)
             logger.error("\(error.toString())")
-            return .none
         }
     }
 
@@ -119,6 +124,7 @@ fileprivate extension SavedReportsFeature {
             do {
                 try savedReportQuery.delete(report)
             } catch {
+                let logger = LogFactory.create(Self.self)
                 logger.error("\(error.toString())")
             }
         }

@@ -13,6 +13,20 @@ struct SpendingTrendChartView: View {
     @Bindable var store: StoreOf<SpendingTrendChartFeature>
 
     var body: some View {
+        Group {
+            if store.hasResults {
+                mainContent
+            } else {
+                NoChartResultsView()
+            }
+        }
+    }
+
+}
+
+private extension SpendingTrendChartView {
+
+    var mainContent: some View {
         VStack(spacing: .Spacing.pt24) {
             titles
 
@@ -23,10 +37,6 @@ struct SpendingTrendChartView: View {
             categoryList
         }
     }
-
-}
-
-private extension SpendingTrendChartView {
 
     var titles: some View {
         VStack {
@@ -131,25 +141,49 @@ private enum Strings {
     static let nameLabel = String(localized: "Category", comment: "label for series value names")
 }
 
-// MARK: -
+// MARK: - Previews
 
 #Preview {
     ScrollView {
-        SpendingTrendChartView(
-            store: .init(
-                initialState:
-                        .init(
-                            title: "My Chart Name",
-                            budgetId: "Budget1",
-                            fromDate: .distantPast.firstDayInMonth(),
-                            toDate: .now.lastDayInMonth(),
-                            accountIds: nil
-                        )
-            ) {
-                SpendingTrendChartFeature()
-            }
-        )
+        SpendingTrendChartView(store: .init(initialState: .withResults) {
+            SpendingTrendChartFeature()
+        })
     }
     .contentMargins(.Spacing.pt16)
     .background(Color.Surface.primary)
+}
+
+#Preview("No Results") {
+    ZStack {
+        Color.Surface.primary
+            .ignoresSafeArea()
+        SpendingTrendChartView(store: .init(initialState: .noResults) {
+            SpendingTrendChartFeature()
+        })
+    }
+}
+
+private extension SpendingTrendChartFeature.State {
+
+    static var withResults: Self {
+        .init(
+            title: "My Chart Name",
+            budgetId: "Budget1",
+            fromDate: .distantPast.firstDayInMonth(),
+            toDate: .now.lastDayInMonth(),
+            accountIds: nil
+        )
+    }
+
+    static var noResults: Self {
+        .init(
+            title: "",
+            budgetId: "",
+            fromDate: .distantPast.firstDayInMonth(),
+            toDate: .now.lastDayInMonth(),
+            accountIds: nil,
+            categoryGroupsBar: [TrendRecord](),
+            categoryGroupsLine: [TrendRecord]()
+        )
+    }
 }

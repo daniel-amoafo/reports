@@ -36,19 +36,28 @@ struct SpendingTotalChartFeature {
             budgetId: String,
             startDate: Date,
             finishDate: Date,
-            accountIds: String?
+            accountIds: String?,
+            categoryGroups: [CategoryRecord]? = nil
         ) {
             self.title = title
             self.startDate = startDate
             self.finishDate = finishDate
             self.accountIds = accountIds
 
-            self.categoryGroups = CategoryListQueries.fetchCategoryGroupTotals(
-                budgetId: budgetId,
-                fromDate: startDate,
-                toDate: finishDate,
-                accountIds: accountIds
-            )
+            self.categoryGroups = if let categoryGroups {
+                categoryGroups
+            } else {
+                CategoryListQueries.fetchCategoryGroupTotals(
+                    budgetId: budgetId,
+                    fromDate: startDate,
+                    toDate: finishDate,
+                    accountIds: accountIds
+                )
+            }
+        }
+
+        var hasResults: Bool {
+            categoryGroups.isNotEmpty
         }
 
         var selectedContent: [CategoryRecord] {
@@ -106,7 +115,6 @@ struct SpendingTotalChartFeature {
         case listRowTapped(id: String)
         case catgoriesForCategoryGroupFetched([CategoryRecord], String)
         case subTitleTapped
-        case onAppear
 
         @CasePathable
         enum Delegate {
@@ -175,9 +183,6 @@ struct SpendingTotalChartFeature {
                 state.catgoriesForCategoryGroup = []
                 state.categoriesForCategoryGroupName = nil
                 state.selectedGraphItem = nil
-                return .none
-
-            case .onAppear:
                 return .none
 
             case .binding,

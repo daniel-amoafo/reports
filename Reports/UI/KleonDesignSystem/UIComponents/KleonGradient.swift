@@ -2,7 +2,7 @@
 
 import SwiftUI
 
-enum Gradient {
+enum KleonGradient {
 
     static func linear(
         colors: [Color] = [.Line.leading, .Line.trailing],
@@ -39,6 +39,21 @@ enum Gradient {
             center: center
         )
     }
+
+    static func onboarding() -> EllipticalGradient {
+        let colorStops: [Gradient.Stop] = [
+            .init(color: Color.Onboarding.stop1, location: 0.1),
+            .init(color: Color.Onboarding.stop2, location: 0.4),
+            .init(color: Color.Onboarding.stop3, location: 0.6),
+            .init(color: Color.Onboarding.stop4, location: 0.9),
+        ]
+        return EllipticalGradient(
+            gradient: Gradient(stops: colorStops),
+            center: .topLeading,
+            startRadiusFraction: -0.3,
+            endRadiusFraction: 1.3
+        )
+    }
 }
 
 #Preview {
@@ -55,9 +70,9 @@ private struct ContainerView: View {
     }
 
     let data: [Item] = [
-        .init(name: "Linear", style: .init(Gradient.linear())),
-        .init(name: "Radial", style: .init(Gradient.radial())),
-        .init(name: "Angular", style: .init(Gradient.angular())),
+        .init(name: "Linear", style: .init(KleonGradient.linear())),
+        .init(name: "Radial", style: .init(KleonGradient.radial())),
+        .init(name: "Angular", style: .init(KleonGradient.angular())),
     ]
 
     var body: some View {

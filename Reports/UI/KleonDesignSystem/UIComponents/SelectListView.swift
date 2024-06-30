@@ -11,17 +11,19 @@ struct SelectListView<Element: Identifiable & CustomStringConvertible>: View {
 
     private let items: IdentifiedArrayOf<Element>
     @Binding private var selected: Set<Element.ID>
-    private var mode: SelectListViewSelectionMode
+    private var mode: SelectionMode
     private var noSelectionAllowed: Bool
     private var typography: Typography
     private let showDoneButton: Bool
+    private let rowLayout: SelectListRowLayoutMode
 
     init(
         items: IdentifiedArrayOf<Element>,
         selectedItems: Binding<Set<Element.ID>>,
         noSelectionAllowed: Bool = false,
         typography: Typography = .title3Emphasized,
-        showDoneButton: Bool = true
+        showDoneButton: Bool = true,
+        rowLayout: SelectListRowLayoutMode = .standard
     ) {
         self.items = items
         self._selected = selectedItems
@@ -29,6 +31,7 @@ struct SelectListView<Element: Identifiable & CustomStringConvertible>: View {
         self.noSelectionAllowed = noSelectionAllowed
         self.typography = typography
         self.showDoneButton = showDoneButton
+        self.rowLayout = rowLayout
     }
 
     init(
@@ -36,13 +39,15 @@ struct SelectListView<Element: Identifiable & CustomStringConvertible>: View {
         selectedItem: Binding<Element.ID?>,
         noSelectionAllowed: Bool = false,
         typography: Typography = .title3Emphasized,
-        showDoneButton: Bool = true
+        showDoneButton: Bool = true,
+        rowLayout: SelectListRowLayoutMode = .standard
     ) {
         self.items = items
         self.noSelectionAllowed = noSelectionAllowed
         self.typography = typography
         self.showDoneButton = showDoneButton
         self.mode = .single
+        self.rowLayout = rowLayout
 
         // creates selected binding using the singleItem binding
         // as the backing source binding provider
@@ -64,46 +69,85 @@ struct SelectListView<Element: Identifiable & CustomStringConvertible>: View {
     }
 
     var body: some View {
-        NavigationStack {
+//        NavigationStack {
             ZStack {
                 Color.Surface.primary
                     .ignoresSafeArea()
-                ScrollView {
-                    VStack(spacing: 0) {
-                        ForEach(items) { item in
-                            Button {
-                                toggleSelection(item)
-                            } label: {
-                                HStack {
-                                    Text(item.description)
-                                        .typography(typography)
-                                    Spacer()
-                                    Image(
-                                        systemName: selected.contains(item.id) ? "square.inset.filled" : "square"
-                                    )
-                                    .symbolRenderingMode(.hierarchical)
-                                }
-                            }
-                            .tag(item.id)
-                            .buttonStyle(listButtonStyle(for: item))
-                        }
+                scrollContent
+            }
+//        }
+    }
+
+    private var isNavRequired: Bool {
+        showDoneButton == true
+    }
+}
+
+private extension SelectListView {
+
+    var scrollContent: some View {
+        ScrollView {
+            VStack(spacing: 0) {
+                ForEach(items) { item in
+                    rowView(for: item)
+                }
+            }
+            .backgroundShadow()
+            .padding()
+            .toolbar {
+                if showDoneButton {
+                    Button(AppStrings.doneButtonTitle) {
+                        dismiss()
                     }
-                    .backgroundShadow()
-                    .padding()
-                    .toolbar {
-                        if showDoneButton {
-                            Button(AppStrings.doneButtonTitle) {
-                                dismiss()
-                            }
-                            .foregroundStyle(Color.Text.primary)
-                        }
-                    }
+                    .foregroundStyle(Color.Text.primary)
                 }
             }
         }
     }
 
-    private func listButtonStyle(for item: Element) -> ListRowButtonStyle {
+    func rowView(for item: Element) -> some View {
+        Button {
+            toggleSelection(item)
+        } label: {
+            let title = item.description
+            let isSelected = selected.contains(item.id)
+            switch rowLayout {
+            case .standard:
+                rowViewStandard(title: title, isSelected: isSelected)
+            case .leading:
+                rowViewLeading(title: title, isSelected: isSelected)
+            }
+        }
+        .tag(item.id)
+        .buttonStyle(listButtonStyle(for: item))
+    }
+
+    func rowViewStandard(title: String, isSelected: Bool) -> some View {
+        HStack {
+            Text(title)
+                .typography(typography)
+            Spacer()
+            rowViewImage(isSelected)
+        }
+    }
+
+    func rowViewLeading(title: String, isSelected: Bool) -> some View {
+        HStack(spacing: .Spacing.pt4) {
+            rowViewImage(isSelected)
+            Text(title)
+                .typography(typography)
+            Spacer()
+        }
+    }
+
+    func rowViewImage(_ isSelected: Bool) -> some View {
+        Image(
+            systemName: isSelected ? "square.inset.filled" : "square"
+        )
+        .symbolRenderingMode(.hierarchical)
+    }
+
+    func listButtonStyle(for item: Element) -> ListRowButtonStyle {
         guard items.count > 2 else {
             return .listRowSingle
         }
@@ -116,7 +160,7 @@ struct SelectListView<Element: Identifiable & CustomStringConvertible>: View {
         return .listRow
     }
 
-    private func toggleSelection(_ item: Element) {
+    func toggleSelection(_ item: Element) {
         if selected.contains(item.id) {
             if selected.count == 1 && noSelectionAllowed == false {
                 // only one item selected and not allowing more to be selected
@@ -140,7 +184,12 @@ struct SelectListView<Element: Identifiable & CustomStringConvertible>: View {
     }
 }
 
-private enum SelectListViewSelectionMode {
+enum SelectListRowLayoutMode {
+    case standard
+    case leading
+}
+
+private enum SelectionMode {
     case single
     case multi
 }
@@ -162,6 +211,7 @@ private struct ContainerView: View {
     @State private var noSelectionAllowed: Bool = false
     @State private var showDoneButton: Bool = true
     @State private var mode: SelectionMode = .multi
+    @State private var rowLayout: SelectListRowLayoutMode = .standard
 
     private let list: IdentifiedArrayOf<Item> = [
         .init(id: "1", name: "First"),
@@ -180,7 +230,8 @@ private struct ContainerView: View {
                         selectedItems: $multiSelect,
                         noSelectionAllowed: noSelectionAllowed,
                         typography: .headlineEmphasized,
-                        showDoneButton: showDoneButton
+                        showDoneButton: showDoneButton,
+                        rowLayout: rowLayout
                     )
 
                 case .single:
@@ -189,7 +240,8 @@ private struct ContainerView: View {
                         selectedItem: $singleSelect,
                         noSelectionAllowed: noSelectionAllowed,
                         typography: .headlineEmphasized,
-                        showDoneButton: showDoneButton
+                        showDoneButton: showDoneButton,
+                        rowLayout: rowLayout
                     )
                 }
             }
@@ -204,6 +256,15 @@ private struct ContainerView: View {
                     Text("Single").tag(SelectionMode.single)
                 }
                 .pickerStyle(.segmented)
+                HStack {
+                    Text("Row Layout")
+                    Spacer()
+                    Picker("", selection: self.$rowLayout) {
+                        Text("Standard").tag(SelectListRowLayoutMode.standard)
+                        Text("Leading").tag(SelectListRowLayoutMode.leading)
+                    }
+                    .pickerStyle(.segmented)
+                }
                 Toggle("No selection allowed", isOn: $noSelectionAllowed)
                 Toggle("Show done button", isOn: $showDoneButton)
                 VStack {

@@ -10,9 +10,6 @@
     "[No Reports]" : {
 
     },
-    "[Show No Saved Reports, create a report first]" : {
-
-    },
     "%@" : {
 
     },
@@ -85,6 +82,9 @@
     "From" : {
       "comment" : "the start date field title"
     },
+    "Hello, World!" : {
+
+    },
     "Hmm, something went wrong.\nPlease try again" : {
       "comment" : "text displayed when unable to load screen into a valid state. Ask the user to retry"
     },
@@ -96,6 +96,12 @@
     },
     "Income v Expense" : {
       "comment" : "The title for a chart displaying income and expenses."
+    },
+    "Leading" : {
+
+    },
+    "Let's Go" : {
+      "comment" : "Submit button title"
     },
     "Linear" : {
 
@@ -124,6 +130,9 @@
     "New Report" : {
       "comment" : "the title when a new report is being created"
     },
+    "No results found" : {
+
+    },
     "No selection allowed" : {
 
     },
@@ -139,6 +148,9 @@
     "Opps, there was an unexpected error loading the saved report." : {
       "comment" : "A generic error message displauyed when unable to load a saved report for an unknown reason"
     },
+    "Place holder" : {
+
+    },
     "Please select an account for the report" : {
       "comment" : "the account for which the transactions the report will be based on"
     },
@@ -147,6 +159,9 @@
     },
     "Reports" : {
       "comment" : "Saved Reports screen tab title name"
+    },
+    "Row Layout" : {
+
     },
     "Run" : {
       "comment" : "Generates a new report"
@@ -168,6 +183,9 @@
     },
     "Select a budget" : {
       "comment" : "Placeholder text if no budget has been set."
+    },
+    "Select a budget to get started" : {
+      "comment" : "Text explaining a budget needs to be selected to continue"
     },
     "Select Account" : {
       "comment" : "title for selecting the bank account to run report from"
@@ -201,6 +219,9 @@
     },
     "Spending Trend" : {
       "comment" : "The title for a chart displaying spending by trend for budget accounts."
+    },
+    "Standard" : {
+
     },
     "The Saved Report Account could not be found." : {
       "comment" : "Error displayed when the account id wasn't found in database"

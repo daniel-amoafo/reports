@@ -8,7 +8,7 @@ import SwiftData
 
 /// Provides Database CRUD operations for the `SavedReport` data model object.
 struct SavedReportQuery: Sendable {
-    var fetchAll: @Sendable () throws -> [SavedReport] // fix fetch only a budgetId
+    var fetchAll: @Sendable () throws -> [SavedReport]
     var fetch: @Sendable (FetchDescriptor<SavedReport>) throws -> [SavedReport]
     var fetchOne: @Sendable (UUID) throws -> SavedReport
     var fetchCount: @Sendable (FetchDescriptor<SavedReport>) throws -> Int

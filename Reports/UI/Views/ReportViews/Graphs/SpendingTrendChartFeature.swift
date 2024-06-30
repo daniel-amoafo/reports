@@ -29,27 +29,42 @@ struct SpendingTrendChartFeature {
         fileprivate var categoriesByCategoryGroupName: String?
         fileprivate var categoriesByCategoryGroupLines: [TrendRecord] = []
 
-        init(title: String, budgetId: String, fromDate: Date, toDate: Date, accountIds: String?) {
+        init(
+            title: String,
+            budgetId: String,
+            fromDate: Date,
+            toDate: Date,
+            accountIds: String?,
+            categoryGroupsBar: [TrendRecord]? = nil,
+            categoryGroupsLine: [TrendRecord]? = nil
+        ) {
             self.title = title
             self.budgetId = budgetId
             self.fromDate = fromDate
             self.toDate = toDate
             self.accountIds = accountIds
 
-            let groupsBarData = SpendingTrendQueries.fetchTrends(
-                budgetId: budgetId,
-                fromDate: fromDate,
-                toDate: toDate,
-                accountIds: accountIds
-            )
-            self.categoryGroupsBarData = groupsBarData
+            self.categoryGroupsBarData = if let categoryGroupsBar {
+                categoryGroupsBar
+            } else {
+                SpendingTrendQueries.fetchTrends(
+                    budgetId: budgetId,
+                    fromDate: fromDate,
+                    toDate: toDate,
+                    accountIds: accountIds
+                )
+            }
 
-            self.categoryGroupsLineData = SpendingTrendQueries.fetchLineMarks(
-                budgetId: budgetId,
-                fromDate: fromDate,
-                toDate: toDate,
-                accountIds: accountIds
-            )
+            self.categoryGroupsLineData = if let categoryGroupsLine {
+                categoryGroupsLine
+            } else {
+                SpendingTrendQueries.fetchLineMarks(
+                    budgetId: budgetId,
+                    fromDate: fromDate,
+                    toDate: toDate,
+                    accountIds: accountIds
+                )
+            }
 
             // dummy values to satisfy all stored values before
             self.categoryList = .init(
@@ -61,6 +76,10 @@ struct SpendingTrendChartFeature {
 
             let categoryListItems = fetchCategoryListGroupTotals()
             self.categoryList = makeCategoryListFeatureState(items: categoryListItems)
+        }
+
+        var hasResults: Bool {
+            categoryGroupsBarData.isNotEmpty
         }
 
         func fetchCategoryListGroupTotals() -> [CategoryRecord] {
