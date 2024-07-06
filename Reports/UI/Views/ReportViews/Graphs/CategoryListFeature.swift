@@ -17,6 +17,7 @@ struct CategoryListFeature {
         var accountIds: String?
         var listItems: [AnyCategoryListItem]
         var categoryGroupName: String?
+        var chartNameColor: ChartNameColor
 
         var isDisplayingSubCategory: Bool {
             contentType == .subCategories
@@ -32,12 +33,8 @@ struct CategoryListFeature {
         }
 
         // Colors are mapped using Apple chart ordering
-        func colorFor(_ record: AnyCategoryListItem) -> Color {
-            // Default colors & ordering used in Apple Charts. This array is used to map the category colors
-            // in the chart to the entries displayed in the list.
-            let colors = [Color.blue, .green, .orange, .purple, .red, .cyan, .yellow]
-            let index = listItems.firstIndex(of: record) ?? 0
-            return colors[index % colors.count]
+        func colorFor(_ name: String) -> Color {
+            return chartNameColor.colorFor(name)
         }
 
     }
@@ -76,5 +73,18 @@ struct CategoryListFeature {
                 return .none
             }
         }
+    }
+}
+
+extension CategoryListFeature.State {
+
+    static var empty: Self {
+        .init(
+            contentType: .group,
+            fromDate: .distantPast,
+            toDate: .distantFuture,
+            listItems: [],
+            chartNameColor: .init(names: [])
+        )
     }
 }

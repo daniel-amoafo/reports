@@ -16,18 +16,20 @@ struct SpendingTrendChartFeature {
         let toDate: Date
         let accountIds: String?
         var contentType: CategoryType = .group
-        var categoryList: CategoryListFeature.State
+        var categoryList: CategoryListFeature.State = .empty
         var categoryGroupName: String?
 
         @Shared(.workspaceValues) var workspaceValues
         fileprivate let categoryGroupsBarData: [TrendRecord]
         fileprivate let categoryGroupsLineData: [TrendRecord]
+        fileprivate let categoryGroupsChartNameColors: ChartNameColor
 
         // Categories for a given categoryGroup.
         // Updated when user selects a categoryGroup to inspect
         fileprivate var categoriesByCategoryGroupBars: [TrendRecord] = []
         fileprivate var categoriesByCategoryGroupName: String?
         fileprivate var categoriesByCategoryGroupLines: [TrendRecord] = []
+        fileprivate var categoriesByCategoryGroupChartNameColors = ChartNameColor(names: [])
 
         init(
             title: String,
@@ -55,6 +57,10 @@ struct SpendingTrendChartFeature {
                 )
             }
 
+            self.categoryGroupsChartNameColors = .init(
+                names: categoryGroupsBarData.map(\.name)
+            )
+
             self.categoryGroupsLineData = if let categoryGroupsLine {
                 categoryGroupsLine
             } else {
@@ -66,16 +72,11 @@ struct SpendingTrendChartFeature {
                 )
             }
 
-            // dummy values to satisfy all stored values before
-            self.categoryList = .init(
-                contentType: .group,
-                fromDate: .distantPast,
-                toDate: .distantFuture,
-                listItems: []
-            )
-
             let categoryListItems = fetchCategoryListGroupTotals()
-            self.categoryList = makeCategoryListFeatureState(items: categoryListItems)
+            self.categoryList = makeCategoryListFeatureState(
+                items: categoryListItems,
+                chartNameColor: categoryGroupsChartNameColors
+            )
         }
 
         var hasResults: Bool {
@@ -91,14 +92,15 @@ struct SpendingTrendChartFeature {
             )
         }
 
-        func makeCategoryListFeatureState(items: [any CategoryListItem])
+        func makeCategoryListFeatureState(items: [any CategoryListItem], chartNameColor: ChartNameColor)
         -> CategoryListFeature.State {
             .init(
                 contentType: contentType,
                 fromDate: fromDate,
                 toDate: toDate,
                 listItems: items.map(AnyCategoryListItem.init),
-                categoryGroupName: categoryGroupName
+                categoryGroupName: categoryGroupName,
+                chartNameColor: chartNameColor
             )
         }
 
@@ -134,10 +136,24 @@ struct SpendingTrendChartFeature {
                 majorUnitAmount: .init(rawAmount),
                 currency: workspaceValues.budgetCurrency
             ).amountFormatted(
-                formatter: .abbreviated(signOption: .none, threshold: -1_000_000_000_000),
+                formatter: .abbreviated(
+                    signOption: .none,
+                    threshold: -1_000_000_000_000
+                ),
                 for: .current
             )
         }
+
+        var chartNameColor: ChartNameColor {
+            switch contentType {
+            case .group:
+                return categoryGroupsChartNameColors
+
+            case .subCategories:
+                return categoriesByCategoryGroupChartNameColors
+            }
+        }
+
     }
 
     enum Action {
@@ -170,12 +186,18 @@ struct SpendingTrendChartFeature {
                     toDate: state.toDate,
                     accountIds: state.accountIds
                 )
+                let chartNameColors: ChartNameColor = .init(names: records.map(\.name))
+
                 state.categoriesByCategoryGroupBars = records
                 state.categoryGroupName = groupName
                 state.categoriesByCategoryGroupLines = lineRecords
+                state.categoriesByCategoryGroupChartNameColors = chartNameColors
                 state.contentType = .subCategories
                 state.categoryList = state
-                    .makeCategoryListFeatureState(items: categoryListItems)
+                    .makeCategoryListFeatureState(
+                        items: categoryListItems,
+                        chartNameColor: chartNameColors
+                    )
                 return .none
 
             case .subTitleTapped, .categoryList(.delegate(.subTitleTapped)):
@@ -183,7 +205,10 @@ struct SpendingTrendChartFeature {
                 state.categoriesByCategoryGroupBars = []
                 state.categoriesByCategoryGroupName = nil
                 let categoryListItems = state.fetchCategoryListGroupTotals()
-                state.categoryList = state.makeCategoryListFeatureState(items: categoryListItems)
+                state.categoryList = state.makeCategoryListFeatureState(
+                    items: categoryListItems,
+                    chartNameColor: state.categoryGroupsChartNameColors
+                )
                 return .none
 
             case .categoryList:

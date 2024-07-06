@@ -22,7 +22,7 @@
 		183ECBE62B74738B006C45B2 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 183ECBE52B74738B006C45B2 /* ComposableArchitecture */; };
 		183ECBEC2B747460006C45B2 /* String+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 183ECBE82B747460006C45B2 /* String+Additions.swift */; };
 		183ECBED2B747460006C45B2 /* Collection+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 183ECBE92B747460006C45B2 /* Collection+Additions.swift */; };
-		183ECBEE2B747460006C45B2 /* Array+Safe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 183ECBEA2B747460006C45B2 /* Array+Safe.swift */; };
+		183ECBEE2B747460006C45B2 /* Array+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 183ECBEA2B747460006C45B2 /* Array+Additions.swift */; };
 		183ECBF12B748E90006C45B2 /* HorizontalDivider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 183ECBF02B748E90006C45B2 /* HorizontalDivider.swift */; };
 		183F17052BF24186003C1334 /* MonthYearPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 183F17042BF24186003C1334 /* MonthYearPickerView.swift */; };
 		18482AE12C16FBD8002C354A /* CategoryListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18482AE02C16FBD8002C354A /* CategoryListItem.swift */; };
@@ -37,6 +37,7 @@
 		185D4B202C1684E600020B41 /* CategoryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185D4B1F2C1684E600020B41 /* CategoryListView.swift */; };
 		185D4B222C16855800020B41 /* CategoryListFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185D4B212C16855800020B41 /* CategoryListFeature.swift */; };
 		185FF8952C3057A60065ABD3 /* NoChartResultsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185FF8942C3057A60065ABD3 /* NoChartResultsView.swift */; };
+		185FF8972C3978EA0065ABD3 /* ChartNameColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185FF8962C3978EA0065ABD3 /* ChartNameColor.swift */; };
 		1868BAC12BE5260000757E78 /* ReportFeatureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1868BAC02BE5260000757E78 /* ReportFeatureTests.swift */; };
 		1868BAC62BE7881900757E78 /* SavedReport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1868BAC52BE7881900757E78 /* SavedReport.swift */; };
 		1868BAC82BE78C2900757E78 /* Database.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1868BAC72BE78C2900757E78 /* Database.swift */; };
@@ -153,7 +154,7 @@
 		183ECBDB2B747085006C45B2 /* Typography.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
 		183ECBE82B747460006C45B2 /* String+Additions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+Additions.swift"; sourceTree = "<group>"; };
 		183ECBE92B747460006C45B2 /* Collection+Additions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Collection+Additions.swift"; sourceTree = "<group>"; };
-		183ECBEA2B747460006C45B2 /* Array+Safe.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Array+Safe.swift"; sourceTree = "<group>"; };
+		183ECBEA2B747460006C45B2 /* Array+Additions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Array+Additions.swift"; sourceTree = "<group>"; };
 		183ECBF02B748E90006C45B2 /* HorizontalDivider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalDivider.swift; sourceTree = "<group>"; };
 		183F17042BF24186003C1334 /* MonthYearPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthYearPickerView.swift; sourceTree = "<group>"; };
 		18482AE02C16FBD8002C354A /* CategoryListItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryListItem.swift; sourceTree = "<group>"; };
@@ -173,6 +174,7 @@
 		185D4B1F2C1684E600020B41 /* CategoryListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryListView.swift; sourceTree = "<group>"; };
 		185D4B212C16855800020B41 /* CategoryListFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryListFeature.swift; sourceTree = "<group>"; };
 		185FF8942C3057A60065ABD3 /* NoChartResultsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoChartResultsView.swift; sourceTree = "<group>"; };
+		185FF8962C3978EA0065ABD3 /* ChartNameColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartNameColor.swift; sourceTree = "<group>"; };
 		1868BAC02BE5260000757E78 /* ReportFeatureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportFeatureTests.swift; sourceTree = "<group>"; };
 		1868BAC52BE7881900757E78 /* SavedReport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedReport.swift; sourceTree = "<group>"; };
 		1868BAC72BE78C2900757E78 /* Database.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Database.swift; sourceTree = "<group>"; };
@@ -397,7 +399,7 @@
 		183ECBE72B747460006C45B2 /* Additions */ = {
 			isa = PBXGroup;
 			children = (
-				183ECBEA2B747460006C45B2 /* Array+Safe.swift */,
+				183ECBEA2B747460006C45B2 /* Array+Additions.swift */,
 				18C3BFB62B820DD000E444C8 /* Binding+Additions.swift */,
 				18C3BFBE2B82370B00E444C8 /* BudgetSystemService+Config.swift */,
 				183ECBE92B747460006C45B2 /* Collection+Additions.swift */,
@@ -574,6 +576,7 @@
 				186E8A1D2B99872F00E65BDE /* ConfigProvider.swift */,
 				1894264A2BDFB6D700C06018 /* AppStrings.swift */,
 				18BC9F3F2C0DE62C003B1E3D /* WorkspaceValues.swift */,
+				185FF8962C3978EA0065ABD3 /* ChartNameColor.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -842,6 +845,7 @@
 				18E2E0922C2587FC009ABB52 /* OnboardingView.swift in Sources */,
 				1873E19B2C08AD6C003C49CD /* SavedReportsFeature.swift in Sources */,
 				18E2E08E2C25634F009ABB52 /* SelectCategoriesFeature.swift in Sources */,
+				185FF8972C3978EA0065ABD3 /* ChartNameColor.swift in Sources */,
 				1873E1932C070840003C49CD /* ForEach+Additions.swift in Sources */,
 				18C3BFBF2B82370B00E444C8 /* BudgetSystemService+Config.swift in Sources */,
 				18E2E08C2C256204009ABB52 /* SelectCategoriesView.swift in Sources */,
@@ -865,7 +869,7 @@
 				186E8A402B9BE5E800E65BDE /* ListStyleViewModifier.swift in Sources */,
 				186A80FD2BCCC5DE0015FFC7 /* ReportInputView.swift in Sources */,
 				184DF0B72B6E1C3E00BA6F21 /* ReportsApp.swift in Sources */,
-				183ECBEE2B747460006C45B2 /* Array+Safe.swift in Sources */,
+				183ECBEE2B747460006C45B2 /* Array+Additions.swift in Sources */,
 				18E2E0902C2584F2009ABB52 /* ReportAppFeature.swift in Sources */,
 				188AA90C2BFC3E7E0032F170 /* GRDBQueries.swift in Sources */,
 				1873E1992C08AB81003C49CD /* TransactionHistoryFeature.swift in Sources */,

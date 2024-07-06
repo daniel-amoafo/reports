@@ -60,7 +60,7 @@ struct CategoryListView: View {
                 } label: {
                     HStack {
                         BasicChartSymbolShape.circle
-                            .foregroundStyle(store.state.colorFor(record))
+                            .foregroundStyle(store.state.colorFor(record.name))
                             .frame(width: 8, height: 8)
                         Text(record.name)
                             .typography(.bodyEmphasized)
@@ -127,7 +127,8 @@ private extension MoneyFormatter {
                 contentType: .group,
                 fromDate: PreviewFactory.fromDate,
                 toDate: PreviewFactory.toDate,
-                listItems: PreviewFactory.grocerySubcategoryToAny
+                listItems: PreviewFactory.grocerySubcategoryToAny,
+                chartNameColor: PreviewFactory.namesForColors
             )
         ) {
             CategoryListFeature()
@@ -189,5 +190,9 @@ private enum PreviewFactory {
 
     static var grocerySubcategoryToAny: [AnyCategoryListItem] {
         grocerySubcategory.map(AnyCategoryListItem.init)
+    }
+
+    static var namesForColors: ChartNameColor {
+        .init(names: grocerySubcategory.map(\.name))
     }
 }

@@ -28,7 +28,7 @@ private extension SpendingTrendChartView {
 
     var mainContent: some View {
         VStack(spacing: .Spacing.pt24) {
-            titles
+            headerTitles
 
             chart
 
@@ -38,7 +38,7 @@ private extension SpendingTrendChartView {
         }
     }
 
-    var titles: some View {
+    var headerTitles: some View {
         VStack {
             Text(store.title)
                 .typography(.title3Emphasized)
@@ -95,11 +95,14 @@ private extension SpendingTrendChartView {
                 )
                 .foregroundStyle(Color.Line.fill)
                 .symbolSize(CGSize(width: 10, height: 10))
-
             }
         }
         .chartXAxis { xAxisMark }
         .chartYAxis { yAxisMark }
+        .chartForegroundStyleScale(
+            domain: store.chartNameColor.names,
+            mapping: store.chartNameColor.colorFor
+        )
         .scaledToFit()
     }
 
