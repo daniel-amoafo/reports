@@ -23,6 +23,7 @@ struct SpendingTotalChartFeature {
         var categoryList: CategoryListFeature.State = .empty
         var rawSelectedGraphValue: Decimal?
         var selectedGraphItem: CategoryRecord?
+        @Shared var transactionEntries: [TransactionEntry]?
 
         fileprivate let categoryGroups: [CategoryRecord]
         fileprivate let categoryGroupsChartNameColors: ChartNameColor
@@ -39,12 +40,14 @@ struct SpendingTotalChartFeature {
             startDate: Date,
             finishDate: Date,
             accountIds: String?,
-            categoryGroups: [CategoryRecord]? = nil
+            categoryGroups: [CategoryRecord]? = nil,
+            transactionEntries: Shared<[TransactionEntry]?>
         ) {
             self.title = title
             self.startDate = startDate
             self.finishDate = finishDate
             self.accountIds = accountIds
+            self._transactionEntries = transactionEntries
 
             self.categoryGroups = if let categoryGroups {
                 categoryGroups
@@ -139,7 +142,8 @@ struct SpendingTotalChartFeature {
                 toDate: finishDate,
                 listItems: items.map(AnyCategoryListItem.init),
                 categoryGroupName: groupName,
-                chartNameColor: chartNameColor
+                chartNameColor: chartNameColor,
+                transactionEntries: $transactionEntries
             )
         }
     }
@@ -253,24 +257,6 @@ private enum SpendingTotalQueries {
         } catch {
             Self.logger.error("\(error.toString())")
             return ([], "")
-        }
-    }
-
-    static func fetchTransactionEntries(for categoryId: String, startDate: Date, finishDate: Date, accountIds: String?)
-    -> IdentifiedArrayOf<TransactionEntry> {
-        do {
-            let transactionsBuilder = TransactionEntry.queryTransactionsByCategoryId(
-                categoryId,
-                startDate: startDate,
-                finishDate: finishDate,
-                accountIds: accountIds
-            )
-            let transactions = try Self.grdb.fetchRecords(builder: transactionsBuilder)
-
-            return .init(uniqueElements: transactions)
-        } catch {
-            Self.logger.error("\(error.toString())")
-            return .init(uniqueElements: [])
         }
     }
 }

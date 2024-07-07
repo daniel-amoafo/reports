@@ -173,7 +173,8 @@ private enum Factory {
                     budgetId: Factory.budgetId,
                     startDate: Date.distantPast,
                     finishDate: Date.distantFuture,
-                    accountIds: nil
+                    accountIds: nil,
+                    transactionEntries: Shared(nil)
                 )
             )
         )

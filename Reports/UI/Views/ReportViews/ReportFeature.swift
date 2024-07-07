@@ -23,6 +23,7 @@ struct ReportFeature {
         var scrollToId: String?
         var showSavedReportNameAlert = false
         var savedReportName: String = ""
+        @Shared var transactionEntries: [TransactionEntry]?
 
         var reportTitle: String {
             guard let savedReportTitle = savedReport?.name else {
@@ -84,6 +85,7 @@ struct ReportFeature {
             self.destination = destination
             self.scrollToId = scrollToId
             self.showSavedReportNameAlert = showSavedReportNameAlert
+            self._transactionEntries = Shared(nil)
         }
     }
 
@@ -95,6 +97,7 @@ struct ReportFeature {
         case destination(PresentationAction<Destination.Action>)
         case showSavedReportNameAlert(isPresented: Bool)
         case savedReportName(shouldSave: Bool)
+        case transactionEntries([TransactionEntry]?)
         case reportReadyToRun
         case chartDisplayed
         case doneButtonTapped
@@ -180,7 +183,8 @@ struct ReportFeature {
                             budgetId: state.budgetId,
                             startDate: state.inputFields.fromDate,
                             finishDate: state.inputFields.toDate,
-                            accountIds: state.inputFields.selectedAccountIds
+                            accountIds: state.inputFields.selectedAccountIds,
+                            transactionEntries: state.$transactionEntries
                         )
                     )
                 case .spendingByTrend:
@@ -190,7 +194,8 @@ struct ReportFeature {
                             budgetId: state.budgetId,
                             fromDate: state.inputFields.fromDate,
                             toDate: state.inputFields.toDate,
-                            accountIds: state.inputFields.selectedAccountIds
+                            accountIds: state.inputFields.selectedAccountIds,
+                            transactionEntries: state.$transactionEntries
                         )
                     )
                 case .incomeExpensesTable:
@@ -205,12 +210,11 @@ struct ReportFeature {
                     await send(.chartDisplayed, animation: .easeInOut)
                 }
 
-            case let .chartGraph(
-                .presented(.spendingByTotal(.categoryList(.delegate(.categoryTapped(transactions)))))
-            ),
-                let .chartGraph(.presented(.spendingByTrend(.categoryList(.delegate(.categoryTapped(transactions)))))):
-                let array = transactions.elements
-                state.destination = .transactionHistory(.init(transactions: array, title: array.first?.categoryName))
+            case let .transactionEntries(entries):
+                guard let entries else { return .none }
+                state.destination = .transactionHistory(
+                    .init(transactions: entries, title: entries.first?.categoryName)
+                )
                 return .none
 
             case .chartDisplayed:
@@ -230,10 +234,12 @@ struct ReportFeature {
 
             case .onAppear:
                 // Run report if we have a Saved Report
+                let transactionEntries = state.$transactionEntries
                 if state.savedReport != nil {
                     return .send(.reportReadyToRun)
+                        .merge(with: onTransactionEntries(transactionEntries))
                 }
-                return .none
+                return onTransactionEntries(transactionEntries)
 
             case .inputFields,
                     .chartGraph,
@@ -251,6 +257,14 @@ struct ReportFeature {
 }
 
 private extension ReportFeature {
+
+    func onTransactionEntries(_ transactionEntries: Shared<[TransactionEntry]?>) -> Effect<Action> {
+        .run { send in
+            for await entries in transactionEntries.publisher.values {
+                await send(.transactionEntries(entries), animation: .smooth)
+            }
+        }
+    }
 
     func makeConfirmDialog(isNew: Bool) -> ConfirmationDialogState<Action.ConfirmationDialog> {
         .init {

@@ -156,7 +156,8 @@ extension SpendingTotalChartFeature.State {
             budgetId: "Budget1",
             startDate: Date.distantPast.firstDayInMonth(),
             finishDate: .now.lastDayInMonth(),
-            accountIds: "A1,A2,A3"
+            accountIds: "A1,A2,A3",
+            transactionEntries: Shared(nil)
         )
     }
 
@@ -167,7 +168,8 @@ extension SpendingTotalChartFeature.State {
             startDate: Date.distantPast.firstDayInMonth(),
             finishDate: .now.lastDayInMonth(),
             accountIds: nil,
-            categoryGroups: [CategoryRecord]()
+            categoryGroups: [CategoryRecord](),
+            transactionEntries: Shared(nil)
         )
     }
 }

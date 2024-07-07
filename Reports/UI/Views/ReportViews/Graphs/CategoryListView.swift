@@ -128,7 +128,8 @@ private extension MoneyFormatter {
                 fromDate: PreviewFactory.fromDate,
                 toDate: PreviewFactory.toDate,
                 listItems: PreviewFactory.grocerySubcategoryToAny,
-                chartNameColor: PreviewFactory.namesForColors
+                chartNameColor: PreviewFactory.namesForColors,
+                transactionEntries: Shared(nil)
             )
         ) {
             CategoryListFeature()

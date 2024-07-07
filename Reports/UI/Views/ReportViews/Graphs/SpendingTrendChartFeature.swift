@@ -18,6 +18,7 @@ struct SpendingTrendChartFeature {
         var contentType: CategoryType = .group
         var categoryList: CategoryListFeature.State = .empty
         var categoryGroupName: String?
+        @Shared var transactionEntries: [TransactionEntry]?
 
         @Shared(.workspaceValues) var workspaceValues
         fileprivate let categoryGroupsBarData: [TrendRecord]
@@ -37,6 +38,7 @@ struct SpendingTrendChartFeature {
             fromDate: Date,
             toDate: Date,
             accountIds: String?,
+            transactionEntries: Shared<[TransactionEntry]?>,
             categoryGroupsBar: [TrendRecord]? = nil,
             categoryGroupsLine: [TrendRecord]? = nil
         ) {
@@ -45,6 +47,7 @@ struct SpendingTrendChartFeature {
             self.fromDate = fromDate
             self.toDate = toDate
             self.accountIds = accountIds
+            self._transactionEntries = transactionEntries
 
             self.categoryGroupsBarData = if let categoryGroupsBar {
                 categoryGroupsBar
@@ -150,7 +153,8 @@ struct SpendingTrendChartFeature {
                 toDate: toDate,
                 listItems: items.map(AnyCategoryListItem.init),
                 categoryGroupName: categoryGroupName,
-                chartNameColor: chartNameColor
+                chartNameColor: chartNameColor,
+                transactionEntries: $transactionEntries
             )
         }
     }

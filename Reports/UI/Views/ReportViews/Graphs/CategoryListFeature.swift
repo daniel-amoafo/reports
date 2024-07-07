@@ -18,6 +18,7 @@ struct CategoryListFeature {
         var listItems: [AnyCategoryListItem]
         var categoryGroupName: String?
         var chartNameColor: ChartNameColor
+        @Shared var transactionEntries: [TransactionEntry]?
 
         var isDisplayingSubCategory: Bool {
             contentType == .subCategories
@@ -47,7 +48,6 @@ struct CategoryListFeature {
         enum Delegate {
             case categoryGroupTapped(id: String)
             case subTitleTapped
-            case categoryTapped(IdentifiedArrayOf<TransactionEntry>)
         }
     }
 
@@ -66,7 +66,8 @@ struct CategoryListFeature {
                         toDate: state.toDate,
                         accountIds: state.accountIds
                     )
-                    return .send(.delegate(.categoryTapped(transactions)), animation: .smooth)
+                    state.transactionEntries = transactions.elements
+                    return .none
                 }
 
             case .delegate:
@@ -84,7 +85,8 @@ extension CategoryListFeature.State {
             fromDate: .distantPast,
             toDate: .distantFuture,
             listItems: [],
-            chartNameColor: .init(names: [])
+            chartNameColor: .init(names: []),
+            transactionEntries: Shared(nil)
         )
     }
 }
