@@ -11,10 +11,6 @@ struct SpendingTotalChartView: View {
     @Bindable var store: StoreOf<SpendingTotalChartFeature>
     @ScaledMetric(relativeTo: .body) private var breadcrumbChevronWidth: CGFloat = 5.0
 
-    // Default colors & ordering used in Apple Charts. This array is used to map the category colors
-    // in the chart to the entries displayed in the list.
-    private let colors = [Color.blue, .green, .orange, .purple, .red, .cyan, .yellow]
-
     var body: some View {
         Group {
             if store.hasResults {
@@ -24,7 +20,6 @@ struct SpendingTotalChartView: View {
             }
         }
     }
-
 }
 
 private extension SpendingTotalChartView {
@@ -37,7 +32,7 @@ private extension SpendingTotalChartView {
 
             Divider()
 
-            listRows
+            categoryList
         }
     }
 
@@ -80,9 +75,12 @@ private extension SpendingTotalChartView {
                 .foregroundStyle(by: .value(Strings.chartNameKey, record.name))
                 .opacity(highlight ? 1.0 : 0.4)
             }
-            .chartLegend()
-            .scaledToFit()
             .chartAngleSelection(value: $store.rawSelectedGraphValue)
+            .chartForegroundStyleScale(
+                domain: store.chartNameColor.names,
+                mapping: store.chartNameColor.colorFor
+            )
+            .scaledToFit()
             .chartOverlay { chartProxy in
                 GeometryReader { geometry in
                     if let plotFrame = chartProxy.plotFrame {
@@ -102,80 +100,10 @@ private extension SpendingTotalChartView {
         }
     }
 
-    var listRows: some View {
-        VStack(spacing: 0) {
-            // Header
-            VStack(spacing: 0) {
-                HStack {
-                    Text(Strings.categorized)
-                        .typography(.title2Emphasized)
-                        .foregroundStyle(Color.Text.secondary)
-                    Spacer()
-                }
-                HStack {
-                    Text(store.listSubTitle)
-                        .typography(.bodyEmphasized)
-                        .foregroundStyle(
-                            store.isDisplayingSubCategory ? Color.Text.link : Color.Text.secondary
-                        )
-                        .onTapGesture {
-                            if store.isDisplayingSubCategory {
-                                store.send(.subTitleTapped, animation: .default)
-                            }
-                        }
-                        .accessibilityAddTraits(store.isDisplayingSubCategory ? .isButton : [])
-                        .accessibilityAction {
-                            if store.isDisplayingSubCategory {
-                                store.send(.subTitleTapped, animation: .default)
-                            }
-                        }
-                    if let breadcrumbTitle = store.maybeCategoryName {
-                        Image(systemName: "chevron.right")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: breadcrumbChevronWidth)
-                            .foregroundStyle(Color.Icon.secondary)
-                        Text(breadcrumbTitle)
-                            .typography(.bodyEmphasized)
-                            .foregroundStyle(Color.Text.primary)
-                    }
-                    Spacer()
-                }
-            }
-            .listRowTop()
-
-            // Category rows
-            ForEach(store.selectedContent) { record in
-                Button {
-                    store.send(.listRowTapped(id: record.id), animation: .default)
-                } label: {
-                    HStack {
-                        BasicChartSymbolShape.circle
-                            .foregroundStyle(colorFor(record))
-                            .frame(width: 8, height: 8)
-                        Text(record.name)
-                            .typography(.bodyEmphasized)
-                            .foregroundStyle(Color.Text.primary)
-                        Spacer()
-                        Text(record.total.amountFormatted)
-                            .typography(.bodyEmphasized)
-                            .foregroundStyle(Color.Text.primary)
-                    }
-                }
-                .buttonStyle(.listRow)
-            }
-
-            // Footer row
-            Text("")
-                .listRowBottom()
-        }
-        .backgroundShadow()
-    }
-
-    // Colors are mapped using Apple chart ordering
-    func colorFor(_ record: CategoryRecord) -> Color {
-        let index = store.selectedContent.firstIndex(of: record) ?? 0
-        return colors[index % colors.count]
+    var categoryList: some View {
+        CategoryListView(
+            store: store.scope(state: \.categoryList, action: \.categoryList)
+        )
     }
 
 }
@@ -183,11 +111,6 @@ private extension SpendingTotalChartView {
 // MARK: -
 
 private enum Strings {
-
-    static let categorized = String(
-        localized: "Categories",
-        comment: "title for list of categories for the selected data set"
-    )
 
     static let chartValueKey = String(
         localized: "Value",
@@ -227,7 +150,7 @@ private enum Strings {
 
 extension SpendingTotalChartFeature.State {
 
-    static let withEntries: Self = {
+    static var withEntries: Self {
         .init(
             title: "My Chart Name",
             budgetId: "Budget1",
@@ -235,9 +158,9 @@ extension SpendingTotalChartFeature.State {
             finishDate: .now.lastDayInMonth(),
             accountIds: "A1,A2,A3"
         )
-    }()
+    }
 
-    static let withNoEntries: Self = {
+    static var withNoEntries: Self {
         .init(
             title: "",
             budgetId: "",
@@ -246,5 +169,5 @@ extension SpendingTotalChartFeature.State {
             accountIds: nil,
             categoryGroups: [CategoryRecord]()
         )
-    }()
+    }
 }

@@ -57,7 +57,7 @@ struct CategoryListFeature {
             case let .listRowTapped(id):
                 switch state.contentType {
                 case .group:
-                    return .send(.delegate(.categoryGroupTapped(id: id)), animation: .smooth)
+                    return .send(.delegate(.categoryGroupTapped(id: id)))
 
                 case .subCategories:
                     let transactions = CategoryListQueries.fetchTransactionEntries(

@@ -20,16 +20,18 @@ struct SpendingTotalChartFeature {
         let finishDate: Date
         let accountIds: String?
         var contentType: CategoryType = .group
-
+        var categoryList: CategoryListFeature.State = .empty
         var rawSelectedGraphValue: Decimal?
         var selectedGraphItem: CategoryRecord?
 
         fileprivate let categoryGroups: [CategoryRecord]
+        fileprivate let categoryGroupsChartNameColors: ChartNameColor
 
         // Categories for a given categoryGroup.
         // Updated when user selects a categoryGroup to inspect
         fileprivate var catgoriesForCategoryGroup: [CategoryRecord] = []
         fileprivate var categoriesForCategoryGroupName: String?
+        fileprivate var categoriesByCategoryGroupChartNameColors = ChartNameColor(names: [])
 
         init(
             title: String,
@@ -54,6 +56,13 @@ struct SpendingTotalChartFeature {
                     accountIds: accountIds
                 )
             }
+
+            let chartNameColor = ChartNameColor(names: self.categoryGroups.map(\.name))
+            self.categoryGroupsChartNameColors = chartNameColor
+            self.categoryList = makeCategoryListFeatureState(
+                items: self.categoryGroups,
+                chartNameColor: chartNameColor
+            )
         }
 
         var hasResults: Bool {
@@ -107,26 +116,48 @@ struct SpendingTotalChartFeature {
                 return categoriesForCategoryGroupName
             }
         }
+
+        var chartNameColor: ChartNameColor {
+            switch contentType {
+            case .group:
+                return categoryGroupsChartNameColors
+
+            case .subCategories:
+                return categoriesByCategoryGroupChartNameColors
+            }
+        }
+
+        func makeCategoryListFeatureState(
+            items: [any CategoryListItem],
+            chartNameColor: ChartNameColor,
+            groupName: String? = nil
+        )
+        -> CategoryListFeature.State {
+            .init(
+                contentType: contentType,
+                fromDate: startDate,
+                toDate: finishDate,
+                listItems: items.map(AnyCategoryListItem.init),
+                categoryGroupName: groupName,
+                chartNameColor: chartNameColor
+            )
+        }
     }
 
     enum Action: BindableAction {
         case binding(BindingAction<State>)
-        case delegate(Delegate)
-        case listRowTapped(id: String)
-        case catgoriesForCategoryGroupFetched([CategoryRecord], String)
+        case categoryList(CategoryListFeature.Action)
         case subTitleTapped
-
-        @CasePathable
-        enum Delegate {
-            case categoryTapped(IdentifiedArrayOf<TransactionEntry>)
-        }
     }
 
     let logger = LogFactory.create(Self.self)
 
     var body: some ReducerOf<Self> {
         BindingReducer()
-        Reduce { state, action in
+        Scope(state: \.categoryList, action: \.categoryList) {
+            CategoryListFeature()
+        }
+        Reduce<State, Action> { state, action in
             switch action {
             case .binding(\.rawSelectedGraphValue):
                 guard let rawSelected = state.rawSelectedGraphValue else {
@@ -150,43 +181,38 @@ struct SpendingTotalChartFeature {
                 state.selectedGraphItem = item
                 return .none
 
-            case let .catgoriesForCategoryGroupFetched(records, categoryGroupName):
+            case let .categoryList(.delegate(.categoryGroupTapped(id))):
+                let (records, groupName) = SpendingTotalQueries.fetchCategoryTotals(
+                    categoryGroupId: id,
+                    startDate: state.startDate,
+                    finishDate: state.finishDate,
+                    accountIds: state.accountIds
+                )
+                let chartNameColor = ChartNameColor(names: records.map(\.name))
                 state.catgoriesForCategoryGroup = records
-                state.categoriesForCategoryGroupName = categoryGroupName
+                state.categoriesForCategoryGroupName = groupName
                 state.contentType = .subCategories
                 state.selectedGraphItem = nil
+                state.categoriesByCategoryGroupChartNameColors = chartNameColor
+                state.categoryList = state.makeCategoryListFeatureState(
+                    items: records,
+                    chartNameColor: chartNameColor,
+                    groupName: groupName
+                )
                 return .none
 
-            case let .listRowTapped(id):
-                switch state.contentType {
-                case .group:
-                    let (records, groupName) = SpendingTotalQueries.fetchCategoryTotals(
-                        categoryGroupId: id,
-                        startDate: state.startDate,
-                        finishDate: state.finishDate,
-                        accountIds: state.accountIds
-                    )
-                    return .send(.catgoriesForCategoryGroupFetched(records, groupName), animation: .smooth)
-
-                case .subCategories:
-                    let transactions = SpendingTotalQueries.fetchTransactionEntries(
-                        for: id,
-                        startDate: state.startDate,
-                        finishDate: state.finishDate,
-                        accountIds: state.accountIds
-                    )
-                    return .send(.delegate(.categoryTapped(transactions)), animation: .smooth)
-                }
-
-            case .subTitleTapped:
+            case .subTitleTapped, .categoryList(.delegate(.subTitleTapped)):
                 state.contentType = .group
                 state.catgoriesForCategoryGroup = []
                 state.categoriesForCategoryGroupName = nil
                 state.selectedGraphItem = nil
+                state.categoryList = state.makeCategoryListFeatureState(
+                    items: state.categoryGroups,
+                    chartNameColor: state.categoryGroupsChartNameColors
+                )
                 return .none
 
-            case .binding,
-                    .delegate:
+            case .binding, .categoryList:
                 return .none
             }
         }

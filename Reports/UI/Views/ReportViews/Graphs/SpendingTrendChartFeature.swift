@@ -83,27 +83,6 @@ struct SpendingTrendChartFeature {
             categoryGroupsBarData.isNotEmpty
         }
 
-        func fetchCategoryListGroupTotals() -> [CategoryRecord] {
-            CategoryListQueries.fetchCategoryGroupTotals(
-                budgetId: budgetId,
-                fromDate: fromDate,
-                toDate: toDate,
-                accountIds: accountIds
-            )
-        }
-
-        func makeCategoryListFeatureState(items: [any CategoryListItem], chartNameColor: ChartNameColor)
-        -> CategoryListFeature.State {
-            .init(
-                contentType: contentType,
-                fromDate: fromDate,
-                toDate: toDate,
-                listItems: items.map(AnyCategoryListItem.init),
-                categoryGroupName: categoryGroupName,
-                chartNameColor: chartNameColor
-            )
-        }
-
         var selectedContent: [TrendRecord] {
             switch contentType {
             case .group:
@@ -131,6 +110,16 @@ struct SpendingTrendChartFeature {
             }
         }
 
+        var chartNameColor: ChartNameColor {
+            switch contentType {
+            case .group:
+                return categoryGroupsChartNameColors
+
+            case .subCategories:
+                return categoriesByCategoryGroupChartNameColors
+            }
+        }
+
         func amountFormatted(for rawAmount: Int) -> String {
             return Money(
                 majorUnitAmount: .init(rawAmount),
@@ -144,21 +133,31 @@ struct SpendingTrendChartFeature {
             )
         }
 
-        var chartNameColor: ChartNameColor {
-            switch contentType {
-            case .group:
-                return categoryGroupsChartNameColors
-
-            case .subCategories:
-                return categoriesByCategoryGroupChartNameColors
-            }
+        func fetchCategoryListGroupTotals() -> [CategoryRecord] {
+            CategoryListQueries.fetchCategoryGroupTotals(
+                budgetId: budgetId,
+                fromDate: fromDate,
+                toDate: toDate,
+                accountIds: accountIds
+            )
         }
 
+        func makeCategoryListFeatureState(items: [any CategoryListItem], chartNameColor: ChartNameColor)
+        -> CategoryListFeature.State {
+            .init(
+                contentType: contentType,
+                fromDate: fromDate,
+                toDate: toDate,
+                listItems: items.map(AnyCategoryListItem.init),
+                categoryGroupName: categoryGroupName,
+                chartNameColor: chartNameColor
+            )
+        }
     }
 
     enum Action {
-        case subTitleTapped
         case categoryList(CategoryListFeature.Action)
+        case subTitleTapped
     }
 
     var body: some ReducerOf<Self> {

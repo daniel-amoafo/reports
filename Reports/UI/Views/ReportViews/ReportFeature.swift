@@ -131,7 +131,7 @@ struct ReportFeature {
         Scope(state: \.inputFields, action: \.inputFields) {
             ReportInputFeature()
         }
-        Reduce { state, action in
+        Reduce<State, Action> { state, action in
             switch action {
             case let .confirmationDialog(.presented(action)):
                 switch action {
@@ -205,7 +205,9 @@ struct ReportFeature {
                     await send(.chartDisplayed, animation: .easeInOut)
                 }
 
-            case let .chartGraph(.presented(.spendingByTotal(.delegate(.categoryTapped(transactions))))),
+            case let .chartGraph(
+                .presented(.spendingByTotal(.categoryList(.delegate(.categoryTapped(transactions)))))
+            ),
                 let .chartGraph(.presented(.spendingByTrend(.categoryList(.delegate(.categoryTapped(transactions)))))):
                 let array = transactions.elements
                 state.destination = .transactionHistory(.init(transactions: array, title: array.first?.categoryName))

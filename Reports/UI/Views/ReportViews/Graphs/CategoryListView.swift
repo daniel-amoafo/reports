@@ -56,7 +56,7 @@ struct CategoryListView: View {
             // Category rows
             ForEach(store.listItems) { record in
                 Button {
-                    store.send(.listRowTapped(id: record.id), animation: .default)
+                    store.send(.listRowTapped(id: record.id), animation: .smooth)
                 } label: {
                     HStack {
                         BasicChartSymbolShape.circle
