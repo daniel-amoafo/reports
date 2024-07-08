@@ -14,8 +14,7 @@ let package = Package(
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
-//        .package(url: "https://github.com/daniel-amoafo/swiftynab/", branch: "serverKnowledge"),
-        .package(path: "../../../swiftynab"),
+        .package(url: "https://github.com/daniel-amoafo/swiftynab/", branch: "master"),
         .package(url: "https://github.com/pointfreeco/swift-identified-collections", from: "1.0.2"),
         .package(url: "https://github.com/pointfreeco/swift-concurrency-extras", from: "1.1.0"),
         .package(path: "../MoneyCommon"),
