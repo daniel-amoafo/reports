@@ -5,7 +5,7 @@ import Foundation
 
 /// AsyncPublisher vends a .value property however does not reliably emit values
 /// when used in a for await syntax. Using a `AsyncStream` reliably delivers the values.
-extension Publisher where Failure == Never {
+extension Publisher where Failure == Never, Output: Sendable {
 
     public var stream: AsyncStream<Output> {
         AsyncStream { continuation in

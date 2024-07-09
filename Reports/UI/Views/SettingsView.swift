@@ -5,12 +5,10 @@ import SwiftUI
 
 struct SettingsView: View {
 
-    @Dependency(\.budgetClient) private var budgetClient
-
     var body: some View {
-
         Button {
             Task {
+                @Dependency(\.budgetClient) var budgetClient
                 await budgetClient.logout()
             }
         } label: {

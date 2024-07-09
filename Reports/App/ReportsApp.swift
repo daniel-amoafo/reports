@@ -31,7 +31,6 @@ struct ReportsApp: App {
                     }
             }
         }
-        .modelContext(modelContext)
     }
 }
 

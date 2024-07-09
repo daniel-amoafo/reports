@@ -6,7 +6,7 @@ import SwiftData
 @Model
 final class SavedReport: Identifiable, Equatable {
 
-    @Attribute(.unique) let id: UUID
+    @Attribute(.unique) var id: UUID
     var name: String
     var fromDate: String
     var toDate: String
