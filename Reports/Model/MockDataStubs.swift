@@ -153,6 +153,16 @@ extension IdentifiedArrayOf where Element == CategoryGroup, ID == CategoryGroup.
             budgetId: "Budget1"
         ),
     ]
+
+}
+
+extension CategoryGroup {
+
+    static func fetchMockData(name: String) -> Self {
+        IdentifiedArrayOf<CategoryGroup>.mocks.first(where: {
+            $0.name == name
+        })!
+    }
 }
 
 // MARK: - Category
@@ -209,6 +219,21 @@ extension IdentifiedArray where Element == Category, ID == Category.ID {
             budgetId: "Budget1"
         ),
     ]
+}
+
+extension Category {
+
+    static func fetchMockData(byName name: String) -> Self {
+        IdentifiedArrayOf<Category>.mocks.first(where: {
+            $0.name == name
+        })!
+    }
+
+    static func fetchMockData(byCategoryGroupId categoryGroupId: String) -> [Self] {
+        IdentifiedArrayOf<Category>.mocks.filter {
+            $0.categoryGroupId == categoryGroupId
+        }
+    }
 }
 
 // MARK: - TransactionEntry

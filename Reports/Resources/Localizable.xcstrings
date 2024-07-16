@@ -82,9 +82,6 @@
     "From" : {
       "comment" : "the start date field title"
     },
-    "Hello, World!" : {
-
-    },
     "Hmm, something went wrong.\nPlease try again" : {
       "comment" : "text displayed when unable to load screen into a valid state. Ask the user to retry"
     },

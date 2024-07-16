@@ -216,6 +216,53 @@ struct ReportInputView: View {
         }
     }
 
+    var categorySection: some View {
+        Button(
+            action: {
+                store.send(.selectCategoriesRowTapped)
+            }, label: {
+                HStack(spacing: 0) {
+                    HStack(alignment: .iconAndTitleAlignment, spacing: .Spacing.pt8) {
+                        Image(systemName: "building.columns.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: iconWidth)
+                            .foregroundStyle(Color.Icon.secondary)
+                            .alignmentGuide(
+                                .iconAndTitleAlignment,
+                                computeValue: { dimension in dimension[VerticalAlignment.center] }
+                            )
+
+                        VStack(alignment: .leading, spacing: .Spacing.pt8) {
+                            Text(Strings.selectAccountTitle)
+                                .typography(.bodyEmphasized)
+                                .foregroundStyle(Color.Text.secondary)
+                                .alignmentGuide(
+                                    .iconAndTitleAlignment,
+                                    computeValue: { dimension in dimension[VerticalAlignment.center] }
+                                )
+
+                            Text("\(store.selectedAccountNames ?? Strings.selectAccountPlaceholder)")
+                                .typography(accountNameTypography)
+                                .foregroundStyle(
+                                    store.isAccountSelected ?
+                                    Color.Text.primary : Color.Text.secondary
+                                )
+                        }
+                        Spacer()
+                    }
+                    Image(systemName: "chevron.right")
+                        .foregroundStyle(Color.Icon.secondary)
+                        .padding(.trailing, .Spacing.pt8)
+                }
+            }
+        )
+        .buttonStyle(.listRow)
+        .popover(item: $store.scope(state: \.selectedAccounts, action: \.selectAccounts)) { store in
+            SelectAccountsView(store: store)
+        }
+    }
+
     var runReportSection: some View {
         HStack {
             Button {

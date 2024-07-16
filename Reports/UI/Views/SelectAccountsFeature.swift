@@ -10,8 +10,8 @@ struct SelectAccountsFeature {
 
     @ObservableState
     struct State: Equatable {
-        var activeAccounts: IdentifiedArrayOf<Account>
-        var closedAccounts: IdentifiedArrayOf<Account>
+        var activeAccounts: IdentifiedArrayOf<Account> = []
+        var closedAccounts: IdentifiedArrayOf<Account> = []
         var activeAllAccounts: Bool = true
         var closedAllAccounts: Bool = true
         let budgetId: String
@@ -19,8 +19,6 @@ struct SelectAccountsFeature {
 
         init(budgetId: String) {
             self.budgetId = budgetId
-            self.activeAccounts = []
-            self.closedAccounts = []
 
             do {
                 let activeAccounts = try Account.fetch(isOnBudget: true, isClosed: false, budgetId: budgetId)
@@ -81,7 +79,7 @@ struct SelectAccountsFeature {
 
             guard isSelected else { return }
 
-            // Add all all other list ids to selectedIds
+            // Add all other list ids to selectedIds
             for otherId in otherIds {
                 workspaceValues.selectedAccountIdsSet.insert(otherId)
             }

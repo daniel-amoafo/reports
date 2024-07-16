@@ -79,6 +79,7 @@ struct ReportInputFeature {
         case setPopoverFromDate(Bool)
         case setPopoverToDate(Bool)
         case selectAccountRowTapped
+        case selectCategoriesRowTapped
         case runReportTapped
         case onAppear
 
@@ -127,6 +128,10 @@ struct ReportInputFeature {
 
             case .selectAccountRowTapped:
                 state.selectedAccounts = .init(budgetId: state.budgetId)
+                return .none
+
+            case .selectCategoriesRowTapped:
+
                 return .none
 
             case .onAppear:

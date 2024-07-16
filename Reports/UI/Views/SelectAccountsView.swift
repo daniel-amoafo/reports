@@ -34,14 +34,14 @@ private extension SelectAccountsView {
     var toolbarTopLeading: some ToolbarContent {
         ToolbarItemGroup(placement: .topBarLeading) {
             Group {
-                Button(Strings.selectAll) {
+                Button(AppStrings.selectAll) {
                     store.send(.selectAll, animation: .smooth)
                 }
                 .foregroundStyle(Color.Text.secondary)
 
                 Text(" | ")
 
-                Button(Strings.deselectAll) {
+                Button(AppStrings.deselectAll) {
                     store.send(.deselectAll, animation: .smooth)
                 }
             }
@@ -69,10 +69,7 @@ private extension SelectAccountsView {
                 Button {
                     store.send(.toggleActiveAll, animation: .smooth)
                 } label: {
-                    Image(
-                        systemName: store.isAllActiveEnabled ? "square.inset.filled" : "square"
-                    )
-                    .symbolRenderingMode(.hierarchical)
+                    rowViewImage( store.isAllActiveEnabled)
                 }
                 .padding(.trailing, .Spacing.pt12)
                 .buttonStyle(.plain)
@@ -101,10 +98,7 @@ private extension SelectAccountsView {
                 Button {
                     store.send(.toggleClosedAll, animation: .smooth)
                 } label: {
-                    Image(
-                        systemName: store.isAllClosedEnabled ? "square.inset.filled" : "square"
-                    )
-                    .symbolRenderingMode(.hierarchical)
+                    rowViewImage( store.isAllClosedEnabled)
                 }
                 .padding(.trailing, .Spacing.pt12)
                 .buttonStyle(.plain)
@@ -121,6 +115,13 @@ private extension SelectAccountsView {
             )
         }
     }
+
+    func rowViewImage(_ isSelected: Bool) -> some View {
+        Image(
+            systemName: isSelected ? "square.inset.filled" : "square"
+        )
+        .symbolRenderingMode(.hierarchical)
+    }
 }
 
 private enum Strings {
@@ -133,29 +134,16 @@ private enum Strings {
         localized: "Closed Accounts",
         comment: "Title for accounts that have been closed."
     )
-    static let selectAll = String(
-        localized: "Select All",
-        comment: "button to select all accounts"
-    )
-    static let deselectAll = String(
-        localized: "Select None",
-        comment: "button to select deselect all accounts"
-    )
-
 }
 
 #Preview {
-    NavigationStack {
-        SelectAccountsView(
-            store: .init(
-                initialState: .init(
-                    budgetId: Factory.budgetId
-                )
-            ) {
-                SelectAccountsFeature()
-            }
-        )
-    }
+    SelectAccountsView(
+        store: .init(
+            initialState: .init(budgetId: Factory.budgetId)
+        ) {
+            SelectAccountsFeature()
+        }
+    )
 }
 
 private enum Factory {

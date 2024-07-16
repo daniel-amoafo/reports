@@ -69,13 +69,13 @@ struct SelectListView<Element: Identifiable & CustomStringConvertible>: View {
     }
 
     var body: some View {
-//        NavigationStack {
+        NavigationStack {
             ZStack {
                 Color.Surface.primary
                     .ignoresSafeArea()
                 scrollContent
             }
-//        }
+        }
     }
 
     private var isNavRequired: Bool {

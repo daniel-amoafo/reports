@@ -112,6 +112,29 @@ extension CategoryGroup {
         let request = CategoryGroup.filter(id: id)
         return try Shared.grdb.fetchRecord(Self.self, request: request)
     }
+
+    static func fetch(isHidden: Bool, budgetId: String) throws -> [Self] {
+        let request = CategoryGroup
+            .filter(Column.hidden == isHidden)
+            .filter(Column.budgetId == budgetId)
+            .filter(Column.deleted == 0)
+            .order(Column.name)
+
+        return try Shared.grdb.fetchRecords(Self.self, request: request)
+    }
+}
+
+extension Category {
+
+    static func fetch(isHidden: Bool, budgetId: String) throws -> [Self] {
+        let request = Category
+            .filter(Column.hidden == isHidden)
+            .filter(Column.budgetId == budgetId)
+            .filter(Column.deleted == 0)
+            .order(Column.name)
+
+        return try Shared.grdb.fetchRecords(Self.self, request: request)
+    }
 }
 
 extension TransactionEntry {

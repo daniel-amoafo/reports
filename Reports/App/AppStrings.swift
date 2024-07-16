@@ -30,4 +30,13 @@ enum AppStrings {
         localized: "All Categories",
         comment: "The collective name for top level category groups"
     )
+
+    static let selectAll = String(
+        localized: "Select All",
+        comment: "button to select all accounts"
+    )
+    static let deselectAll = String(
+        localized: "Select None",
+        comment: "button to select deselect all accounts"
+    )
 }
