@@ -12,6 +12,8 @@ struct SelectCategoriesFeature {
         var groups: IdentifiedArrayOf<CategoryGroup> = []
         var categories: IdentifiedArrayOf<Category> = []
         let budgetId: String
+        var searchTerm: String = ""
+        var searchFilteredCategories: IdentifiedArrayOf<Category>?
         @Shared var selected: Set<String>
 
         init(
@@ -23,6 +25,13 @@ struct SelectCategoriesFeature {
             self.budgetId = budgetId
             self._selected = selected
 
+            configureGroupsAndCategories(groups, categories)
+        }
+
+        mutating func configureGroupsAndCategories(
+            _ groups: IdentifiedArrayOf<CategoryGroup>?,
+            _ categories: IdentifiedArrayOf<Category>?
+        ) {
             do {
                 self.groups = if let groups {
                     groups
@@ -51,7 +60,10 @@ struct SelectCategoriesFeature {
         }
 
         func categories(for groupId: String) -> [Category] {
-            categories.filter { $0.categoryGroupId == groupId }
+            guard let filteredCategories = searchFilteredCategories else {
+                return categories.filter { $0.categoryGroupId == groupId }
+            }
+            return filteredCategories.filter { $0.categoryGroupId == groupId }
         }
 
         func isEntireGroupSelected(id: String) -> Bool {
@@ -85,6 +97,13 @@ struct SelectCategoriesFeature {
                 selected.insert(id)
             }
         }
+
+        mutating func filterCategories(with searchTerm: String) {
+            let filtered = categories.filter {
+                $0.name.contains(searchTerm)
+            }
+            searchFilteredCategories = .init(filtered)
+        }
     }
 
     enum Action {
@@ -92,6 +111,7 @@ struct SelectCategoriesFeature {
         case groupRowTapped(String)
         case selectAll
         case deselectAll
+        case searchTermChanged(String)
     }
 
     var body: some ReducerOf<Self> {
@@ -106,7 +126,23 @@ struct SelectCategoriesFeature {
                 state.toggleGroupSelection(id, isSelected: isSelected)
                 return .none
 
-            case .selectAll, .deselectAll:
+            case let .searchTermChanged(searchTerm):
+                state.searchTerm = searchTerm
+                guard searchTerm.isNotEmpty else {
+                    state.searchFilteredCategories = nil
+                    return .none
+                }
+                state.filterCategories(with: searchTerm)
+                return .none
+
+            case .selectAll:
+                let allIds = state.categories.map(\.id)
+                state.selected.removeAll()
+                state.selected = .init(allIds)
+                return .none
+
+            case .deselectAll:
+                state.selected.removeAll()
                 return .none
             }
         }

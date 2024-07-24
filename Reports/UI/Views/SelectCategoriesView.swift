@@ -12,12 +12,13 @@ struct SelectCategoriesView: View {
     var body: some View {
         NavigationStack {
             List(store.groups) { group in
-                groupView(for: group)
+                maybeGroupView(for: group)
             }
             .scrollContentBackground(.hidden)
             .background(Color.Surface.primary)
             .toolbar { toolbarTopLeading }
             .toolbar { toolbarTopTrailing }
+            .searchable(text: $store.searchTerm.sending(\.searchTermChanged))
         }
     }
 }
@@ -26,13 +27,13 @@ private extension SelectCategoriesView {
 
     var toolbarTopLeading: some ToolbarContent {
         ToolbarItemGroup(placement: .topBarLeading) {
-            Group {
+            HStack {
                 Button(AppStrings.selectAll) {
                     store.send(.selectAll, animation: .smooth)
                 }
                 .foregroundStyle(Color.Text.secondary)
 
-                Text(" | ")
+                Text("|")
 
                 Button(AppStrings.deselectAll) {
                     store.send(.deselectAll, animation: .smooth)
@@ -51,29 +52,37 @@ private extension SelectCategoriesView {
         }
     }
 
-    func groupView(for group: CategoryGroup) -> some View {
-        Section {
-            ForEach(store.state.categories(for: group.id)) { category in
-                categoryView(for: category)
-            }
-        } header: {
-            Button {
-                store.send(.groupRowTapped(group.id), animation: .smooth)
-            } label: {
-                HStack {
-                    Text(group.name)
-                        .typography(.subheadlineEmphasized)
-                        .foregroundStyle(Color.Text.secondary)
-
-                    Spacer()
-                    rowViewImage(store.state.isEntireGroupSelected(id: group.id))
+    @ViewBuilder
+    func maybeGroupView(for group: CategoryGroup) -> some View {
+        let categories = store.state.categories(for: group.id)
+        if categories.isNotEmpty {
+            Section {
+                ForEach(categories) { category in
+                    categoryView(for: category)
                 }
-                .contentShape(.interaction, Rectangle())
+            } header: {
+                categoryHeaderRow(for: group)
             }
-            .buttonStyle(.plain)
-            .foregroundStyle(Color.Button.primary)
+            .listRowBackground(Color.Surface.secondary)
         }
-        .listRowBackground(Color.Surface.secondary)
+    }
+
+    func categoryHeaderRow(for group: CategoryGroup) -> some View {
+        Button {
+            store.send(.groupRowTapped(group.id), animation: .smooth)
+        } label: {
+            HStack {
+                Text(group.name)
+                    .typography(.subheadlineEmphasized)
+                    .foregroundStyle(Color.Text.secondary)
+
+                Spacer()
+                rowViewImage(store.state.isEntireGroupSelected(id: group.id))
+            }
+            .contentShape(.interaction, Rectangle())
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(Color.Button.primary)
     }
 
     func categoryView(for category: Category) -> some View {

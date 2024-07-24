@@ -16,6 +16,9 @@
     "%@ Total" : {
       "comment" : "A category total. %@ = The selected category"
     },
+    "|" : {
+
+    },
     "⬅️" : {
 
     },
