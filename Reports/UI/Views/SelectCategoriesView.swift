@@ -11,8 +11,12 @@ struct SelectCategoriesView: View {
 
     var body: some View {
         NavigationStack {
-            List(store.groups) { group in
-                maybeGroupView(for: group)
+            List {
+                if let noResults = store.noResultsLabel {
+                    showNoResults(noResults)
+                } else {
+                    showCategories
+                }
             }
             .scrollContentBackground(.hidden)
             .background(Color.Surface.primary)
@@ -24,6 +28,18 @@ struct SelectCategoriesView: View {
 }
 
 private extension SelectCategoriesView {
+
+    var showCategories: some View {
+        ForEach(store.groups) { group in
+            maybeGroupView(for: group)
+        }
+    }
+
+    func showNoResults(_ label: String) -> some View {
+        Text(label)
+            .typography(.title3Emphasized)
+            .foregroundStyle(Color.Text.primary)
+    }
 
     var toolbarTopLeading: some ToolbarContent {
         ToolbarItemGroup(placement: .topBarLeading) {
@@ -38,9 +54,26 @@ private extension SelectCategoriesView {
                 Button(AppStrings.deselectAll) {
                     store.send(.deselectAll, animation: .smooth)
                 }
+
+                Text("|")
+
+                Button(
+                    "Show selected",
+                    systemImage: selectedCategorySystemImage,
+                    action: { store.send(.onlySelectedCategoryToggled, animation: .smooth) }
+                )
+                .foregroundStyle(
+                    store.isOnlySelectedFilter ?
+                    Color.Button.primary : Color.Text.secondary
+                )
             }
             .foregroundStyle(Color.Text.secondary)
         }
+    }
+
+    var selectedCategorySystemImage: String {
+        let fill = store.isOnlySelectedFilter ? ".fill" : ""
+        return "line.3.horizontal.decrease.circle\(fill)"
     }
 
     var toolbarTopTrailing: some ToolbarContent {
@@ -50,6 +83,11 @@ private extension SelectCategoriesView {
             }
             .foregroundStyle(Color.Text.primary)
         }
+    }
+
+    var noCategoriesToShows: some View {
+        Text("No Items")
+            .typography(.title3Emphasized)
     }
 
     @ViewBuilder

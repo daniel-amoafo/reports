@@ -15,4 +15,17 @@ extension String {
 
         """
     }
+
+    static func andCategoryIds(_ categoryIds: String?) -> String {
+        guard let categoryIds, categoryIds.isNotEmpty else { return " " }
+        // expecting a comma , separated list of category ids, convert to a SQL IN expression.
+        // e.g. category.id IN ('SomeUUID','AnotherUUID')
+        let inValues = "('\(categoryIds.replacingOccurrences(of: ",", with: "','"))')"
+        return """
+
+        AND category.id IN \(inValues)
+
+        """
+    }
+
 }

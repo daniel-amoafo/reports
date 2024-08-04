@@ -175,6 +175,7 @@ private extension SpendingTrendChartFeature.State {
             fromDate: .distantPast.firstDayInMonth(),
             toDate: .now.lastDayInMonth(),
             accountIds: nil,
+            categoryIds: nil,
             transactionEntries: Shared(nil)
         )
     }
@@ -186,6 +187,7 @@ private extension SpendingTrendChartFeature.State {
             fromDate: .distantPast.firstDayInMonth(),
             toDate: .now.lastDayInMonth(),
             accountIds: nil,
+            categoryIds: nil,
             transactionEntries: Shared(nil),
             categoryGroupsBar: [TrendRecord](),
             categoryGroupsLine: [TrendRecord]()

@@ -32,8 +32,7 @@ public struct MoneyFormatter: CustomDebugStringConvertible, Sendable {
             ///
             /// - Parameters:
             ///     - omitsCentsIfPossible: Display whole-dollar amounts without a decimal and cents.
-            ///     - reduceCentsToMinimumSignificatDigits: Reduce cents to minimum significant
-            ///       digits by removing extra zero (e.g., 0.15400000 BTC -> 0.154 BTC)
+            ///     - reduceCentsToMinimumSignificatDigits 
             ///     - showsAsCentsIfPossible: Display sub-$1 amounts as a whole number of cents
             ///       (for currencies with a cents symbol)
             case dollar(

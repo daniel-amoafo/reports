@@ -75,13 +75,14 @@ private extension ReportView {
     var chartGraphView: some View {
         VStack {
             if let store = store.scope(
-                state: \.chartGraph?.spendingByTotal, action: \.chartGraph.spendingByTotal
+                state: \.chartGraph?.spendingByTotal,
+                action: \.chartGraph.spendingByTotal
             ) {
                 SpendingTotalChartView(store: store)
 
             } else if let store = store.scope(
-                state: \.chartGraph?.spendingByTrend, action:
-                    \.chartGraph.spendingByTrend
+                state: \.chartGraph?.spendingByTrend,
+                action: \.chartGraph.spendingByTrend
             ) {
                 SpendingTrendChartView(store: store)
             }
@@ -152,7 +153,8 @@ private enum Factory {
                 .init(
                     chart: .mock,
                     budgetId: budgetId,
-                    selectedAccountIds: selectedAccountIds
+                    selectedAccountIds: selectedAccountIds,
+                    selectedCategoryIds: .init()
                 )
             )
         )
@@ -174,6 +176,7 @@ private enum Factory {
                     startDate: Date.distantPast,
                     finishDate: Date.distantFuture,
                     accountIds: nil,
+                    categoryIds: nil,
                     transactionEntries: Shared(nil)
                 )
             )
@@ -186,7 +189,8 @@ private enum Factory {
                 .init(
                     chart: .mock,
                     budgetId: MockData.budgetId,
-                    selectedAccountIds: selectedAccountIds
+                    selectedAccountIds: selectedAccountIds,
+                    selectedCategoryIds: .init()
                 )
             )
         )

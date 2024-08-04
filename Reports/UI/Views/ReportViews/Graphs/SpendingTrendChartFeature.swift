@@ -15,6 +15,7 @@ struct SpendingTrendChartFeature {
         let fromDate: Date
         let toDate: Date
         let accountIds: String?
+        let categoryIds: String?
         var contentType: CategoryType = .group
         var categoryList: CategoryListFeature.State = .empty
         var categoryGroupName: String?
@@ -38,6 +39,7 @@ struct SpendingTrendChartFeature {
             fromDate: Date,
             toDate: Date,
             accountIds: String?,
+            categoryIds: String?,
             transactionEntries: Shared<[TransactionEntry]?>,
             categoryGroupsBar: [TrendRecord]? = nil,
             categoryGroupsLine: [TrendRecord]? = nil
@@ -47,6 +49,7 @@ struct SpendingTrendChartFeature {
             self.fromDate = fromDate
             self.toDate = toDate
             self.accountIds = accountIds
+            self.categoryIds = categoryIds
             self._transactionEntries = transactionEntries
 
             self.categoryGroupsBarData = if let categoryGroupsBar {
@@ -141,7 +144,8 @@ struct SpendingTrendChartFeature {
                 budgetId: budgetId,
                 fromDate: fromDate,
                 toDate: toDate,
-                accountIds: accountIds
+                accountIds: accountIds,
+                categoryIds: categoryIds
             )
         }
 
@@ -187,7 +191,8 @@ struct SpendingTrendChartFeature {
                     categoryGroupId: id,
                     fromDate: state.fromDate,
                     toDate: state.toDate,
-                    accountIds: state.accountIds
+                    accountIds: state.accountIds,
+                    categoryIds: state.categoryIds
                 )
                 let chartNameColors: ChartNameColor = .init(names: records.map(\.name))
 

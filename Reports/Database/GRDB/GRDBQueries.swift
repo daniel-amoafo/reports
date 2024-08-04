@@ -118,6 +118,7 @@ extension CategoryGroup {
             .filter(Column.hidden == isHidden)
             .filter(Column.budgetId == budgetId)
             .filter(Column.deleted == 0)
+            .filter(Column.name !=  "Internal Master Category")
             .order(Column.name)
 
         return try Shared.grdb.fetchRecords(Self.self, request: request)

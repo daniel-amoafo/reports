@@ -184,6 +184,7 @@ struct ReportFeature {
                             startDate: state.inputFields.fromDate,
                             finishDate: state.inputFields.toDate,
                             accountIds: state.inputFields.selectedAccountIds,
+                            categoryIds: state.inputFields.selectedCategoryIds,
                             transactionEntries: state.$transactionEntries
                         )
                     )
@@ -195,6 +196,7 @@ struct ReportFeature {
                             fromDate: state.inputFields.fromDate,
                             toDate: state.inputFields.toDate,
                             accountIds: state.inputFields.selectedAccountIds,
+                            categoryIds: state.inputFields.selectedCategoryIds,
                             transactionEntries: state.$transactionEntries
                         )
                     )
@@ -287,7 +289,10 @@ private extension ReportFeature {
     // Persist SaveReport
     func saveReport(name: String, inputFields: ReportInputFeature.State, existing: SavedReport?) -> Bool {
         // validate input fields re
-        guard let selectedAccounts = inputFields.selectedAccountIds, selectedAccounts.isNotEmpty else {
+        guard let selectedAccounts = inputFields.selectedAccountIds, selectedAccounts.isNotEmpty,
+              let selectedCategoryIds = inputFields.selectedCategoryIds,
+              selectedCategoryIds.isNotEmpty
+        else {
             return false
         }
         do {
@@ -307,6 +312,7 @@ private extension ReportFeature {
                     chartId: inputFields.chart.id,
                     budgetId: inputFields.budgetId,
                     selectedAccountIds: selectedAccounts,
+                    selectedCategoryIds: selectedCategoryIds,
                     lastModified: .now
                 )
             }

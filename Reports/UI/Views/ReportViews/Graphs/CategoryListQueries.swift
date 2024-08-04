@@ -18,7 +18,8 @@ enum CategoryListQueries {
         budgetId: String,
         fromDate: Date,
         toDate: Date,
-        accountIds: String?
+        accountIds: String?,
+        categoryIds: String?
     ) -> [CategoryRecord] {
         do {
             let categoryGroupBuilder = CategoryRecord
@@ -26,7 +27,8 @@ enum CategoryListQueries {
                     budgetId: budgetId,
                     startDate: fromDate,
                     finishDate: toDate,
-                    accountIds: accountIds
+                    accountIds: accountIds,
+                    categoryIds: categoryIds
                 )
 
             return try grdb.fetchRecords(builder: categoryGroupBuilder)
@@ -40,7 +42,8 @@ enum CategoryListQueries {
         categoryGroupId: String,
         fromDate: Date,
         toDate: Date,
-        accountIds: String?
+        accountIds: String?,
+        categoryIds: String?
     ) -> ([CategoryRecord], String) {
         do {
             let categoryBuilder = CategoryRecord
@@ -48,7 +51,8 @@ enum CategoryListQueries {
                     forCategoryGroupId: categoryGroupId,
                     startDate: fromDate,
                     finishDate: toDate,
-                    accountIds: accountIds
+                    accountIds: accountIds,
+                    categoryIds: categoryIds
                 )
             let records = try Self.grdb.fetchRecords(builder: categoryBuilder)
 

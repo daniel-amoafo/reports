@@ -16,21 +16,28 @@ struct ReportInputFeature {
         var toDate: Date
         @Shared(.workspaceValues) var workspaceValues
         @Presents var selectedAccounts: SelectAccountsFeature.State?
+        @Presents var selectedCategories: SelectCategoriesFeature.State?
         var popoverFromDate = false
         var popoverToDate = false
+        @Shared var selectedCategoryIdsSet: Set<String>
+        private var categories: IdentifiedArrayOf<Category> = .init(uniqueElements: [])
 
         init(
             chart: ReportChart,
             budgetId: String,
             fromDate: Date = Date.firstDayOfLastMonth,
             toDate: Date = Date.lastDayOfThisMonth,
-            selectedAccountIds: String? = nil
+            selectedAccountIds: String? = nil,
+            selectedCategoryIds: String? = nil
         ) {
             self.chart = chart
             self.budgetId = budgetId
             self.fromDate = fromDate
             self.toDate = toDate
+            self._selectedCategoryIdsSet = Shared(WorkspaceValues.makeSet(for: selectedCategoryIds))
             self.workspaceValues.updateSelectedAccountIds(ids: selectedAccountIds)
+
+            setCategories()
         }
 
         var selectedAccountIds: String? {
@@ -45,11 +52,37 @@ struct ReportInputFeature {
             workspaceValues.selectedAccountOnBudgetIdNames
         }
 
+        var selectedCategoryIds: String? {
+            guard selectedCategoryIdsSet.isNotEmpty else { return nil }
+            return selectedCategoryIdsSet
+                .compactMap { categories[id: $0]?.id }
+                .joined(separator: ",")
+        }
+
+        var selectedCategoryNames: String? {
+            guard selectedCategoryIdsSet.isNotEmpty else { return nil }
+            if selectedCategoryIdsSet.count == categories.count {
+                return AppStrings.allCategoriesTitle
+            }
+
+            if selectedCategoryIdsSet.count > 3 {
+                return AppStrings.someCategoriesName
+            }
+
+            return selectedCategoryIdsSet
+                .compactMap { categories[id: $0]?.name }
+                .joined(separator: ", ")
+        }
+
         var isAccountSelected: Bool {
             selectedAccountIds != nil
         }
+
+        var isCategoriesSelected: Bool {
+            selectedCategoryIds != nil
+        }
         var isRunReportDisabled: Bool {
-            !isAccountSelected
+            !isAccountSelected && !isCategoriesSelected
         }
 
         var fromDateFormatted: String { Date.iso8601local.string(from: fromDate) }
@@ -60,13 +93,24 @@ struct ReportInputFeature {
                 if lhs == rhs {
                     return true
                 }
-                let lhsSet = workspaceValues.makeSet(for: lhs)
-                let rhsSet = workspaceValues.makeSet(for: rhs)
+                let lhsSet = WorkspaceValues.makeSet(for: lhs)
+                let rhsSet = WorkspaceValues.makeSet(for: rhs)
                 return lhsSet == rhsSet
             }
             return savedReport.fromDate == fromDateFormatted &&
             savedReport.toDate == toDateFormatted &&
             accountIdsAreEqual(savedReport.selectedAccountIds, selectedAccountIds ?? "")
+        }
+
+        mutating func setCategories() {
+            do {
+                let categoriesFetchResults = try Category.fetch(isHidden: false, budgetId: budgetId)
+                categories = .init(uniqueElements: categoriesFetchResults)
+            } catch {
+                let logger = LogFactory.create(Self.self)
+                logger.error("Unable to fetch categories")
+                logger.debug("\(error.toString())")
+            }
         }
     }
 
@@ -74,6 +118,7 @@ struct ReportInputFeature {
         case chartMoreInfoTapped
         case delegate(Delegate)
         case selectAccounts(PresentationAction<SelectAccountsFeature.Action>)
+        case selectCategories(PresentationAction<SelectCategoriesFeature.Action>)
         case updateFromDateTapped(Date)
         case updateToDateTapped(Date)
         case setPopoverFromDate(Bool)
@@ -131,7 +176,10 @@ struct ReportInputFeature {
                 return .none
 
             case .selectCategoriesRowTapped:
-
+                state.selectedCategories = .init(
+                    selected: state.$selectedCategoryIdsSet,
+                    budgetId: state.budgetId
+                )
                 return .none
 
             case .onAppear:
@@ -141,12 +189,15 @@ struct ReportInputFeature {
                 state.toDate = state.toDate.lastDayInMonth()
                 return .none
 
-            case .delegate, .selectAccounts:
+            case .delegate, .selectAccounts, .selectCategories:
                 return .none
             }
         }
         .ifLet(\.$selectedAccounts, action: \.selectAccounts) {
             SelectAccountsFeature()
+        }
+        .ifLet(\.$selectedCategories, action: \.selectCategories) {
+            SelectCategoriesFeature()
         }
     }
 }

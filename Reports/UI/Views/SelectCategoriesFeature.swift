@@ -14,18 +14,47 @@ struct SelectCategoriesFeature {
         let budgetId: String
         var searchTerm: String = ""
         var searchFilteredCategories: IdentifiedArrayOf<Category>?
+        var isOnlySelectedFilter: Bool = false
         @Shared var selected: Set<String>
 
         init(
             selected: Shared<Set<String>>,
             budgetId: String,
             groups: IdentifiedArrayOf<CategoryGroup>? = nil,
-            categories: IdentifiedArrayOf<Category>? = nil
+            categories: IdentifiedArrayOf<Category>? = nil,
+            isOnlySelectedFilter: Bool = false
         ) {
             self.budgetId = budgetId
+            self.isOnlySelectedFilter = isOnlySelectedFilter
             self._selected = selected
 
             configureGroupsAndCategories(groups, categories)
+        }
+
+        private var listCategories: IdentifiedArrayOf<Category> {
+            if let searchFilteredCategories {
+                searchFilteredCategories
+            } else if isOnlySelectedFilter {
+                .init(uniqueElements: selectedCategories)
+            } else {
+                categories
+            }
+        }
+
+        var selectedCategories: [Category] {
+            selected
+                .compactMap { categories[id: $0] }
+                .sorted { $0.name < $1.name }
+        }
+
+        var noResultsLabel: String? {
+            guard listCategories.isEmpty else { return nil }
+            if let searchFilteredCategories, searchFilteredCategories.isEmpty {
+                return Strings.noSearchResults
+            } else if isOnlySelectedFilter {
+                return Strings.noSelectedCategories
+            }
+            return nil
         }
 
         mutating func configureGroupsAndCategories(
@@ -60,10 +89,7 @@ struct SelectCategoriesFeature {
         }
 
         func categories(for groupId: String) -> [Category] {
-            guard let filteredCategories = searchFilteredCategories else {
-                return categories.filter { $0.categoryGroupId == groupId }
-            }
-            return filteredCategories.filter { $0.categoryGroupId == groupId }
+            return listCategories.filter { $0.categoryGroupId == groupId }
         }
 
         func isEntireGroupSelected(id: String) -> Bool {
@@ -104,14 +130,16 @@ struct SelectCategoriesFeature {
             }
             searchFilteredCategories = .init(filtered)
         }
+
     }
 
     enum Action {
         case categoryRowTapped(String)
         case groupRowTapped(String)
+        case searchTermChanged(String)
+        case onlySelectedCategoryToggled
         case selectAll
         case deselectAll
-        case searchTermChanged(String)
     }
 
     var body: some ReducerOf<Self> {
@@ -135,6 +163,9 @@ struct SelectCategoriesFeature {
                 state.filterCategories(with: searchTerm)
                 return .none
 
+            case .onlySelectedCategoryToggled:
+                state.isOnlySelectedFilter.toggle()
+                return .none
             case .selectAll:
                 let allIds = state.categories.map(\.id)
                 state.selected.removeAll()
@@ -147,4 +178,17 @@ struct SelectCategoriesFeature {
             }
         }
     }
+}
+
+private enum Strings {
+
+    static let noSearchResults = String(
+        localized: "No matches for search results.",
+        comment: "Message when no categories match search string"
+    )
+
+    static let noSelectedCategories = String(
+        localized: "No categories selected.",
+        comment: "Message when no categories have been selected yet"
+    )
 }

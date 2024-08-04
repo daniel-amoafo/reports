@@ -8,7 +8,13 @@ extension CategoryRecord {
 
     /// Creates `CategoryGroup` total amounts  for a given date range.
     /// The record entry values can be used directly to plot data in a chart.
-    static func queryTransactionsByCategoryGroupTotals(budgetId: String, startDate: Date, finishDate: Date, accountIds: String?)
+    static func queryTransactionsByCategoryGroupTotals(
+        budgetId: String,
+        startDate: Date,
+        finishDate: Date,
+        accountIds: String?,
+        categoryIds: String?
+    )
     -> GRDBDatabase.RecordSQLBuilder<CategoryRecord> {
         .init(
             record: CategoryRecord.self,
@@ -24,6 +30,7 @@ extension CategoryRecord {
             AND transactionEntry.deleted <> 1
             """ +
             .andAccountIds(accountIds) +
+            .andCategoryIds(categoryIds) +
             """
             AND transactionEntry.budgetSummaryId = :budgetId
             AND ( (categoryGroup.name = 'Internal Master Category' AND category.name = 'Uncategorized' ) OR categoryGroup.name <> 'Internal Master Category')
@@ -45,7 +52,8 @@ extension CategoryRecord {
         forCategoryGroupId categoryGroupId: String,
         startDate: Date,
         finishDate: Date,
-        accountIds: String?
+        accountIds: String?,
+        categoryIds: String?
     )
     -> GRDBDatabase.RecordSQLBuilder<CategoryRecord> {
         .init(
@@ -62,6 +70,7 @@ extension CategoryRecord {
             AND transactionEntry.deleted <> 1
             """ +
             .andAccountIds(accountIds) +
+            .andCategoryIds(categoryIds) +
             """
             AND categoryGroup.id = :categoryGroupId
             AND ( categoryGroup.name <> 'Internal Master Category' OR (categoryGroup.name = 'Internal Master Category' AND category.name = 'Uncategorized' ))

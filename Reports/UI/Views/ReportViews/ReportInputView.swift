@@ -22,6 +22,8 @@ struct ReportInputView: View {
 
             accountSection
 
+            categorySection
+
             runReportSection
         }
         .backgroundShadow()
@@ -187,7 +189,7 @@ struct ReportInputView: View {
                             )
 
                         VStack(alignment: .leading, spacing: .Spacing.pt8) {
-                            Text(Strings.selectAccountTitle)
+                            Text(Strings.accountsTitle)
                                 .typography(.bodyEmphasized)
                                 .foregroundStyle(Color.Text.secondary)
                                 .alignmentGuide(
@@ -196,7 +198,7 @@ struct ReportInputView: View {
                                 )
 
                             Text("\(store.selectedAccountNames ?? Strings.selectAccountPlaceholder)")
-                                .typography(accountNameTypography)
+                                .typography(accountSubtitleTypography)
                                 .foregroundStyle(
                                     store.isAccountSelected ?
                                     Color.Text.primary : Color.Text.secondary
@@ -223,7 +225,7 @@ struct ReportInputView: View {
             }, label: {
                 HStack(spacing: 0) {
                     HStack(alignment: .iconAndTitleAlignment, spacing: .Spacing.pt8) {
-                        Image(systemName: "building.columns.fill")
+                        Image(systemName: "magazine")
                             .resizable()
                             .scaledToFit()
                             .frame(width: iconWidth)
@@ -234,16 +236,18 @@ struct ReportInputView: View {
                             )
 
                         VStack(alignment: .leading, spacing: .Spacing.pt8) {
-                            Text(Strings.selectAccountTitle)
+                            Text(Strings.categoriesTitle)
                                 .typography(.bodyEmphasized)
                                 .foregroundStyle(Color.Text.secondary)
                                 .alignmentGuide(
                                     .iconAndTitleAlignment,
-                                    computeValue: { dimension in dimension[VerticalAlignment.center] }
+                                    computeValue: { dimension in
+                                        dimension[VerticalAlignment.center]
+                                    }
                                 )
 
-                            Text("\(store.selectedAccountNames ?? Strings.selectAccountPlaceholder)")
-                                .typography(accountNameTypography)
+                            Text("\(store.selectedCategoryNames ?? Strings.selectCategoryPlaceholder)")
+                                .typography(categorySubtitleTypography)
                                 .foregroundStyle(
                                     store.isAccountSelected ?
                                     Color.Text.primary : Color.Text.secondary
@@ -258,8 +262,8 @@ struct ReportInputView: View {
             }
         )
         .buttonStyle(.listRow)
-        .popover(item: $store.scope(state: \.selectedAccounts, action: \.selectAccounts)) { store in
-            SelectAccountsView(store: store)
+        .popover(item: $store.scope(state: \.selectedCategories, action: \.selectCategories)) { store in
+            SelectCategoriesView(store: store)
         }
     }
 
@@ -280,14 +284,22 @@ struct ReportInputView: View {
         .listRowBottom()
     }
 
-    var accountNameTypography: Typography {
-        switch store.selectedAccountIdsSet.count {
+    var accountSubtitleTypography: Typography {
+        rowSubtitleTypography(for: store.selectedAccountIdsSet)
+    }
+
+    var categorySubtitleTypography: Typography {
+        rowSubtitleTypography(for: store.selectedCategoryIdsSet)
+    }
+
+    func rowSubtitleTypography(for selectedIds: Set<String>) -> Typography {
+        switch selectedIds.count {
         case 0:
-            return .bodyItalic
+            return .bodyItalic // placholder text
         case 1...2:
-            return .body
+            return .body // up to account names
         default:
-            return .bodyEmphasized
+            return .bodyEmphasized // All Accounts title
         }
     }
 }
@@ -303,13 +315,24 @@ private enum Strings {
     static let fromDateTitle = String(localized: "From", comment: "the start date field title")
     static let toDateTitle = String(localized: "To", comment: "the end date field title")
     static let runReportTitle = String(localized: "Run", comment: "Generates a new report")
-    static let selectAccountTitle = String(
-        localized: "Select Account",
+    static let accountsTitle = String(
+        localized: "Accounts",
         comment: "title for selecting the bank account to run report from"
     )
+
+    static let categoriesTitle = String(
+        localized: "Categories",
+        comment: "title for selecting the categories to run report on"
+    )
+
     static let selectAccountPlaceholder = String(
-        localized: "Please select an account for the report",
-        comment: "the account for which the transactions the report will be based on"
+        localized: "Please select accounts",
+        comment: "the accounts the transactions report will be based on"
+    )
+
+    static let selectCategoryPlaceholder = String(
+        localized: "Please select categories",
+        comment: "the categories the transactions report will be based on"
     )
 }
 

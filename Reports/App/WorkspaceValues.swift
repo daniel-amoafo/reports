@@ -46,7 +46,7 @@ extension WorkspaceValues {
     /// the count of id's to return
     func accountOnBudgetNames(for ids: String?) -> String? {
         guard let ids else { return nil }
-        let set = makeSet(for: ids)
+        let set = Self.makeSet(for: ids)
         return accountOnBudgetNames(for: set)
     }
 
@@ -76,10 +76,11 @@ extension WorkspaceValues {
             selectedAccountIdsSet = .init()
             return
         }
-        selectedAccountIdsSet = makeSet(for: ids)
+        selectedAccountIdsSet = Self.makeSet(for: ids)
     }
 
-    func makeSet(for ids: String) -> Set<String> {
+    static func makeSet(for ids: String?) -> Set<String> {
+        guard let ids, ids.isNotEmpty else { return .init() }
         let array = ids
             .split(separator: ",")
             .map(String.init)

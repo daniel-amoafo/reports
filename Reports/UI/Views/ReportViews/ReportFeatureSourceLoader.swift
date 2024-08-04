@@ -23,64 +23,97 @@ enum ReportFeatureSourceLoader {
             savedReport = nil
 
         case let .existing(id):
-            @Dependency(\.savedReportQuery) var savedReportQuery
-            let report: SavedReport
-            do {
-                report = try savedReportQuery.fetchOne(id)
-            } catch {
-                let msg = "Saved Report could not be loaded from SwiftData. :-/ id: \(id)"
-                throw LoadError.reportNotFounded(msg)
-            }
+
+            let report = try getReport(id)
+
             savedReport = report
+
             let budgetId = report.budgetId
-            guard let chart = ReportChart.defaultCharts[id: report.chartId] else {
-                throw LoadError.invalidChartId(
-                    "\(String(describing: SavedReport.self)) chart id (\(report.chartId)) not found."
-                )
-            }
-            guard let fromDate = Date.iso8601local.date(from: report.fromDate) else {
-                logger.error("\(String(describing: SavedReport.self)) fromDate parsing error (\(report.fromDate)).")
-                throw LoadError.invalidDateFormat(String(format: Strings.invalidDate, "(\(report.fromDate))."))
-            }
-            guard let toDate = Date.iso8601local.date(from: report.toDate) else {
-                logger.debug("\(String(describing: SavedReport.self)) toDate parsing error (\(report.toDate)).")
-                throw LoadError.invalidDateFormat(Strings.invalidDate)
-            }
 
-            let selectedAcountIds: String?
-            do {
-                if case let accountIdsString = report.selectedAccountIds, accountIdsString.isNotEmpty {
-                    @Shared(.workspaceValues) var workspaceValues
-                    let accountNames = workspaceValues.accountsOnBudgetNames
-                    let accountIds = accountIdsString
-                        .split(separator: ",")
-                        .map { String($0) }
+            let chart = try getChart(report)
 
-                    guard accountIds.allSatisfy({ accountNames.keys.contains($0) }) else {
-                        logger.error(
-                            "\(String(describing: SavedReport.self)) - invalid account id(s) in (\(accountIdsString))."
-                        )
-                        throw LoadError.invalidSelectedAccount(Strings.invalidAccount)
-                    }
-                    selectedAcountIds = accountIdsString
-                } else {
-                    selectedAcountIds = nil
-                }
-            } catch {
-                logger.error("\(error.toString())")
-                throw LoadError.unknown(Strings.unexpectedError)
-            }
+            let (fromDate, toDate) = try getDates(report)
+
+            let selectedAcountIds = try getAccountIds(report)
+
+            let selectedCategoryIds = try getCategoryIds(report)
 
             inputFeatureState = .init(
                 chart: chart,
                 budgetId: budgetId,
                 fromDate: fromDate,
                 toDate: toDate,
-                selectedAccountIds: selectedAcountIds
+                selectedAccountIds: selectedAcountIds,
+                selectedCategoryIds: selectedCategoryIds
             )
         }
 
         return (inputFeatureState, savedReport)
+    }
+
+    private static func getReport(_ id: UUID) throws -> SavedReport {
+        @Dependency(\.savedReportQuery) var savedReportQuery
+        do {
+            return try savedReportQuery.fetchOne(id)
+        } catch {
+            let msg = "Saved Report could not be loaded from SwiftData. :-/ id: \(id)"
+            throw LoadError.reportNotFounded(msg)
+        }
+    }
+
+    private static func getChart(_ report: SavedReport) throws -> ReportChart {
+        guard let chart = ReportChart.defaultCharts[id: report.chartId] else {
+            throw LoadError.invalidChartId(
+                "\(String(describing: SavedReport.self)) chart id (\(report.chartId)) not found."
+            )
+        }
+        return chart
+    }
+
+    private static func getDates(_ report: SavedReport) throws -> (Date, Date) {
+        guard let fromDate = Date.iso8601local.date(from: report.fromDate) else {
+            logger.error("\(String(describing: SavedReport.self)) fromDate parsing error (\(report.fromDate)).")
+            throw LoadError.invalidDateFormat(String(format: Strings.invalidDate, "(\(report.fromDate))."))
+        }
+        guard let toDate = Date.iso8601local.date(from: report.toDate) else {
+            logger.debug("\(String(describing: SavedReport.self)) toDate parsing error (\(report.toDate)).")
+            throw LoadError.invalidDateFormat(Strings.invalidDate)
+        }
+
+        return (fromDate, toDate)
+    }
+
+    private static func getAccountIds(_ report: SavedReport) throws -> String? {
+        let accountIdsString = report.selectedAccountIds
+        guard accountIdsString.isNotEmpty else { return nil }
+        do {
+            @Shared(.workspaceValues) var workspaceValues
+            let accountNames = workspaceValues.accountsOnBudgetNames
+            let accountIds = accountIdsString
+                .split(separator: ",")
+                .map { String($0) }
+
+            // validate accounts exist
+            guard accountIds.allSatisfy({ accountNames.keys.contains($0) }) else {
+                logger.error(
+                    "\(String(describing: SavedReport.self)) - invalid account id(s) in (\(accountIdsString))."
+                )
+                throw LoadError.invalidSelectedAccount(Strings.invalidAccount)
+            }
+            return accountIdsString
+        } catch {
+            logger.error("\(error.toString())")
+            throw LoadError.unknown(Strings.unexpectedError)
+        }
+    }
+
+    private static func getCategoryIds(_ report: SavedReport) throws -> String? {
+        let categoryIdsString = report.selectedCategoryIds
+        guard categoryIdsString.isNotEmpty else { return nil }
+
+        // validate categoryIds exists?
+
+        return categoryIdsString
     }
 
 }

@@ -88,7 +88,9 @@ struct HomeFeature: Sendable {
                 guard let budgetId = state.selectedBudgetId else {
                     return .none
                 }
-                let sourceData = ReportFeature.State.SourceData.new(.init(chart: chart, budgetId: budgetId))
+                let sourceData = ReportFeature.State.SourceData.new(
+                    .init(chart: chart, budgetId: budgetId)
+                )
                 return .send(.delegate(.presentReport(sourceData)))
 
             case .didUpdateSavedReports:

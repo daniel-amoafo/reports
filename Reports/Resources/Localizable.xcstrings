@@ -34,6 +34,9 @@
     "A table summarising income & expenses for each category in a month" : {
       "comment" : "description text of the income expense chart"
     },
+    "Accounts" : {
+      "comment" : "title for selecting the bank account to run report from"
+    },
     "All Accounts" : {
       "comment" : "A label indicating all available accounts will be selected for the report."
     },
@@ -59,7 +62,7 @@
       "comment" : "Button title for a cancel action."
     },
     "Categories" : {
-      "comment" : "title for list of categories for the selected data set"
+      "comment" : "title for list of categories for the selected data set\ntitle for selecting the categories to run report on"
     },
     "Category" : {
       "comment" : "label for series value names"
@@ -130,6 +133,15 @@
     "New Report" : {
       "comment" : "the title when a new report is being created"
     },
+    "No categories selected." : {
+      "comment" : "Message when no categories have been selected yet"
+    },
+    "No Items" : {
+
+    },
+    "No matches for search results." : {
+      "comment" : "Message when no categories match search string"
+    },
     "No results found" : {
 
     },
@@ -151,8 +163,11 @@
     "Place holder" : {
 
     },
-    "Please select an account for the report" : {
-      "comment" : "the account for which the transactions the report will be based on"
+    "Please select accounts" : {
+      "comment" : "the accounts the transactions report will be based on"
+    },
+    "Please select categories" : {
+      "comment" : "the categories the transactions report will be based on"
     },
     "Reconnect" : {
       "comment" : "Button title when unable to load app to a valid state"
@@ -187,9 +202,6 @@
     "Select a budget to get started" : {
       "comment" : "Text explaining a budget needs to be selected to continue"
     },
-    "Select Account" : {
-      "comment" : "title for selecting the bank account to run report from"
-    },
     "Select All" : {
       "comment" : "button to select all accounts"
     },
@@ -208,11 +220,17 @@
     "Show done button" : {
 
     },
+    "Show selected" : {
+
+    },
     "Single" : {
 
     },
     "Some Accounts" : {
       "comment" : "A label indicating a few accounts have been selected for the report."
+    },
+    "Some Categories" : {
+      "comment" : "A label indicating a few categories have been selected for the report."
     },
     "Spending Total" : {
       "comment" : "The title for a chart displaying spending totals by category"

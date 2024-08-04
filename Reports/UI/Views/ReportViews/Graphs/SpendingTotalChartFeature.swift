@@ -19,6 +19,7 @@ struct SpendingTotalChartFeature {
         let startDate: Date
         let finishDate: Date
         let accountIds: String?
+        let categoryIds: String?
         var contentType: CategoryType = .group
         var categoryList: CategoryListFeature.State = .empty
         var rawSelectedGraphValue: Decimal?
@@ -40,6 +41,7 @@ struct SpendingTotalChartFeature {
             startDate: Date,
             finishDate: Date,
             accountIds: String?,
+            categoryIds: String?,
             categoryGroups: [CategoryRecord]? = nil,
             transactionEntries: Shared<[TransactionEntry]?>
         ) {
@@ -47,6 +49,7 @@ struct SpendingTotalChartFeature {
             self.startDate = startDate
             self.finishDate = finishDate
             self.accountIds = accountIds
+            self.categoryIds = categoryIds
             self._transactionEntries = transactionEntries
 
             self.categoryGroups = if let categoryGroups {
@@ -56,7 +59,8 @@ struct SpendingTotalChartFeature {
                     budgetId: budgetId,
                     fromDate: startDate,
                     toDate: finishDate,
-                    accountIds: accountIds
+                    accountIds: accountIds,
+                    categoryIds: categoryIds
                 )
             }
 
@@ -190,7 +194,8 @@ struct SpendingTotalChartFeature {
                     categoryGroupId: id,
                     startDate: state.startDate,
                     finishDate: state.finishDate,
-                    accountIds: state.accountIds
+                    accountIds: state.accountIds,
+                    categoryIds: state.categoryIds
                 )
                 let chartNameColor = ChartNameColor(names: records.map(\.name))
                 state.catgoriesForCategoryGroup = records
@@ -239,7 +244,8 @@ private enum SpendingTotalQueries {
         categoryGroupId: String,
         startDate: Date,
         finishDate: Date,
-        accountIds: String?
+        accountIds: String?,
+        categoryIds: String?
     ) -> ([CategoryRecord], String) {
         do {
             let categoryBuilder = CategoryRecord
@@ -247,7 +253,8 @@ private enum SpendingTotalQueries {
                     forCategoryGroupId: categoryGroupId,
                     startDate: startDate,
                     finishDate: finishDate,
-                    accountIds: accountIds
+                    accountIds: accountIds,
+                    categoryIds: categoryIds
                 )
             let records = try Self.grdb.fetchRecords(builder: categoryBuilder)
 
