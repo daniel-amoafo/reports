@@ -66,7 +66,7 @@ struct ReportInputFeature {
             }
 
             if selectedCategoryIdsSet.count > 3 {
-                return AppStrings.someCategoriesName
+                return AppStrings.someCategoriesTitle
             }
 
             return selectedCategoryIdsSet

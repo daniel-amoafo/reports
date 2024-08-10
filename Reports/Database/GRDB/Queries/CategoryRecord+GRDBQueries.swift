@@ -19,6 +19,7 @@ extension CategoryRecord {
         .init(
             record: CategoryRecord.self,
             sql: """
+            -- queryTransactionsByCategoryGroupTotals
             SELECT categoryGroup.name as name, SUM(amount) as total, categoryGroup.id as id,
             budgetSummary.currencyCode FROM transactionEntry
             INNER JOIN account on account.id = transactionEntry.accountId
@@ -59,6 +60,7 @@ extension CategoryRecord {
         .init(
             record: CategoryRecord.self,
             sql: """
+            -- queryTransactionsByCategoryTotals
             SELECT category.name as name, SUM(amount) as total, category.id as id,
             budgetSummary.currencyCode FROM transactionEntry
             INNER JOIN account on account.id = transactionEntry.accountId

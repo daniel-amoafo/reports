@@ -16,17 +16,17 @@ enum AppStrings {
         localized: "OK",
         comment: "Button title for an OK action."
     )
-    static let allAccountsName = String(
+    static let allAccountsTitle = String(
         localized: "All Accounts",
         comment: "A label indicating all available accounts will be selected for the report."
     )
 
-    static let someAccountsName = String(
+    static let someAccountsTitle = String(
         localized: "Some Accounts",
         comment: "A label indicating a few accounts have been selected for the report."
     )
 
-    static let someCategoriesName = String(
+    static let someCategoriesTitle = String(
         localized: "Some Categories",
         comment: "A label indicating a few categories have been selected for the report."
     )

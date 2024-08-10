@@ -9,7 +9,10 @@ public struct Money: Equatable, Hashable, Sendable {
     public let currency: Currency
 
     public var amount: Decimal {
-        toMajorUnitAmount as Decimal
+        let result = toMajorUnitAmount as Decimal
+        assert(!result.isNaN)
+        assert(result.isFinite)
+        return result
     }
 
     public init(minorUnitAmount: Int, currency: Currency) {

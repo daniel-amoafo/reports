@@ -22,7 +22,7 @@ struct CategoryListView: View {
                     Spacer()
                 }
                 HStack {
-                    Text(AppStrings.allCategoriesTitle)
+                    Text(store.primaryLabel)
                         .typography(.bodyEmphasized)
                         .foregroundStyle(
                             store.isDisplayingSubCategory ? Color.Text.link : Color.Text.secondary
@@ -129,6 +129,7 @@ private extension MoneyFormatter {
                 toDate: PreviewFactory.toDate,
                 listItems: PreviewFactory.grocerySubcategoryToAny,
                 chartNameColor: PreviewFactory.namesForColors,
+                categorySelectionMode: .all,
                 transactionEntries: Shared(nil)
             )
         ) {

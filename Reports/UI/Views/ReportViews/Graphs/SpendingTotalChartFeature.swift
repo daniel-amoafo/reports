@@ -88,7 +88,7 @@ struct SpendingTotalChartFeature {
         var totalName: String {
             switch contentType {
             case .group:
-                return AppStrings.allCategoriesTitle
+                return categorySelectionMode.title
             case .subCategories:
                 return String(format: Strings.categoryNameTotal, (categoriesForCategoryGroupName ?? ""))
             }
@@ -105,10 +105,7 @@ struct SpendingTotalChartFeature {
         }
 
         var listSubTitle: String {
-            switch contentType {
-            case .group, .subCategories:
-                return AppStrings.allCategoriesTitle
-            }
+            categorySelectionMode.title
         }
 
         var isDisplayingSubCategory: Bool {
@@ -134,6 +131,10 @@ struct SpendingTotalChartFeature {
             }
         }
 
+        var categorySelectionMode: CategoryListFeature.CategorySelectionMode {
+            categoryIds == nil ? .all : .some
+        }
+
         func makeCategoryListFeatureState(
             items: [any CategoryListItem],
             chartNameColor: ChartNameColor,
@@ -147,6 +148,7 @@ struct SpendingTotalChartFeature {
                 listItems: items.map(AnyCategoryListItem.init),
                 categoryGroupName: groupName,
                 chartNameColor: chartNameColor,
+                categorySelectionMode: categorySelectionMode,
                 transactionEntries: $transactionEntries
             )
         }

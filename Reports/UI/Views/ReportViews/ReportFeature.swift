@@ -38,7 +38,7 @@ struct ReportFeature {
             let fromMonth = inputFields.fromDate.formatted(.dateTime.month())
             let toYear = inputFields.toDate.formatted(.dateTime.year())
             let toMonth = inputFields.toDate.formatted(.dateTime.month())
-            let accountName = "\(inputFields.selectedAccountNames ?? AppStrings.allAccountsName)"
+            let accountName = "\(inputFields.selectedAccountNames ?? AppStrings.allAccountsTitle)"
 
             if fromYear == toYear {
                 return "\(fromYear) \(fromMonth) - \(toMonth), \(accountName)"

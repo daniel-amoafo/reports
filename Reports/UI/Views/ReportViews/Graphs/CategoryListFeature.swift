@@ -8,20 +8,30 @@ import SwiftUI
 @Reducer
 struct CategoryListFeature {
 
+    enum CategorySelectionMode {
+        case all
+        case some
+    }
+
     @ObservableState
     struct State: Equatable {
 
-        var contentType: CategoryType
-        var fromDate: Date
-        var toDate: Date
+        let contentType: CategoryType
+        let fromDate: Date
+        let toDate: Date
         var accountIds: String?
-        var listItems: [AnyCategoryListItem]
+        let listItems: [AnyCategoryListItem]
         var categoryGroupName: String?
-        var chartNameColor: ChartNameColor
+        let chartNameColor: ChartNameColor
+        let categorySelectionMode: CategorySelectionMode
         @Shared var transactionEntries: [TransactionEntry]?
 
         var isDisplayingSubCategory: Bool {
             contentType == .subCategories
+        }
+
+        var primaryLabel: String {
+            categorySelectionMode.title
         }
 
         var maybeCategoryName: String? {
@@ -86,7 +96,20 @@ extension CategoryListFeature.State {
             toDate: .distantFuture,
             listItems: [],
             chartNameColor: .init(names: []),
+            categorySelectionMode: .all,
             transactionEntries: Shared(nil)
         )
+    }
+}
+
+extension CategoryListFeature.CategorySelectionMode {
+
+    var title: String {
+        switch self {
+        case .all:
+            AppStrings.allCategoriesTitle
+        case .some:
+            AppStrings.someCategoriesTitle
+        }
     }
 }

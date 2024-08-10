@@ -246,7 +246,7 @@ struct ReportInputView: View {
                                     }
                                 )
 
-                            Text("\(store.selectedCategoryNames ?? Strings.selectCategoryPlaceholder)")
+                            Text("\(store.selectedCategoryNames ?? AppStrings.allCategoriesTitle)")
                                 .typography(categorySubtitleTypography)
                                 .foregroundStyle(
                                     store.isAccountSelected ?

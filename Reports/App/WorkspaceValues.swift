@@ -57,11 +57,11 @@ extension WorkspaceValues {
         let accounts = accountsOnBudgetNames
         guard ids.isNotEmpty else { return nil }
         if ids == Set(accounts.keys) {
-            return AppStrings.allAccountsName
+            return AppStrings.allAccountsTitle
         }
 
         guard ids.count <= displayAccountNamesThreshold  else {
-            return AppStrings.someAccountsName
+            return AppStrings.someAccountsTitle
         }
         let names = accounts
             .filter { ids.contains($0.key) }

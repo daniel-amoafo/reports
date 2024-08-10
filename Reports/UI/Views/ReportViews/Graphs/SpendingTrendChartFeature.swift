@@ -126,6 +126,10 @@ struct SpendingTrendChartFeature {
             }
         }
 
+        var categorySelectionMode: CategoryListFeature.CategorySelectionMode {
+            categoryIds == nil ? .all : .some
+        }
+
         func amountFormatted(for rawAmount: Int) -> String {
             return Money(
                 majorUnitAmount: .init(rawAmount),
@@ -158,6 +162,7 @@ struct SpendingTrendChartFeature {
                 listItems: items.map(AnyCategoryListItem.init),
                 categoryGroupName: categoryGroupName,
                 chartNameColor: chartNameColor,
+                categorySelectionMode: categorySelectionMode,
                 transactionEntries: $transactionEntries
             )
         }
