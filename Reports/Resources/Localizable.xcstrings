@@ -184,7 +184,7 @@
     "Save" : {
       "comment" : "Button title for a save action."
     },
-    "Save New Report?" : {
+    "Save New Report" : {
       "comment" : "Confirmation message when saving a new report."
     },
     "Save Report Name" : {
@@ -250,7 +250,7 @@
     "Total Spending" : {
 
     },
-    "Update Saved Report?" : {
+    "Update Report Name" : {
       "comment" : "Confirmation message when updating an existing saved report."
     },
     "Value" : {

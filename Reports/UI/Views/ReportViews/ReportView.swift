@@ -38,18 +38,32 @@ struct ReportView: View {
         .onAppear {
             store.send(.onAppear)
         }
-        .navigationTitle(store.reportTitle)
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
+        .toolbar { toolbarPrincipal }
+        .toolbar { toolbarTopTrailing }
+        .background(Color.Surface.primary)
+        .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
+    }
+
+    var toolbarPrincipal: some ToolbarContent {
+        ToolbarItemGroup(placement: .principal) {
+            Button(store.reportTitle) {
+                store.send(.reportTitleTapped)
+            }
+            .foregroundStyle(Color.Text.primary)
+            .disabled(store.isNewReport)
+        }
+    }
+
+    var toolbarTopTrailing: some ToolbarContent {
+        ToolbarItemGroup(placement: .topBarTrailing) {
             Button(AppStrings.doneButtonTitle) {
                 store.send(.doneButtonTapped)
             }
             .foregroundStyle(Color.Text.primary)
             .fontWeight(.bold)
         }
-        .background(Color.Surface.primary)
-        .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
-        .toolbarBackground(.visible, for: .navigationBar)
     }
 
 }

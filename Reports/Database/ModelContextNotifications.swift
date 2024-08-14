@@ -56,6 +56,13 @@ private extension ModelContextNotifications {
                         return true
                     }
 
+                    if let updatedObjects: Set<NSManagedObject> = $0.updatedObjects,
+                       updatedObjects
+                        .map(\.entity.name)
+                        .contains(String(describing: modelType)) {
+                        return true
+                    }
+
                     // Save notification did not include inserted or deleted objects
                     return false
                 }
@@ -74,6 +81,10 @@ private extension Notification {
 
     var deletedObjects: Set<NSManagedObject>? {
         return userInfo?.value(for: .deletedObjects)
+    }
+
+    var updatedObjects: Set<NSManagedObject>? {
+        return userInfo?.value(for: .updatedObjects)
     }
 }
 

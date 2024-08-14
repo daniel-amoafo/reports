@@ -25,6 +25,10 @@ struct ReportFeature {
         var savedReportName: String = ""
         @Shared var transactionEntries: [TransactionEntry]?
 
+        var saveReportSource: SaveReportSource = .doneButton
+
+        var isNewReport: Bool { savedReport == nil }
+
         var reportTitle: String {
             guard let savedReportTitle = savedReport?.name else {
                 return Strings.newReportTitle
@@ -101,11 +105,12 @@ struct ReportFeature {
         case reportReadyToRun
         case chartDisplayed
         case doneButtonTapped
+        case reportTitleTapped
         case onAppear
 
-        enum ConfirmationDialog: Sendable {
+        enum ConfirmationDialog: Equatable, Sendable {
             case saveNewReport
-            case updateExistingReport
+            case updateExistingReport(source: State.SaveReportSource)
             case discard
         }
 
@@ -136,6 +141,10 @@ struct ReportFeature {
         }
         Reduce<State, Action> { state, action in
             switch action {
+            case .reportTitleTapped:
+                state.showSaveReportAlert(source: .reportTitle)
+                return .none
+
             case let .confirmationDialog(.presented(action)):
                 switch action {
                 case .saveNewReport:
@@ -143,8 +152,7 @@ struct ReportFeature {
                     state.showSavedReportNameAlert = true
                     return .none
                 case .updateExistingReport:
-                    state.savedReportName = state.savedReport?.name ?? ""
-                    state.showSavedReportNameAlert = true
+                    state.showSaveReportAlert(source: .doneButton)
                     return .none
                 case .discard:
                     break
@@ -166,9 +174,14 @@ struct ReportFeature {
                     // alert user there was a problem saving
                     return .none
                 }
-                return .run { _ in
-                    if isPresented {
-                        await dismiss()
+
+                switch state.saveReportSource {
+                case .reportTitle: return .none
+                case .doneButton:
+                    return .run { _ in
+                        if isPresented {
+                            await dismiss()
+                        }
                     }
                 }
 
@@ -225,7 +238,10 @@ struct ReportFeature {
 
             case .doneButtonTapped:
                 if state.hasUnsavedChanges {
-                    state.confirmationDialog = makeConfirmDialog(isNew: state.savedReport == nil)
+                    state.confirmationDialog = makeConfirmDialog(
+                        isNew: state.isNewReport,
+                        reportSource: .doneButton
+                    )
                     return .none
                 }
                 return .run { _ in
@@ -268,11 +284,17 @@ private extension ReportFeature {
         }
     }
 
-    func makeConfirmDialog(isNew: Bool) -> ConfirmationDialogState<Action.ConfirmationDialog> {
+    func makeConfirmDialog(
+        isNew: Bool,
+        reportSource: State.SaveReportSource
+    ) -> ConfirmationDialogState<Action.ConfirmationDialog> {
         .init {
             TextState("")
         } actions: {
-            ButtonState(action: isNew ? .saveNewReport : .updateExistingReport) {
+            ButtonState(
+                action: isNew ?
+                    .saveNewReport : .updateExistingReport(source: reportSource)
+            ) {
                 TextState(AppStrings.saveButtonTitle)
             }
             ButtonState(role: .destructive, action: .discard) {
@@ -326,6 +348,20 @@ private extension ReportFeature {
 
 }
 
+extension ReportFeature.State {
+
+    enum SaveReportSource: Equatable {
+        case doneButton
+        case reportTitle
+    }
+
+    mutating func showSaveReportAlert(source: SaveReportSource) {
+        savedReportName = savedReport?.name ?? ""
+        showSavedReportNameAlert = true
+        saveReportSource = source
+    }
+}
+
 // MARK: -
 
 private enum Strings {
@@ -338,9 +374,9 @@ private enum Strings {
         comment: "Confirmation action to not save changes & exit"
     )
     static let confirmSaveNewReport = String(
-        localized: "Save New Report?", comment: "Confirmation message when saving a new report."
+        localized: "Save New Report", comment: "Confirmation message when saving a new report."
     )
     static let confirmUpdateSavedReport = String(
-        localized: "Update Saved Report?", comment: "Confirmation message when updating an existing saved report."
+        localized: "Update Report Name", comment: "Confirmation message when updating an existing saved report."
     )
 }

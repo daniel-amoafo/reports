@@ -52,7 +52,7 @@ private extension SpendingTotalChartView {
                         }
                     }
                 } else {
-                    Text(AppStrings.allCategoriesTitle)
+                    Text(store.listSubTitle)
                 }
             }
             .font(Typography.subheadlineEmphasized.font)
