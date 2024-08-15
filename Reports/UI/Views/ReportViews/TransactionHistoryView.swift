@@ -82,7 +82,7 @@ private extension TransactionHistoryView {
                         .foregroundStyle(Color.Text.secondary)
                 }
                 Spacer()
-                Text(entry.amountFormatted)
+                Text(entry.money.reportsFormatted)
                     .typography(.headlineEmphasized)
             }
             .padding(.horizontal)

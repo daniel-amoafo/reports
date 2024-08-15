@@ -54,7 +54,7 @@ private extension SpendingTrendChartView {
                         }
                     }
                 } else {
-                    Text(AppStrings.allCategoriesTitle)
+                    Text(store.listSubTitle)
                 }
             }
             .font(Typography.subheadlineEmphasized.font)

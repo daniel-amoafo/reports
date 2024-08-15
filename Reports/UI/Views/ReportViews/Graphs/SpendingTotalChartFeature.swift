@@ -101,7 +101,7 @@ struct SpendingTotalChartFeature {
             }
             // tally up all the totals for each record to provide a grand total
             let total = selected.map(\.total).reduce(.zero(currency), +)
-            return total.amountFormatted
+            return total.reportsFormatted
         }
 
         var listSubTitle: String {

@@ -82,6 +82,9 @@
     "Done" : {
       "comment" : "Button title to dismiss the current screen."
     },
+    "edit report name" : {
+      "comment" : "tap to enter the saved report name"
+    },
     "Enter a report name" : {
       "comment" : "Placeholder text advising to enter a report name for saving."
     },
@@ -172,6 +175,9 @@
     "Reconnect" : {
       "comment" : "Button title when unable to load app to a valid state"
     },
+    "Report Name" : {
+      "comment" : "Title for alert when a report name is required for saving."
+    },
     "Reports" : {
       "comment" : "Saved Reports screen tab title name"
     },
@@ -186,9 +192,6 @@
     },
     "Save New Report" : {
       "comment" : "Confirmation message when saving a new report."
-    },
-    "Save Report Name" : {
-      "comment" : "Title for alert when a report name is required for saving."
     },
     "Saved Report" : {
       "comment" : "The saved report alert title"

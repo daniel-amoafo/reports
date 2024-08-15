@@ -89,7 +89,7 @@ private extension SpendingTotalChartView {
                             Text(store.selectedGraphItem?.name ?? store.totalName)
                                 .typography(.title3Emphasized)
                                 .foregroundStyle(Color.Text.secondary)
-                            Text(store.selectedGraphItem?.total.amountFormatted ?? store.grandTotalValue)
+                            Text(store.selectedGraphItem?.total.reportsFormatted ?? store.grandTotalValue)
                                 .typography(.title2Emphasized)
                                 .foregroundStyle(Color.Text.primary)
                         }

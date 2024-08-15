@@ -126,6 +126,10 @@ struct SpendingTrendChartFeature {
             }
         }
 
+        var listSubTitle: String {
+            categorySelectionMode.title
+        }
+
         var categorySelectionMode: CategoryListFeature.CategorySelectionMode {
             categoryIds == nil ? .all : .some
         }

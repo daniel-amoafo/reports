@@ -39,11 +39,24 @@ struct ReportView: View {
             store.send(.onAppear)
         }
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar { toolbarLeading }
         .toolbar { toolbarPrincipal }
         .toolbar { toolbarTopTrailing }
         .background(Color.Surface.primary)
         .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
+    }
+
+    var toolbarLeading: some ToolbarContent {
+        ToolbarItemGroup(placement: .topBarLeading) {
+            if !store.isNewReport {
+                Button(Strings.editReportNameA11y, systemImage: "pencil.circle") {
+                    store.send(.reportTitleTapped)
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(Color.Text.primary)
+            }
+        }
     }
 
     var toolbarPrincipal: some ToolbarContent {
@@ -111,10 +124,14 @@ private extension ReportView {
 private enum Strings {
 
     static let saveReportAlertTitle = String(
-        localized: "Save Report Name", comment: "Title for alert when a report name is required for saving."
+        localized: "Report Name", comment: "Title for alert when a report name is required for saving."
     )
     static let saveReportPlaceholder = String(
         localized: "Enter a report name", comment: "Placeholder text advising to enter a report name for saving."
+    )
+
+    static let editReportNameA11y = String(
+        localized: "edit report name", comment: "tap to enter the saved report name"
     )
 }
 

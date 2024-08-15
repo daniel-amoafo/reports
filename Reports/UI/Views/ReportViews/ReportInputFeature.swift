@@ -169,7 +169,7 @@ struct ReportInputFeature {
                 return .none
 
             case .runReportTapped:
-                return .send(.delegate(.reportReadyToRun), animation: .smooth)
+                return runReport()
 
             case .selectAccountRowTapped:
                 state.selectedAccounts = .init(budgetId: state.budgetId)
@@ -182,6 +182,16 @@ struct ReportInputFeature {
                 )
                 return .none
 
+            case let .selectCategories(action):
+                switch action {
+                case .presented: return .none
+                case .dismiss:
+                    guard state.selectedAccountIds != nil else {
+                        return .none
+                    }
+                return runReport()
+                }
+
             case .onAppear:
                 // Ensure provided date is first day of month in FromDate
                 // and last day of month ToDate
@@ -189,7 +199,7 @@ struct ReportInputFeature {
                 state.toDate = state.toDate.lastDayInMonth()
                 return .none
 
-            case .delegate, .selectAccounts, .selectCategories:
+            case .delegate, .selectAccounts:
                 return .none
             }
         }
@@ -199,6 +209,10 @@ struct ReportInputFeature {
         .ifLet(\.$selectedCategories, action: \.selectCategories) {
             SelectCategoriesFeature()
         }
+    }
+
+    private func runReport() -> Effect<ReportInputFeature.Action> {
+        .send(.delegate(.reportReadyToRun), animation: .smooth)
     }
 }
 
