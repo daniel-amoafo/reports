@@ -181,8 +181,10 @@ private extension AppFeature {
             $0[$1.id] = $1.name
         }
         @Shared(.workspaceValues) var workspaceValues
-        workspaceValues.accountsOnBudgetNames = accountNames
-        workspaceValues.budgetCurrency = budget.currency
+        $workspaceValues.withLock {
+            $0.accountsOnBudgetNames = accountNames
+            $0.budgetCurrency = budget.currency
+        }
         Self.logger.debug("Workspace values synced.")
     }
 

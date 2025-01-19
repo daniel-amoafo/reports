@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		1800034D2BD6919B003C2804 /* ReportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1800034C2BD6919B003C2804 /* ReportView.swift */; };
 		180003512BD796D0003C2804 /* MockDataStubs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180003502BD796D0003C2804 /* MockDataStubs.swift */; };
+		181531522D3BB9FE004F22D6 /* SpendingHighLowChartFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181531512D3BB9FE004F22D6 /* SpendingHighLowChartFeature.swift */; };
+		181531552D3C9D6B004F22D6 /* SpendingHighLowChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181531542D3C9D6B004F22D6 /* SpendingHighLowChartView.swift */; };
+		181531572D3CA01F004F22D6 /* GraphTitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181531562D3CA01F004F22D6 /* GraphTitleView.swift */; };
 		183ECBB92B6F092B006C45B2 /* BudgetSystemService in Frameworks */ = {isa = PBXBuildFile; productRef = 183ECBB82B6F092B006C45B2 /* BudgetSystemService */; };
 		183ECBC12B70E0B6006C45B2 /* KeyValueStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 183ECBC02B70E0B6006C45B2 /* KeyValueStore.swift */; };
 		183ECBC32B70E0E3006C45B2 /* InMemoryKeyValueStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 183ECBC22B70E0E3006C45B2 /* InMemoryKeyValueStore.swift */; };
@@ -92,7 +95,6 @@
 		18BC9F4D2C11CBFD003B1E3D /* KleonGradient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18BC9F4C2C11CBFD003B1E3D /* KleonGradient.swift */; };
 		18C3BFB02B81874000E444C8 /* AppIntroLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C3BFAF2B81874000E444C8 /* AppIntroLoginView.swift */; };
 		18C3BFB22B820AEA00E444C8 /* SFSafariView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C3BFB12B820AEA00E444C8 /* SFSafariView.swift */; };
-		18C3BFB72B820DD000E444C8 /* Binding+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C3BFB62B820DD000E444C8 /* Binding+Additions.swift */; };
 		18C3BFBF2B82370B00E444C8 /* BudgetSystemService+Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C3BFBE2B82370B00E444C8 /* BudgetSystemService+Config.swift */; };
 		18C3BFC12B83993200E444C8 /* URL+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C3BFC02B83993200E444C8 /* URL+Additions.swift */; };
 		18C3BFC32B8399C600E444C8 /* URLTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C3BFC22B8399C600E444C8 /* URLTests.swift */; };
@@ -144,6 +146,9 @@
 /* Begin PBXFileReference section */
 		1800034C2BD6919B003C2804 /* ReportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportView.swift; sourceTree = "<group>"; };
 		180003502BD796D0003C2804 /* MockDataStubs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockDataStubs.swift; sourceTree = "<group>"; };
+		181531512D3BB9FE004F22D6 /* SpendingHighLowChartFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendingHighLowChartFeature.swift; sourceTree = "<group>"; };
+		181531542D3C9D6B004F22D6 /* SpendingHighLowChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendingHighLowChartView.swift; sourceTree = "<group>"; };
+		181531562D3CA01F004F22D6 /* GraphTitleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraphTitleView.swift; sourceTree = "<group>"; };
 		183ECBC02B70E0B6006C45B2 /* KeyValueStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyValueStore.swift; sourceTree = "<group>"; };
 		183ECBC22B70E0E3006C45B2 /* InMemoryKeyValueStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InMemoryKeyValueStore.swift; sourceTree = "<group>"; };
 		183ECBC42B70E10C006C45B2 /* Atomic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Atomic.swift; sourceTree = "<group>"; };
@@ -233,7 +238,6 @@
 		18C3BFAE2B806A7500E444C8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		18C3BFAF2B81874000E444C8 /* AppIntroLoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIntroLoginView.swift; sourceTree = "<group>"; };
 		18C3BFB12B820AEA00E444C8 /* SFSafariView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SFSafariView.swift; sourceTree = "<group>"; };
-		18C3BFB62B820DD000E444C8 /* Binding+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Binding+Additions.swift"; sourceTree = "<group>"; };
 		18C3BFBE2B82370B00E444C8 /* BudgetSystemService+Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BudgetSystemService+Config.swift"; sourceTree = "<group>"; };
 		18C3BFC02B83993200E444C8 /* URL+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Additions.swift"; sourceTree = "<group>"; };
 		18C3BFC22B8399C600E444C8 /* URLTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLTests.swift; sourceTree = "<group>"; };
@@ -295,6 +299,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		181531532D3C9D4B004F22D6 /* CategoryList */ = {
+			isa = PBXGroup;
+			children = (
+				185D4B1F2C1684E600020B41 /* CategoryListView.swift */,
+				185D4B212C16855800020B41 /* CategoryListFeature.swift */,
+				18ACA2692C1B339100D007CF /* CategoryListQueries.swift */,
+			);
+			path = CategoryList;
+			sourceTree = "<group>";
+		};
 		183ECBB72B6F092B006C45B2 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -403,7 +417,6 @@
 			children = (
 				184F126C2C6E25230047990D /* Money+Reports.swift */,
 				183ECBEA2B747460006C45B2 /* Array+Additions.swift */,
-				18C3BFB62B820DD000E444C8 /* Binding+Additions.swift */,
 				18C3BFBE2B82370B00E444C8 /* BudgetSystemService+Config.swift */,
 				183ECBE92B747460006C45B2 /* Collection+Additions.swift */,
 				18A1AE262BF339E10013EAD3 /* Date+Additions.swift */,
@@ -510,13 +523,14 @@
 		188A8E3E2BF21CF700938B81 /* Graphs */ = {
 			isa = PBXGroup;
 			children = (
-				18A514C82BD5001300B072DE /* SpendingTotalChartView.swift */,
+				181531532D3C9D4B004F22D6 /* CategoryList */,
 				18BC9F432C100D16003B1E3D /* SpendingTotalChartFeature.swift */,
-				188A8E3F2BF21D1E00938B81 /* SpendingTrendChartView.swift */,
+				18A514C82BD5001300B072DE /* SpendingTotalChartView.swift */,
 				18BC9F452C1046FB003B1E3D /* SpendingTrendChartFeature.swift */,
-				185D4B1F2C1684E600020B41 /* CategoryListView.swift */,
-				185D4B212C16855800020B41 /* CategoryListFeature.swift */,
-				18ACA2692C1B339100D007CF /* CategoryListQueries.swift */,
+				188A8E3F2BF21D1E00938B81 /* SpendingTrendChartView.swift */,
+				181531512D3BB9FE004F22D6 /* SpendingHighLowChartFeature.swift */,
+				181531542D3C9D6B004F22D6 /* SpendingHighLowChartView.swift */,
+				181531562D3CA01F004F22D6 /* GraphTitleView.swift */,
 			);
 			path = Graphs;
 			sourceTree = "<group>";
@@ -840,6 +854,7 @@
 				183ECBE12B747085006C45B2 /* Typography.swift in Sources */,
 				1856B68F2C09BAC900F1E0ED /* SelectAccountsView.swift in Sources */,
 				1868BACA2BE791B600757E78 /* SavedReportQuery.swift in Sources */,
+				181531522D3BB9FE004F22D6 /* SpendingHighLowChartFeature.swift in Sources */,
 				183F17052BF24186003C1334 /* MonthYearPickerView.swift in Sources */,
 				18BC9F462C1046FB003B1E3D /* SpendingTrendChartFeature.swift in Sources */,
 				188A44A22C0AE78B00F21721 /* SelectAccountsFeature.swift in Sources */,
@@ -876,7 +891,6 @@
 				18E2E0902C2584F2009ABB52 /* ReportAppFeature.swift in Sources */,
 				188AA90C2BFC3E7E0032F170 /* GRDBQueries.swift in Sources */,
 				1873E1992C08AB81003C49CD /* TransactionHistoryFeature.swift in Sources */,
-				18C3BFB72B820DD000E444C8 /* Binding+Additions.swift in Sources */,
 				185D4B202C1684E600020B41 /* CategoryListView.swift in Sources */,
 				18ACA26A2C1B339100D007CF /* CategoryListQueries.swift in Sources */,
 				188A8E402BF21D1E00938B81 /* SpendingTrendChartView.swift in Sources */,
@@ -900,11 +914,13 @@
 				183ECBC32B70E0E3006C45B2 /* InMemoryKeyValueStore.swift in Sources */,
 				1868BAC82BE78C2900757E78 /* Database.swift in Sources */,
 				18C3BFB02B81874000E444C8 /* AppIntroLoginView.swift in Sources */,
+				181531552D3C9D6B004F22D6 /* SpendingHighLowChartView.swift in Sources */,
 				18C3BFB22B820AEA00E444C8 /* SFSafariView.swift in Sources */,
 				18A146B82BEBA69300B4E74F /* ProcessorInfo.swift in Sources */,
 				186E8A382B9B34BA00E65BDE /* ListRowButtonStyle.swift in Sources */,
 				185D4B222C16855800020B41 /* CategoryListFeature.swift in Sources */,
 				188AA9082BF763A70032F170 /* Publisher+Async.swift in Sources */,
+				181531572D3CA01F004F22D6 /* GraphTitleView.swift in Sources */,
 				183ECBDF2B747085006C45B2 /* FloatingTitleRow.swift in Sources */,
 				183ECBEC2B747460006C45B2 /* String+Additions.swift in Sources */,
 				188F7B642C258B2A00C0469F /* OnboardingViewFeature.swift in Sources */,
@@ -1021,6 +1037,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
 			};
 			name = Debug;
 		};
@@ -1076,6 +1093,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_VERSION = 6.0;
 			};
 			name = Release;
 		};
@@ -1120,7 +1138,6 @@
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_STRICT_CONCURRENCY = complete;
-				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				_EXPERIMENTAL_SWIFT_EXPLICIT_MODULES = YES;
 			};
@@ -1163,7 +1180,6 @@
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_STRICT_CONCURRENCY = complete;
-				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				_EXPERIMENTAL_SWIFT_EXPLICIT_MODULES = YES;
 			};
@@ -1186,7 +1202,6 @@
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Reports.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Reports";
 			};
@@ -1209,7 +1224,6 @@
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Reports.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Reports";
 			};
@@ -1231,7 +1245,6 @@
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = Reports;
 			};
@@ -1253,7 +1266,6 @@
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = Reports;
 			};

@@ -76,7 +76,9 @@ struct CategoryListFeature {
                         toDate: state.toDate,
                         accountIds: state.accountIds
                     )
-                    state.transactionEntries = transactions.elements
+                    state.$transactionEntries.withLock {
+                        $0 = transactions.elements
+                    }
                     return .none
                 }
 
@@ -97,7 +99,7 @@ extension CategoryListFeature.State {
             listItems: [],
             chartNameColor: .init(names: []),
             categorySelectionMode: .all,
-            transactionEntries: Shared(nil)
+            transactionEntries: Shared(value: nil)
         )
     }
 }

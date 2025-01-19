@@ -62,7 +62,7 @@ struct OnboardingViewFeature {
                 guard let budgetId = state.selectedBudgetId else {
                     return .none
                 }
-                configProvider.selectedBudgetId = budgetId
+                configProvider.setSelectedBudgetId( budgetId)
 
                 return .send(.delegate(.didComplete), animation: .smooth)
 

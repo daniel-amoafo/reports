@@ -105,7 +105,7 @@ private enum Strings {
                 listItems: PreviewFactory.grocerySubcategoryToAny,
                 chartNameColor: PreviewFactory.namesForColors,
                 categorySelectionMode: .all,
-                transactionEntries: Shared(nil)
+                transactionEntries: Shared(value: nil)
             )
         ) {
             CategoryListFeature()

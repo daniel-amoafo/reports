@@ -32,7 +32,7 @@ extension ForEach where ID == Data.Element.ID,
 extension ForEach where ID == Data.Element.ID,
                         Data.Element: Identifiable,
                         Content: View {
-    init<T>(
+    init<T: Sendable>(
         _ data: Binding<T>,
         @ViewBuilder content: @escaping (T.Index, Binding<T.Element>) -> Content
     ) where Data == IdentifiableIndices<T>, T: MutableCollection {

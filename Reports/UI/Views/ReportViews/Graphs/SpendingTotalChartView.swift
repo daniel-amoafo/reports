@@ -3,7 +3,6 @@
 import BudgetSystemService
 import Charts
 import ComposableArchitecture
-
 import SwiftUI
 
 struct SpendingTotalChartView: View {
@@ -27,11 +26,8 @@ private extension SpendingTotalChartView {
     var mainContent: some View {
         VStack(spacing: .Spacing.pt24) {
             titles
-
             chart
-
             Divider()
-
             categoryList
         }
     }
@@ -57,7 +53,6 @@ private extension SpendingTotalChartView {
             }
             .font(Typography.subheadlineEmphasized.font)
             .foregroundStyle(Color.Text.primary)
-
         }
     }
 
@@ -158,7 +153,7 @@ extension SpendingTotalChartFeature.State {
             finishDate: .now.lastDayInMonth(),
             accountIds: "A1,A2,A3",
             categoryIds: "CAT-GROCERIES",
-            transactionEntries: Shared(nil)
+            transactionEntries: Shared(value: nil)
         )
     }
 
@@ -171,7 +166,7 @@ extension SpendingTotalChartFeature.State {
             accountIds: nil,
             categoryIds: nil,
             categoryGroups: [CategoryRecord](),
-            transactionEntries: Shared(nil)
+            transactionEntries: Shared(value: nil)
         )
     }
 }

@@ -34,9 +34,10 @@ struct ReportInputFeature {
             self.budgetId = budgetId
             self.fromDate = fromDate
             self.toDate = toDate
-            self._selectedCategoryIdsSet = Shared(WorkspaceValues.makeSet(for: selectedCategoryIds))
-            self.workspaceValues.updateSelectedAccountIds(ids: selectedAccountIds)
-
+            self._selectedCategoryIdsSet = Shared(value: WorkspaceValues.makeSet(for: selectedCategoryIds))
+            self.$workspaceValues.withLock {
+                $0.updateSelectedAccountIds(ids: selectedAccountIds)
+            }
             setCategories()
         }
 
@@ -89,7 +90,7 @@ struct ReportInputFeature {
         var toDateFormatted: String { Date.iso8601local.string(from: toDate) }
 
         func isEqual(to savedReport: SavedReport) -> Bool {
-            func accountIdsAreEqual(_ lhs: String, _ rhs: String) -> Bool {
+            func areSetsEqual(_ lhs: String, _ rhs: String) -> Bool {
                 if lhs == rhs {
                     return true
                 }
@@ -99,7 +100,8 @@ struct ReportInputFeature {
             }
             return savedReport.fromDate == fromDateFormatted &&
             savedReport.toDate == toDateFormatted &&
-            accountIdsAreEqual(savedReport.selectedAccountIds, selectedAccountIds ?? "")
+            areSetsEqual(savedReport.selectedAccountIds, selectedAccountIds ?? "") &&
+            areSetsEqual(savedReport.selectedCategoryIds, selectedCategoryIds ?? "")
         }
 
         mutating func setCategories() {
@@ -169,7 +171,7 @@ struct ReportInputFeature {
                 return .none
 
             case .runReportTapped:
-                return runReport()
+                return runReport(state)
 
             case .selectAccountRowTapped:
                 state.selectedAccounts = .init(budgetId: state.budgetId)
@@ -184,12 +186,10 @@ struct ReportInputFeature {
 
             case let .selectCategories(action):
                 switch action {
-                case .presented: return .none
+                case .presented:
+                    return .none
                 case .dismiss:
-                    guard state.selectedAccountIds != nil else {
-                        return .none
-                    }
-                return runReport()
+                    return runReport(state)
                 }
 
             case .onAppear:
@@ -211,8 +211,11 @@ struct ReportInputFeature {
         }
     }
 
-    private func runReport() -> Effect<ReportInputFeature.Action> {
-        .send(.delegate(.reportReadyToRun), animation: .smooth)
+    private func runReport(_ state: ReportInputFeature.State) -> Effect<ReportInputFeature.Action> {
+        guard state.selectedAccountIds != nil else {
+            return .none
+        }
+        return .send(.delegate(.reportReadyToRun), animation: .smooth)
     }
 }
 

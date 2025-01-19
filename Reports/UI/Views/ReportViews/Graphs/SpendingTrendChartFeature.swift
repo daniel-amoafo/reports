@@ -59,7 +59,8 @@ struct SpendingTrendChartFeature {
                     budgetId: budgetId,
                     fromDate: fromDate,
                     toDate: toDate,
-                    accountIds: accountIds
+                    accountIds: accountIds,
+                    categoryIds: categoryIds
                 )
             }
 
@@ -74,7 +75,8 @@ struct SpendingTrendChartFeature {
                     budgetId: budgetId,
                     fromDate: fromDate,
                     toDate: toDate,
-                    accountIds: accountIds
+                    accountIds: accountIds,
+                    categoryIds: categoryIds
                 )
             }
 
@@ -96,6 +98,17 @@ struct SpendingTrendChartFeature {
             case .subCategories:
                 return categoriesByCategoryGroupBars
             }
+        }
+
+        func popoverTotal(for date: Date) -> String {
+            @Dependency(\.configProvider) var configProvider
+            guard let currency = configProvider.currency else { return "" }
+            return selectedContent.filter({
+                $0.date == date
+            })
+            .map({ $0.total })
+            .reduce(Money.zero(currency), { $0 + $1 })
+            .amountFormatted
         }
 
         var maybeCategoryName: String? {
@@ -251,7 +264,8 @@ private enum SpendingTrendQueries {
         budgetId: String,
         fromDate: Date,
         toDate: Date,
-        accountIds: String?
+        accountIds: String?,
+        categoryIds: String?
     ) -> [TrendRecord] {
         do {
             let sqlBuilder = TrendRecord
@@ -259,7 +273,8 @@ private enum SpendingTrendQueries {
                     budgetId: budgetId,
                     fromDate: fromDate,
                     toDate: toDate,
-                    accountIds: accountIds
+                    accountIds: accountIds,
+                    categoryIds: categoryIds
                 )
 
             return try grdb.fetchRecords(builder: sqlBuilder)
@@ -302,14 +317,16 @@ private enum SpendingTrendQueries {
         budgetId: String,
         fromDate: Date,
         toDate: Date,
-        accountIds: String?
+        accountIds: String?,
+        categoryIds: String?
     ) -> [TrendRecord] {
         do {
             let sqlBuilder = TrendRecord.queryBySpendingTrendsLineMarks(
                 budgetId: budgetId,
                 fromDate: fromDate,
                 toDate: toDate,
-                accountIds: accountIds
+                accountIds: accountIds,
+                categoryIds: categoryIds
             )
 
             return try grdb.fetchRecords(builder: sqlBuilder)

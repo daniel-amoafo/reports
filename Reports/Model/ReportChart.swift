@@ -24,6 +24,11 @@ struct ReportChart: Identifiable, Equatable, Sendable {
                 description: Strings.spendingTrendDescription
             ),
             .init(
+                type: .spendingByHighLow,
+                name: Strings.spendingHighLowTitle,
+                description: Strings.spendingHighLowDescription
+            ),
+            .init(
                 type: .incomeExpensesTable,
                 name: Strings.incomeExpenseTitle,
                 description: Strings.incomeExpenseDescription
@@ -39,6 +44,7 @@ struct ReportChart: Identifiable, Equatable, Sendable {
 enum ChartType: Equatable, Sendable {
     case spendingByTotal
     case spendingByTrend
+    case spendingByHighLow
     case incomeExpensesTable
     case line
 
@@ -46,6 +52,7 @@ enum ChartType: Equatable, Sendable {
         switch self {
         case .spendingByTotal: return "spendingTotal"
         case .spendingByTrend: return "spendingTrend"
+        case .spendingByHighLow: return "spendingByHighLow"
         case .incomeExpensesTable: return "incomeVexpense"
         case .line: return "line"
         }
@@ -61,6 +68,8 @@ enum ChartType: Equatable, Sendable {
             return Image(.chartPie)
         case .incomeExpensesTable:
             return Image(.chartTable)
+        case .spendingByHighLow:
+            return Image(.chartLineHighLow)
         }
     }
 }
@@ -91,6 +100,14 @@ extension ReportChart {
         static let incomeExpenseDescription = String(
             localized: "A table summarising income & expenses for each category in a month",
             comment: "description text of the income expense chart"
+        )
+        static let spendingHighLowTitle = String(
+            localized: "Spending High/Low",
+            comment: "The title for a chart displaying the highest and lowest spending for each month."
+        )
+        static let spendingHighLowDescription = String(
+            localized: "A line chart showing the highest and lowest spending for each month.",
+            comment: "description text of the spending high low chart"
         )
     }
 

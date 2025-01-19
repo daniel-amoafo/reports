@@ -1,9 +1,11 @@
 // Created by Daniel Amoafo on 7/3/2024.
 
+import BudgetSystemService
 import Dependencies
 import Foundation
+import MoneyCommon
 
-final class ConfigProvider: Sendable {
+struct ConfigProvider {
 
     private let defaultStore: KeyValueStore
     private let secureStore: KeyValueStore
@@ -35,16 +37,20 @@ final class ConfigProvider: Sendable {
         return path
     }
 
+    var currency: Currency? {
+        guard let selectedBudgetId else { return nil }
+        return try? BudgetSummary.fetch(id: selectedBudgetId)?.currency
+    }
+
     var selectedBudgetId: String? {
-        get {
-            defaultStore.string(forKey: Key.selectedBudgetId.rawValue)
+        defaultStore.string(forKey: Key.selectedBudgetId.rawValue)
+    }
+
+    func setSelectedBudgetId(_ id: String) {
+        guard id != selectedBudgetId else {
+            return
         }
-        set {
-            guard newValue != selectedBudgetId else {
-                return
-            }
-            defaultStore.set(newValue, forKey: Key.selectedBudgetId.rawValue)
-        }
+        defaultStore.set(id, forKey: Key.selectedBudgetId.rawValue)
     }
 }
 

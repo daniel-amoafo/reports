@@ -11,7 +11,7 @@ import MoneyCommon
 /// see: https://api.ynab.com/#deltas
 struct ServerKnowledgeConfig: Codable, FetchableRecord, PersistableRecord, CustomDebugStringConvertible, Sendable {
 
-    nonisolated(unsafe) static let budgetSummary = belongsTo(BudgetSummary.self)
+    static let budgetSummary = belongsTo(BudgetSummary.self)
 
     let budgetId: String
 
@@ -45,9 +45,9 @@ extension BudgetSummary: @retroactive EncodableRecord {}
 extension BudgetSummary: @retroactive PersistableRecord {}
 extension BudgetSummary: @retroactive FetchableRecord {
 
-    nonisolated(unsafe) static let transactions = hasMany(TransactionEntry.self)
-    nonisolated(unsafe) static let dbAccounts = hasMany(Account.self)
-    nonisolated(unsafe) static let categoryGroup = hasMany(CategoryGroup.self)
+    static let transactions = hasMany(TransactionEntry.self)
+    static let dbAccounts = hasMany(Account.self)
+    static let categoryGroup = hasMany(CategoryGroup.self)
 
     public func encode(to container: inout PersistenceContainer) throws {
         container["id"] = id
@@ -80,7 +80,7 @@ extension Account: @retroactive EncodableRecord {}
 extension Account: @retroactive PersistableRecord {}
 extension Account: @retroactive FetchableRecord {
 
-    nonisolated(unsafe) static let budgetSummary = belongsTo(BudgetSummary.self)
+    static let budgetSummary = belongsTo(BudgetSummary.self)
 
     enum Column: String, CodingKey, ColumnExpression {
         case id, name, onBudget, closed, deleted
@@ -114,8 +114,8 @@ extension CategoryGroup: @retroactive EncodableRecord {}
 extension CategoryGroup: @retroactive PersistableRecord {}
 extension CategoryGroup: @retroactive FetchableRecord {
 
-    nonisolated(unsafe) static let budgetSummary = belongsTo(BudgetSummary.self)
-    nonisolated(unsafe) static let category = hasMany(Category.self)
+    static let budgetSummary = belongsTo(BudgetSummary.self)
+    static let category = hasMany(Category.self)
 
     enum Column: String, CodingKey, ColumnExpression {
         case id, name, hidden, deleted
@@ -149,8 +149,8 @@ extension Category: @retroactive EncodableRecord {}
 extension Category: @retroactive PersistableRecord {}
 extension Category: @retroactive FetchableRecord {
 
-    nonisolated(unsafe) static let budgetSummary = belongsTo(BudgetSummary.self)
-    nonisolated(unsafe) static let categoryGroup = belongsTo(CategoryGroup.self)
+    static let budgetSummary = belongsTo(BudgetSummary.self)
+    static let categoryGroup = belongsTo(CategoryGroup.self)
 
     enum Column: String, CodingKey, ColumnExpression {
         case id, name, hidden, deleted, categoryGroupId
@@ -184,7 +184,7 @@ extension TransactionEntry: @retroactive EncodableRecord {}
 extension TransactionEntry: @retroactive PersistableRecord {}
 extension TransactionEntry: @retroactive FetchableRecord {
 
-    nonisolated(unsafe) static let budgetSummary = belongsTo(BudgetSummary.self)
+    static let budgetSummary = belongsTo(BudgetSummary.self)
 
     var budgetSummary: QueryInterfaceRequest<BudgetSummary> {
         request(for: TransactionEntry.budgetSummary)

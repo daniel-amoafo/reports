@@ -31,7 +31,7 @@ private extension ModelContextNotifications {
 
     private static let impl = Self { modelType in
         AsyncStream(
-            NotificationCenter.default
+            UncheckedSendable(NotificationCenter.default
             // Should use ModelContext.didSave notificaion name
             // however due to be a bug as of iOS17.4, it does not fire when modelContext saved operation runs.
             // see https://developer.apple.com/forums/thread/731378
@@ -66,7 +66,7 @@ private extension ModelContextNotifications {
                     // Save notification did not include inserted or deleted objects
                     return false
                 }
-                .map { _ in }
+                .map { _ in })
         )
     }
 

@@ -108,19 +108,25 @@ struct SelectCategoriesFeature {
 
         func toggleGroupSelection(_ id: String, isSelected: Bool) {
             let categoryIds = Set(categoryIds(for: id))
-            selected = selected.filter {
-                !categoryIds.contains($0)
+            $selected.withLock {
+                $0 = selected.filter {
+                    !categoryIds.contains($0)
+                }
             }
             guard isSelected else { return }
 
-            selected = selected.union(categoryIds)
+            $selected.withLock {
+                $0 = selected.union(categoryIds)
+            }
         }
 
         func toggleCategoryIdSelection(_ id: String) {
-            if isCategoryIdSelected(id) {
-                selected.remove(id)
-            } else {
-                selected.insert(id)
+            $selected.withLock {
+                if isCategoryIdSelected(id) {
+                    $0.remove(id)
+                } else {
+                    $0.insert(id)
+                }
             }
         }
 
@@ -168,12 +174,14 @@ struct SelectCategoriesFeature {
                 return .none
             case .selectAll:
                 let allIds = state.categories.map(\.id)
-                state.selected.removeAll()
-                state.selected = .init(allIds)
+                state.$selected.withLock {
+                    $0.removeAll()
+                    $0 = .init(allIds)
+                }
                 return .none
 
             case .deselectAll:
-                state.selected.removeAll()
+                state.$selected.withLock { $0.removeAll() }
                 return .none
             }
         }

@@ -25,6 +25,9 @@
     "A bar chart showing spending trends." : {
       "comment" : "description text of the spending trend chart"
     },
+    "A line chart showing the highest and lowest spending for each month." : {
+      "comment" : "description text of the spending high low chart"
+    },
     "A pie chart showing spending totals by category for budget accounts." : {
       "comment" : "description text of the spending total chart"
     },
@@ -50,6 +53,9 @@
 
     },
     "Aug 23 - Dec 23, Main Budget" : {
+
+    },
+    "Bar %@" : {
 
     },
     "Budget Accounts" : {
@@ -91,6 +97,9 @@
     "From" : {
       "comment" : "the start date field title"
     },
+    "Hello, World!" : {
+
+    },
     "Hmm, something went wrong.\nPlease try again" : {
       "comment" : "text displayed when unable to load screen into a valid state. Ask the user to retry"
     },
@@ -108,6 +117,9 @@
     },
     "Let's Go" : {
       "comment" : "Submit button title"
+    },
+    "Line %@" : {
+
     },
     "Linear" : {
 
@@ -211,6 +223,9 @@
     "Select None" : {
       "comment" : "button to select deselect all accounts"
     },
+    "Selected" : {
+
+    },
     "Selected Values:" : {
 
     },
@@ -234,6 +249,9 @@
     },
     "Some Categories" : {
       "comment" : "A label indicating a few categories have been selected for the report."
+    },
+    "Spending High/Low" : {
+      "comment" : "The title for a chart displaying the highest and lowest spending for each month."
     },
     "Spending Total" : {
       "comment" : "The title for a chart displaying spending totals by category"

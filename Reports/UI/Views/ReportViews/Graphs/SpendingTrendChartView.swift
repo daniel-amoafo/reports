@@ -11,6 +11,7 @@ import SwiftUI
 struct SpendingTrendChartView: View {
 
     @Bindable var store: StoreOf<SpendingTrendChartFeature>
+    @State var rawSelectedDate: Date?
 
     var body: some View {
         Group {
@@ -29,11 +30,8 @@ private extension SpendingTrendChartView {
     var mainContent: some View {
         VStack(spacing: .Spacing.pt24) {
             headerTitles
-
             chart
-
             Divider()
-
             categoryList
         }
     }
@@ -96,6 +94,25 @@ private extension SpendingTrendChartView {
                 .foregroundStyle(Color.Line.fill)
                 .symbolSize(CGSize(width: 10, height: 10))
             }
+
+            if let selectedDate {
+                RuleMark(
+                    x: .value("Selected", selectedDate, unit: .month)
+                )
+                .foregroundStyle(Color.gray.opacity(0.3))
+                .offset(yStart: -10)
+                .zIndex(-1)
+                .annotation(
+                    position: .top,
+                    spacing: 0,
+                    overflowResolution: .init(
+                        x: .fit(to: .chart),
+                        y: .disabled
+                    )
+                ) {
+                    popoverRecordDetails(selectedDate)
+                }
+            }
         }
         .chartXAxis { xAxisMark }
         .chartYAxis { yAxisMark }
@@ -104,12 +121,49 @@ private extension SpendingTrendChartView {
             mapping: store.chartNameColor.colorFor
         )
         .scaledToFit()
+        .chartXSelection(value: $rawSelectedDate)
     }
 
     var categoryList: some View {
         CategoryListView(
             store: store.scope(state: \.categoryList, action: \.categoryList)
         )
+    }
+
+}
+
+// MARK: - Chart Components
+
+private extension SpendingTrendChartView {
+
+    var selectedDate: Date? {
+        if let rawSelectedDate {
+            return store.selectedContent.first(where: {
+                let firstOfMonth = $0.date.firstDayInMonth()
+                let lastOfMonth = $0.date.lastDayInMonth()
+
+                return (firstOfMonth ... lastOfMonth).contains(rawSelectedDate)
+            })?.date
+        }
+        return nil
+    }
+
+    @ViewBuilder
+    func popoverRecordDetails(_ date: Date) -> some View {
+        if let lineRecord = store.lineBarContent.first(where: {
+               $0.date == date
+           }) {
+            VStack {
+                Text("\(date.formatted(date: .abbreviated, time: .omitted))")
+                Text("Bar \(store.state.popoverTotal(for: date))")
+                Text("Line \(lineRecord.total.amountFormatted)")
+            }
+            .padding(6)
+            .background {
+                RoundedRectangle(cornerRadius: 4)
+                    .foregroundStyle(Color.gray.opacity(0.12))
+            }
+        }
     }
 
     var xAxisMark: AnyAxisContent {
@@ -132,7 +186,6 @@ private extension SpendingTrendChartView {
             }
         )
     }
-
 }
 
 private enum Strings {
@@ -176,7 +229,7 @@ private extension SpendingTrendChartFeature.State {
             toDate: .now.lastDayInMonth(),
             accountIds: nil,
             categoryIds: nil,
-            transactionEntries: Shared(nil)
+            transactionEntries: Shared(value: nil)
         )
     }
 
@@ -188,7 +241,7 @@ private extension SpendingTrendChartFeature.State {
             toDate: .now.lastDayInMonth(),
             accountIds: nil,
             categoryIds: nil,
-            transactionEntries: Shared(nil),
+            transactionEntries: Shared(value: nil),
             categoryGroupsBar: [TrendRecord](),
             categoryGroupsLine: [TrendRecord]()
         )

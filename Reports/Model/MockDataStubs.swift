@@ -60,7 +60,7 @@ enum MockData {
     }
 
     static func insertConfigData(_ config: ConfigProvider) {
-        config.selectedBudgetId = IdentifiedArrayOf<BudgetSummary>.mocks[0].id
+        config.setSelectedBudgetId(IdentifiedArrayOf<BudgetSummary>.mocks[0].id)
     }
 
     static func updateWorkspaceValues(budgetCurrency: Currency, accounts: [Account]) {
@@ -69,8 +69,10 @@ enum MockData {
             $0[$1.id] = $1.name
         }
         @Shared(.workspaceValues) var workspaceValues
-        workspaceValues.accountsOnBudgetNames = accountNames
-        workspaceValues.budgetCurrency = budgetCurrency
+        $workspaceValues.withLock {
+            $0.accountsOnBudgetNames = accountNames
+            $0.budgetCurrency = budgetCurrency
+        }
     }
 }
 

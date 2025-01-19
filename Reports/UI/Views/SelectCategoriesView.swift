@@ -162,7 +162,7 @@ private enum PreviewFactory {
 
     static var stateWithSelectedValues: SelectCategoriesFeature.State {
         .init(
-            selected: Shared(selectedCategories),
+            selected: Shared(value: selectedCategories),
             budgetId: budgetId
         )
     }

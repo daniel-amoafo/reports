@@ -37,8 +37,8 @@ struct SelectAccountsFeature {
         var selectedAccountIdsSet: Binding<Set<String>> {
             .init {
                 workspaceValues.selectedAccountIdsSet
-            } set: {
-                workspaceValues.selectedAccountIdsSet = $0
+            } set: { newValue in
+                $workspaceValues.withLock { $0.selectedAccountIdsSet = newValue }
             }
         }
 
@@ -73,15 +73,19 @@ struct SelectAccountsFeature {
         mutating func toggleAll(for other: IdentifiedArrayOf<Account>, isSelected: Bool) {
             let otherIds = other.elements.map(\.id)
             // Remove all other list ids from selectedIds
-            workspaceValues.selectedAccountIdsSet = workspaceValues.selectedAccountIdsSet.filter {
-                !otherIds.contains($0)
+            $workspaceValues.withLock {
+                $0.selectedAccountIdsSet = workspaceValues.selectedAccountIdsSet.filter {
+                    !otherIds.contains($0)
+                }
             }
 
             guard isSelected else { return }
 
             // Add all other list ids to selectedIds
             for otherId in otherIds {
-                workspaceValues.selectedAccountIdsSet.insert(otherId)
+                $workspaceValues.withLock {
+                    _ = $0.selectedAccountIdsSet.insert(otherId)
+                }
             }
         }
     }

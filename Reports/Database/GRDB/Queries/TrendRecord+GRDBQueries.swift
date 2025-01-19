@@ -12,7 +12,8 @@ extension TrendRecord {
         budgetId: String,
         fromDate: Date,
         toDate: Date,
-        accountIds: String?
+        accountIds: String?,
+        categoryIds: String?
     ) -> GRDBDatabase.RecordSQLBuilder<TrendRecord> {
         .init(
             record: TrendRecord.self,
@@ -29,6 +30,7 @@ extension TrendRecord {
             AND transactionEntry.deleted <> 1
             """ +
             .andAccountIds(accountIds) +
+            .andCategoryIds(categoryIds) +
             """
             AND transactionEntry.budgetSummaryId = :budgetId
             AND ((categoryGroup.name = 'Internal Master Category' AND category.name = 'Uncategorized' ) OR categoryGroup.name <> 'Internal Master Category')
@@ -86,7 +88,8 @@ extension TrendRecord {
         budgetId: String,
         fromDate: Date,
         toDate: Date,
-        accountIds: String?
+        accountIds: String?,
+        categoryIds: String?
     ) -> GRDBDatabase.RecordSQLBuilder<TrendRecord> {
         .init(
             record: TrendRecord.self,
@@ -102,6 +105,7 @@ extension TrendRecord {
             AND transactionEntry.deleted <> 1
             """ +
             .andAccountIds(accountIds) +
+            .andCategoryIds(categoryIds) +
             """
             AND transactionEntry.budgetSummaryId = :budgetId
             AND ((categoryGroup.name = 'Internal Master Category' AND category.name = 'Uncategorized' ) OR categoryGroup.name <> 'Internal Master Category')

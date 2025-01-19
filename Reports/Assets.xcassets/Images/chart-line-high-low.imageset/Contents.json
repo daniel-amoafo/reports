@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "chart-line-high-low.pdf",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

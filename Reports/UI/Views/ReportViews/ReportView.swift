@@ -208,7 +208,7 @@ private enum Factory {
                     finishDate: Date.distantFuture,
                     accountIds: nil,
                     categoryIds: nil,
-                    transactionEntries: Shared(nil)
+                    transactionEntries: Shared(value: nil)
                 )
             )
         )

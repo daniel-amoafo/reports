@@ -89,7 +89,7 @@ struct ReportFeature {
             self.destination = destination
             self.scrollToId = scrollToId
             self.showSavedReportNameAlert = showSavedReportNameAlert
-            self._transactionEntries = Shared(nil)
+            self._transactionEntries = Shared(value: nil)
         }
     }
 
@@ -120,6 +120,7 @@ struct ReportFeature {
     enum ChartGraph {
         case spendingByTotal(SpendingTotalChartFeature)
         case spendingByTrend(SpendingTrendChartFeature)
+        case spendingByHighLow(SpendingHighLowChartFeature)
     }
 
     @Reducer(state: .equatable)
@@ -201,6 +202,7 @@ struct ReportFeature {
                             transactionEntries: state.$transactionEntries
                         )
                     )
+
                 case .spendingByTrend:
                     state.chartGraph = .spendingByTrend(
                         SpendingTrendChartFeature.State(
@@ -213,8 +215,20 @@ struct ReportFeature {
                             transactionEntries: state.$transactionEntries
                         )
                     )
+                case .spendingByHighLow:
+                    state.chartGraph = .spendingByHighLow(
+                        SpendingHighLowChartFeature.State(
+                            title: chartTitle,
+                            budgetId: state.budgetId,
+                            fromDate: state.inputFields.fromDate,
+                            toDate: state.inputFields.toDate,
+                            accountIds: state.inputFields.selectedAccountIds
+                        )
+                    )
+
                 case .incomeExpensesTable:
                     break
+
                 case .line:
                     break
                 }

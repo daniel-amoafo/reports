@@ -135,7 +135,7 @@ struct HomeFeature: Sendable {
 private extension HomeFeature {
 
     func updateBudgetClientSelectedBudgetId(_ selectedBudgetId: String) {
-        configProvider.selectedBudgetId = selectedBudgetId
+        configProvider.setSelectedBudgetId(selectedBudgetId)
     }
 
 }
