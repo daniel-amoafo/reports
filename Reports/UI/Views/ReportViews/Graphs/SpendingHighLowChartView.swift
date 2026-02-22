@@ -9,7 +9,7 @@ struct SpendingHighLowChartView: View {
     @Bindable var store: StoreOf<SpendingHighLowChartFeature>
 
     var body: some View {
-        Text("Hello, World!")
+        mainContent
     }
 }
 
@@ -17,12 +17,16 @@ private extension SpendingHighLowChartView {
 
     var mainContent: some View {
         VStack(spacing: .Spacing.pt24) {
-            GraphTitleView(
-                title: store.title,
-                listSubTitle: "",
-                selected: ("Selected Category", { print("selected tapped") })
-            )
+            title
         }
+    }
+
+    var title: some View {
+        GraphTitleView(
+            title: store.title,
+            listSubTitle: "",
+            selected: nil
+        )
     }
 }
 

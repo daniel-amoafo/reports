@@ -127,6 +127,14 @@ private extension Typography {
             return
         }
 
+        // TODO switch to using CTFontManagerCreateFontDescriptorsFromData or CTFontManagerRegisterFontsForURL instead of deprecated API
+//        CTFontManagerCreateFontDescriptorsFromData
+//        CTFontManagerRegisterFontURLs(
+//            <#T##CFArray#>,
+//            <#T##CTFontManagerScope#>,
+//            <#T##Bool#>,
+//            <#T##((CFArray, Bool) -> Bool)?#>
+//        )
         CTFontManagerRegisterGraphicsFont(font, nil)
 
         if let fullName = font.fullName as? String {

@@ -226,7 +226,7 @@ private extension GRDBDatabase {
 
 extension GRDBDatabase {
 
-    func save(record: PersistableRecord) throws {
+    func save(record: any PersistableRecord) throws {
         try save(records: [record])
     }
 
@@ -238,7 +238,7 @@ extension GRDBDatabase {
         }
     }
 
-    func save(records: [PersistableRecord], in db: GRDB.Database) throws {
+    func save(records: [any PersistableRecord], in db: GRDB.Database) throws {
         for record in records {
             try record.save(db)
         }

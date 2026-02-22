@@ -52,9 +52,9 @@ extension BudgetClient: @retroactive DependencyKey {
 
 extension BudgetClient: @retroactive TestDependencyKey {
 
-    public static var testValue = BudgetClient.testsAndPreviews
+    public static let testValue = BudgetClient.testsAndPreviews
 
-    public static var previewValue = BudgetClient.testsAndPreviews
+    public static let previewValue = BudgetClient.testsAndPreviews
 }
 
 extension DependencyValues {
