@@ -112,6 +112,11 @@ private extension ReportView {
                 action: \.chartGraph.spendingByTrend
             ) {
                 SpendingTrendChartView(store: store)
+            } else if let store = store.scope(
+                state: \.chartGraph?.incomeExpenseTable,
+                action: \.chartGraph.incomeExpenseTable
+            ) {
+                IncomeExpenseChartView(store: store)
             }
         }
         .id(store.chartContainerId)

@@ -72,7 +72,19 @@ private extension TransactionHistoryView {
 
     func rowView(for entry: TransactionEntry) -> some View {
         VStack(spacing: 0) {
-            HStack {
+            HStack(spacing: .Spacing.pt16) {
+                // Category Icon
+                ZStack {
+                    Circle()
+                        .fill(entry.rawAmount >= 0 ? Color(hex: "#10b981")
+                            .opacity(0.15) : Color(hex: "#ef4444").opacity(0.15))
+                        .frame(width: 40, height: 40)
+
+                    Image(systemName: categoryIconName(for: entry))
+                        .foregroundStyle(entry.rawAmount >= 0 ? Color(hex: "#10b981") : Color(hex: "#ef4444"))
+                        .font(.system(size: 16, weight: .semibold))
+                }
+
                 VStack(alignment: .leading, spacing: .Spacing.pt4) {
                     Text(entry.payeeName ?? "[No Payee Details]")
                         .typography(.headlineEmphasized)
@@ -84,10 +96,20 @@ private extension TransactionHistoryView {
                 Spacer()
                 Text(entry.money.reportsFormatted)
                     .typography(.headlineEmphasized)
+                    .foregroundStyle(entry.rawAmount >= 0 ? Color(hex: "#10b981") : Color.Text.primary)
             }
             .padding(.horizontal)
             .padding(.vertical, .Spacing.pt8)
             HorizontalDivider()
+        }
+    }
+
+    func categoryIconName(for entry: TransactionEntry) -> String {
+        // Simple mapping based on common YNAB categories or amount sign
+        if entry.rawAmount >= 0 {
+            return "arrow.down.right.circle.fill"
+        } else {
+            return "cart.fill" // Default for expenses
         }
     }
 

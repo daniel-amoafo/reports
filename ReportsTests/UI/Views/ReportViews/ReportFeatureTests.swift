@@ -21,7 +21,7 @@ import XCTest
      }
 
      override func tearDown() async throws {
-         try? store.dependencies.database.swiftData.delete(model: SavedReport.self)
+         try await store.dependencies.database.swiftData.delete(model: SavedReport.self)
      }
 
     @MainActor
@@ -87,9 +87,9 @@ import XCTest
         XCTAssertFalse(store.state.inputFields.isRunReportDisabled)
 
         await store.send(.onAppear) {
-            $0.inputFields
-                .workspaceValues
-                .selectedAccountIdsSet = Set(["account2ID", "account3ID"])
+            $0.inputFields.$workspaceValues.withLock {
+                $0.selectedAccountIdsSet = Set(["account2ID", "account3ID"])
+            }
         }
         await store.receive(\.reportReadyToRun) {
             $0.chartGraph = .spendingByTotal(
@@ -98,7 +98,9 @@ import XCTest
                     budgetId: savedReport.budgetId,
                     startDate: Date.local.date(from: savedReport.fromDate)!,
                     finishDate: Date.local.date(from: savedReport.toDate)!,
-                    accountIds: self.store.state.inputFields.selectedAccountIds
+                    accountIds: self.store.state.inputFields.selectedAccountIds,
+                    categoryIds: self.store.state.inputFields.selectedCategoryIds,
+                    transactionEntries: self.store.state.$transactionEntries
                 )
             )
         }
@@ -116,7 +118,7 @@ import XCTest
             $0.confirmationDialog = Factory.expectedUpdateExistingConfirmationDialog
         }
 
-        await store.send(.confirmationDialog(.presented(.updateExistingReport))) {
+        await store.send(.confirmationDialog(.presented(.updateExistingReport(source: .doneButton)))) {
             $0.confirmationDialog = nil
             $0.showSavedReportNameAlert = true
             $0.savedReportName = "My First Report"
@@ -167,6 +169,7 @@ private enum Factory {
         "account3ID": "Third Account",
     ]
 
+    @MainActor
     static func createTestStore(
         sourceData: SourceData,
         chartGraph: ChartGraph.State? = nil,
@@ -205,6 +208,7 @@ private enum Factory {
             chartId: ReportChart.firstChart.id,
             budgetId: budgetId,
             selectedAccountIds: "account2ID,account3ID",
+            selectedCategoryIds: "cat1ID,cat2ID",
             lastModified: Date.local.date(from: "2024-02-02")!
         )
     }
@@ -231,7 +235,7 @@ private enum Factory {
         .init {
             TextState("")
         } actions: {
-            ButtonState(action: .updateExistingReport) {
+            ButtonState(action: .updateExistingReport(source: .doneButton)) {
                 TextState("Save")
             }
             ButtonState(role: .destructive, action: .discard) {

@@ -5,6 +5,6 @@ import Foundation
 
 public extension Date {
 
-    static let local: ISO8601DateFormatter = Date.iso8601local
+    nonisolated(unsafe) static let local: ISO8601DateFormatter = Date.iso8601local
 
 }

@@ -10,9 +10,14 @@ struct ReportFeature {
     @ObservableState
     struct State: Equatable {
 
-        enum SourceData: Sendable {
+        enum SourceData: Equatable, Sendable {
             case new(ReportInputFeature.State)
             case existing(UUID)
+        }
+
+        enum SaveReportSource: Equatable {
+            case doneButton
+            case reportTitle
         }
 
         var inputFields: ReportInputFeature.State
@@ -91,6 +96,15 @@ struct ReportFeature {
             self.showSavedReportNameAlert = showSavedReportNameAlert
             self._transactionEntries = Shared(value: nil)
         }
+
+        static func == (lhs: State, rhs: State) -> Bool {
+            lhs.inputFields == rhs.inputFields &&
+            lhs.savedReport?.id == rhs.savedReport?.id &&
+            lhs.scrollToId == rhs.scrollToId &&
+            lhs.showSavedReportNameAlert == rhs.showSavedReportNameAlert &&
+            lhs.savedReportName == rhs.savedReportName &&
+            lhs.saveReportSource == rhs.saveReportSource
+        }
     }
 
     enum Action: BindableAction, Sendable {
@@ -116,14 +130,15 @@ struct ReportFeature {
 
     }
 
-    @Reducer(state: .equatable)
+    @Reducer
     enum ChartGraph {
         case spendingByTotal(SpendingTotalChartFeature)
         case spendingByTrend(SpendingTrendChartFeature)
         case spendingByHighLow(SpendingHighLowChartFeature)
+        case incomeExpenseTable(IncomeExpenseChartFeature)
     }
 
-    @Reducer(state: .equatable)
+    @Reducer
     enum Destination {
       case transactionHistory(TransactionHistoryFeature)
     }
@@ -227,7 +242,16 @@ struct ReportFeature {
                     )
 
                 case .incomeExpensesTable:
-                    break
+                    state.chartGraph = .incomeExpenseTable(
+                        IncomeExpenseChartFeature.State(
+                            title: chartTitle,
+                            budgetId: state.budgetId,
+                            fromDate: state.inputFields.fromDate,
+                            toDate: state.inputFields.toDate,
+                            accountIds: state.inputFields.selectedAccountIds,
+                            categoryIds: state.inputFields.selectedCategoryIds
+                        )
+                    )
 
                 case .line:
                     break
@@ -363,11 +387,6 @@ private extension ReportFeature {
 }
 
 extension ReportFeature.State {
-
-    enum SaveReportSource: Equatable {
-        case doneButton
-        case reportTitle
-    }
 
     mutating func showSaveReportAlert(source: SaveReportSource) {
         savedReportName = savedReport?.name ?? ""

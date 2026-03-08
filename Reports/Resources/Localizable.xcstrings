@@ -10,6 +10,9 @@
     "[No Reports]" : {
 
     },
+    "%.1f%% vs last period" : {
+
+    },
     "%@" : {
 
     },
@@ -76,6 +79,9 @@
     "Chart" : {
       "comment" : "the title name for the chart section"
     },
+    "Chart Type" : {
+
+    },
     "Closed Accounts" : {
       "comment" : "Title for accounts that have been closed."
     },
@@ -93,6 +99,9 @@
     },
     "Enter a report name" : {
       "comment" : "Placeholder text advising to enter a report name for saving."
+    },
+    "Financial Report" : {
+
     },
     "From" : {
       "comment" : "the start date field title"
@@ -266,6 +275,15 @@
       "comment" : "the end date field title"
     },
     "Total Spending" : {
+
+    },
+    "Track your income & expenses" : {
+
+    },
+    "Trend Analysis" : {
+
+    },
+    "Type" : {
 
     },
     "Update Report Name" : {

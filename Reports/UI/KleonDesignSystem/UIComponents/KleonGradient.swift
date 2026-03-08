@@ -40,6 +40,10 @@ enum KleonGradient {
         )
     }
 
+    static var purpleDusk: LinearGradient {
+        linear(colors: [Color(hex: "#6418c3"), Color(hex: "#a700a3")])
+    }
+
     static func onboarding() -> EllipticalGradient {
         let colorStops: [Gradient.Stop] = [
             .init(color: Color.Onboarding.stop1, location: 0.1),
